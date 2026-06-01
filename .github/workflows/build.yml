@@ -58,7 +58,10 @@ jobs:
       - name: 执行构建
         env:
           GRADLE_OPTS: "-Xmx4096m -Dorg.gradle.logging.level=quiet"
-        run: ./gradlew clean :app:assembleDebug --no-daemon --console=plain
+        run: |
+          gradle wrapper --gradle-version 8.7
+          chmod +x gradlew
+          ./gradlew clean :app:assembleDebug --no-daemon --console=plain
 
       - name: 提取产物
         id: copy_apk

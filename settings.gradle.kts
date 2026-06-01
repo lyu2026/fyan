@@ -14,6 +14,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "fyan-universal-project"
+rootProject.name = "fyan"
 
 include(":app")

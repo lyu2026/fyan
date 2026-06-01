@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  build-and-release:
+  o:
     runs-on: ubuntu-latest
     steps:
       - name: 拉取代码
@@ -57,11 +57,12 @@ jobs:
 
       - name: 执行构建
         env:
-          GRADLE_OPTS: "-Xmx4096m -Dorg.gradle.logging.level=quiet"
+          GRADLE_OPTS: "-Xmx3072m -XX:MaxMetaspaceSize=1024m -Dorg.gradle.logging.level=quiet"
         run: |
           gradle wrapper --gradle-version 8.7
           chmod +x gradlew
-          ./gradlew clean :app:assembleDebug --no-daemon --console=plain
+          ./gradlew --stop
+          ./gradlew clean :app:assembleDebug --no-daemon --console=plain --quiet
 
       - name: 提取产物
         id: copy_apk

@@ -1,0 +1,76 @@
+name: 打包
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 拉取代码
+        uses: actions/checkout@v4
+
+      - name: 制作图标
+        run: |
+          sudo apt-get update && sudo apt-get install -y librsvg2-bin
+          mkdir -p app/src/main/res/mipmap-mdpi
+          mkdir -p app/src/main/res/mipmap-hdpi
+          mkdir -p app/src/main/res/mipmap-xhdpi
+          mkdir -p app/src/main/res/mipmap-xxhdpi
+          mkdir -p app/src/main/res/mipmap-xxxhdpi
+          mkdir -p app/src/main/res/drawable-nodpi
+          cat << 'EOF' > icon.svg
+          <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'>
+          <path fill='#182f7c' d='M22 160C24.454 143.054 16.5853 132.65 13.4815 116C9.97234 97.1759 12.736 78.2877 20.9155 61C26.0869 50.0703 33.9203 40.2336 43 32.3156C51.482 24.9189 61.375 19.0889 72 15.3539C148.419 -11.5096 215.961 76.5528 176.557 145C169.578 157.123 159.687 167.613 148 175.289C129.186 187.646 105.13 193.147 83 188.101C67.2432 184.509 55.4391 173.824 39 178L39 180C71.5954 201.934 113.59 208.388 149 188.107C211.847 152.113 216.694 57.2914 156 16.5412C106.911 -16.4176 37.3621 1.39795 11.2711 55C-0.893272 79.9908 -2.33571 109.918 7.4357 136C10.4118 143.944 14.4601 155.464 22 160z'/>
+          <path fill='#e7012f' d='M152 32C129.661 54.2096 100.324 57.2205 75 73.7193C43.9509 93.9482 23.9661 142.848 22 179C37.5865 160.674 46.6722 137.953 65.0033 121.197C77.1959 110.051 90.6913 101.114 106 94.8735C116.446 90.6153 127.88 89.3212 136.94 82.0781C148.864 72.5449 157.553 46.8596 152 32z'/>
+          <path fill='#fdd10d' d='M29 173C43.0987 162.737 53.7887 151.332 70 143.794C98.7821 130.409 129.676 132.568 139 95C99.2805 102.494 70.5991 114.991 45.1159 148C39.2031 155.659 31.9352 163.64 29 173z'/>
+          <path fill='#189b46' d='M109 141C99.6665 144.353 89.6053 142.785 80 144.495C62.1128 147.679 34.3205 163.533 26 180C35.3374 176.038 43.8144 171.84 54 170.329C67.3509 168.348 80.8788 170.053 93 162.874C99.4792 159.036 110.743 149.55 109 141z'/>
+          <path fill='#182f7c' d='M12.0314 180.845C-0.397656 185.854 8.59856 204.19 20.9267 199.02C32.7652 194.055 23.5938 176.186 12.0314 180.845z'/>
+          </svg>
+          EOF
+          cat << 'EOF' > tv.svg
+          <svg xmlns='http://www.w3.org/2000/svg' width='320' height='180' viewBox='0 0 427 240'>
+          <rect width='427' height='240' fill='#fff'/>
+          <path fill="#182f7c" d="m135.52859,179.85488c2.454,-16.946 -5.4147,-27.35 -8.5185,-44c-3.50916,-18.8241 -0.7455,-37.7123 7.434,-55c5.1714,-10.9297 13.0048,-20.7664 22.0845,-28.6844c8.482,-7.3967 18.375,-13.2267 29,-16.9617c76.419,-26.8635 143.961,61.1989 104.557,129.6461c-6.979,12.123 -16.87,22.613 -28.557,30.289c-18.814,12.357 -42.87,17.858 -65,12.812c-15.7568,-3.592 -27.5609,-14.277 -44,-10.101l0,2c32.5954,21.934 74.59,28.388 110,8.107c62.847,-35.994 67.694,-130.8156 7,-171.5658c-49.089,-32.9588 -118.6379,-15.14325 -144.7289,38.4588c-12.16437,24.9908 -13.60681,54.918 -3.8354,81c2.9761,7.944 7.0244,19.464 14.5643,24z"/>
+          <path fill="#e7012f" d="m265.52859,51.85488c-22.339,22.2096 -51.676,25.2205 -77,41.7193c-31.0491,20.2289 -51.0339,69.1287 -53,105.2807c15.5865,-18.326 24.6722,-41.047 43.0033,-57.803c12.1926,-11.146 25.688,-20.083 40.9967,-26.3235c10.446,-4.2582 21.88,-5.5523 30.94,-12.7954c11.924,-9.5332 20.613,-35.2185 15.06,-50.0781z"/>
+          <path fill="#fdd10d" d="m142.52859,192.85488c14.0987,-10.263 24.7887,-21.668 41,-29.206c28.7821,-13.385 59.676,-11.226 69,-48.794c-39.7195,7.494 -68.4009,19.991 -93.8841,53c-5.9128,7.659 -13.1807,15.64 -16.1159,25z"/>
+          <path fill="#189b46" d="m222.52859,160.85488c-9.3335,3.353 -19.3947,1.785 -29,3.495c-17.8872,3.184 -45.6795,19.038 -54,35.505c9.3374,-3.962 17.8144,-8.16 28,-9.671c13.3509,-1.981 26.8788,-0.276 39,-7.455c6.4792,-3.838 17.743,-13.324 16,-21.874z"/>
+          <path fill="#182f7c" d="m125.55999,200.69988c-12.42906,5.009 -3.43284,23.345 8.8953,18.175c11.8385,-4.965 2.6671,-22.834 -8.8953,-18.175z"/>
+          </svg>
+          EOF
+          echo "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" | base64 -d > app/src/main/res/drawable-nodpi/splash.png
+          rsvg-convert -w 48 -h 48 icon.svg -o app/src/main/res/mipmap-mdpi/icon.png
+          rsvg-convert -w 72 -h 72 icon.svg -o app/src/main/res/mipmap-hdpi/icon.png
+          rsvg-convert -w 96 -h 96 icon.svg -o app/src/main/res/mipmap-xhdpi/icon.png
+          rsvg-convert -w 144 -h 144 icon.svg -o app/src/main/res/mipmap-xxhdpi/icon.png
+          rsvg-convert -w 192 -h 192 icon.svg -o app/src/main/res/mipmap-xxxhdpi/icon.png
+          rsvg-convert -w 320 -h 180 tv.svg -o app/src/main/res/drawable-nodpi/tv.png
+
+      - name: 整理文件
+        run: |
+          mkdir -p app/src/main/kotlin/com/fyan
+          mkdir -p app/src/main/res/xml
+          mv src/*.kt app/src/main/kotlin/com/fyan/
+          mv xml/AndroidManifest.xml app/src/main/
+          find xml/ -type f ! -name 'AndroidManifest.xml' -exec mv {} app/src/main/res/xml/ \; || true
+          mv app_build.gradle.kts app/build.gradle.kts
+          mv settings.gradle.kts ./
+          mv build.gradle.kts ./
+
+      - name: 安装环境
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: 安卓打包
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          argument: :app:assembleDebug
+
+      - name: 上传包件
+        uses: actions/upload-artifact@v4
+        with:
+          name: fyan
+          path: app/build/outputs/apk/debug/*.apk

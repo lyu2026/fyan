@@ -16,6 +16,10 @@ android {
         versionName = "1.0"
     }
 
+    kotlin {
+        jvmToolchain(17)
+    }
+
     sourceSets {
         getByName("main") {
             java.setSrcDirs(listOf("src/main/kotlin"))

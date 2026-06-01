@@ -20,6 +20,7 @@ jobs:
           mkdir -p app/src/main/res/mipmap-xxhdpi
           mkdir -p app/src/main/res/mipmap-xxxhdpi
           mkdir -p app/src/main/res/drawable-nodpi
+          
           cat << 'EOF' > icon.svg
           <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'>
           <path fill='#182f7c' d='M22 160C24.454 143.054 16.5853 132.65 13.4815 116C9.97234 97.1759 12.736 78.2877 20.9155 61C26.0869 50.0703 33.9203 40.2336 43 32.3156C51.482 24.9189 61.375 19.0889 72 15.3539C148.419 -11.5096 215.961 76.5528 176.557 145C169.578 157.123 159.687 167.613 148 175.289C129.186 187.646 105.13 193.147 83 188.101C67.2432 184.509 55.4391 173.824 39 178L39 180C71.5954 201.934 113.59 208.388 149 188.107C211.847 152.113 216.694 57.2914 156 16.5412C106.911 -16.4176 37.3621 1.39795 11.2711 55C-0.893272 79.9908 -2.33571 109.918 7.4357 136C10.4118 143.944 14.4601 155.464 22 160z'/>
@@ -29,6 +30,7 @@ jobs:
           <path fill='#182f7c' d='M12.0314 180.845C-0.397656 185.854 8.59856 204.19 20.9267 199.02C32.7652 194.055 23.5938 176.186 12.0314 180.845z'/>
           </svg>
           EOF
+
           cat << 'EOF' > tv.svg
           <svg xmlns='http://www.w3.org/2000/svg' width='320' height='180' viewBox='0 0 427 240'>
           <rect width='427' height='240' fill='#fff'/>
@@ -39,22 +41,28 @@ jobs:
           <path fill="#182f7c" d="m125.55999,200.69988c-12.42906,5.009 -3.43284,23.345 8.8953,18.175c11.8385,-4.965 2.6671,-22.834 -8.8953,-18.175z"/>
           </svg>
           EOF
+          
           echo "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" | base64 -d > app/src/main/res/drawable-nodpi/splash.png
           rsvg-convert -w 48 -h 48 icon.svg -o app/src/main/res/mipmap-mdpi/icon.png
           rsvg-convert -w 72 -h 72 icon.svg -o app/src/main/res/mipmap-hdpi/icon.png
           rsvg-convert -w 96 -h 96 icon.svg -o app/src/main/res/mipmap-xhdpi/icon.png
           rsvg-convert -w 144 -h 144 icon.svg -o app/src/main/res/mipmap-xxhdpi/icon.png
           rsvg-convert -w 192 -h 192 icon.svg -o app/src/main/res/mipmap-xxxhdpi/icon.png
-          rsvg-convert -w 320 -h 180 tv.svg -o app/src/main/res/drawable-nodpi/tv.png
+          rsvg-convert -w 320 -h 180 tv.svg -o app/src/main/res/drawable-nodpi/icon_tv.png
 
       - name: 整理文件
         run: |
           mkdir -p app/src/main/kotlin/com/fyan
           mkdir -p app/src/main/res/xml
+          
           mv src/*.kt app/src/main/kotlin/com/fyan/
+          
           mv xml/AndroidManifest.xml app/src/main/
           find xml/ -type f ! -name 'AndroidManifest.xml' -exec mv {} app/src/main/res/xml/ \; || true
+          
           mv app_build.gradle.kts app/build.gradle.kts
+          mv settings.gradle.kts ./
+          mv build.gradle.kts ./
 
       - name: 安装环境
         uses: actions/setup-java@v4
@@ -66,6 +74,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
         with:
           argument: :app:assembleDebug
+          cache-disabled: true
 
       - name: 上传包件
         uses: actions/upload-artifact@v4

@@ -245,7 +245,8 @@ fun FloatingLogPanel(modifier: Modifier = Modifier, logs: List<LogItem>, onDelet
                                 LogType.WARNING -> Color(0xFFFDD10D)
                                 LogType.INFO -> MaterialTheme.colorScheme.onSurface
                             }
-                            Text(text = "[${log.time}] ${log.target} ➜ ${log.message}", color = logTextColor, style = MaterialTheme.typography.bodySmall.copy(lineHeight = 1.2.em), modifier = Modifier.weight(1f).padding(trailing = 4.dp))
+                            val textModifier = Modifier.weight(1f).padding(PaddingValues(end = 4.dp))
+                            Text(text = "[${log.time}] ${log.target} ➜ ${log.message}", color = logTextColor, style = MaterialTheme.typography.bodySmall.copy(lineHeight = 1.2.em), modifier = textModifier)
                             IconButton(onClick = { onDelete(log.id) }, modifier = Modifier.size(16.dp).align(Alignment.CenterVertically)) { Icon(imageVector = Icons.Default.Delete, contentDescription = null, tint = Color.Gray.copy(alpha = 0.7f), modifier = Modifier.size(12.dp)) }
                         }
                         HorizontalDivider(color = Color.Gray.copy(alpha = 0.08f))

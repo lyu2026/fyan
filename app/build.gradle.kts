@@ -10,6 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "com.fyan"
+        multiDexEnabled = true
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -22,6 +23,11 @@ android {
 
     buildTypes {
         release { isMinifyEnabled = false }
+    }
+
+    dexOptions {
+        javaMaxHeapSize = "3g"
+        preDexLibraries = true
     }
 }
 

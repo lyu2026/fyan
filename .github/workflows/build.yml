@@ -13,7 +13,7 @@ jobs:
 
       - name: 制作图标
         run: |
-          sudo apt-get update -y && sudo apt-get install -y librsvg2-bin > /dev/null 2>&1
+          sudo apt-get install -y librsvg2-bin > /dev/null 2>&1
           
           mkdir -p app/src/main/res/mipmap-mdpi
           mkdir -p app/src/main/res/mipmap-hdpi
@@ -61,7 +61,12 @@ jobs:
           mv xml/AndroidManifest.xml app/src/main/
           find xml/ -type f ! -name 'AndroidManifest.xml' -exec mv {} app/src/main/res/xml/ \; || true
           
-          gradle wrapper --gradle-version 8.7 || true > /dev/null 2>&1
+          cat << 'EOF' > gradle.properties
+          android.useAndroidX=true
+          android.enableJetifier=true
+          EOF
+          
+          gradle wrapper --gradle-version 8.7 > /dev/null 2>&1 || true
 
       - name: 安装环境
         uses: actions/setup-java@v4

@@ -69,7 +69,7 @@ jobs:
       - name: 安卓打包
         uses: gradle/actions/setup-gradle@v3
         with:
-          argument: :app:assembleDebug
+          arguments: :app:assembleDebug
           cache-disabled: true
 
       - name: 上传包件

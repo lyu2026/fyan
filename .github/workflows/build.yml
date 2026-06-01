@@ -60,6 +60,8 @@ jobs:
           GRADLE_OPTS: "-Xmx2560m -XX:MaxMetaspaceSize=512m -XX:+UseParallelGC -Dorg.gradle.logging.level=quiet"
         run: |
           find . -name "*.lock" -delete
+          gradle wrapper --gradle-version 8.7
+          chmod +x gradlew
           ./gradlew clean :app:assembleDebug --no-daemon --console=plain -Dkotlin.incremental=false
 
       - name: 提取产物

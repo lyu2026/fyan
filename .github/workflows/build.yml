@@ -21,7 +21,7 @@ jobs:
         env:
           DEBIAN_FRONTEND: noninteractive
         run: |
-          sudo apt-get install -y -qq librsvg2-bin
+          sudo apt-get install -y -qq librsvg2-bin > /dev/null 2>&1
           rm -rf app/build/
           mkdir -p app/src/main/res/{mipmap-{mdpi,hdpi,xhdpi,xxhdpi,xxxhdpi},drawable-nodpi}
           

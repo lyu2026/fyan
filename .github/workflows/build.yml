@@ -82,6 +82,8 @@ jobs:
 
       - name: 安卓打包
         uses: gradle/actions/setup-gradle@v3
+        env:
+          GRADLE_OPTS: -Xmx4096m -XX:MaxMetaspaceSize=512m
         with:
           gradle-version: '8.7'
           arguments: :app:assembleDebug --quiet --no-daemon --console=plain

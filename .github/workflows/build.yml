@@ -57,12 +57,10 @@ jobs:
 
       - name: 执行构建
         env:
-          GRADLE_OPTS: "-Xmx3072m -XX:MaxMetaspaceSize=1024m -Dorg.gradle.logging.level=quiet"
+          GRADLE_OPTS: "-Xmx2560m -XX:MaxMetaspaceSize=512m -XX:+UseParallelGC -Dorg.gradle.logging.level=quiet"
         run: |
-          gradle wrapper --gradle-version 8.7
-          chmod +x gradlew
-          ./gradlew --stop
-          ./gradlew clean :app:assembleDebug --no-daemon --console=plain -Dkotlin.compiler.execution.strategy="in-process"
+          find . -name "*.lock" -delete
+          ./gradlew clean :app:assembleDebug --no-daemon --console=plain -Dkotlin.incremental=false
 
       - name: 提取产物
         id: copy_apk

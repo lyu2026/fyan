@@ -20,13 +20,6 @@ android {
         jvmToolchain(17)
     }
 
-    sourceSets {
-        getByName("main") {
-            java.setSrcDirs(listOf("src/main/kotlin"))
-            res.setSrcDirs(listOf("src/main/res"))
-        }
-    }
-
     buildTypes {
         release { isMinifyEnabled = false }
     }

@@ -63,16 +63,13 @@ jobs:
 
       - name: 配置打包
         uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.7'
-          cache-disabled: true
-          generate-job-summary: false
-          dependency-graph: 'disabled'
 
       - name: 执行打包
         env:
           GRADLE_OPTS: -Xmx4096m -XX:MaxMetaspaceSize=512m
-        run: ./gradlew :app:assembleDebug --quiet --no-daemon --console=plain
+        run: |
+          ./gradlew clean :app:assembleDebug --quiet
+          ./gradlew :app:assembleDebug --quiet --no-daemon --console=plain
 
       - name: 提取附件
         id: copy_apk

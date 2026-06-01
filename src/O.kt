@@ -25,14 +25,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
+import androidx.core.view.WindowCompat
 import androidx.navigation.compose.*
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.roundToInt
 
-// 1. 日志模型定义
 data class LogItem(
 	val id: String = UUID.randomUUID().toString(),
 	val time: String,
@@ -46,9 +48,23 @@ class O : ComponentActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		setContent {
-			// 全局联动系统深色/浅色模式切换
 			val isDark = isSystemInDarkTheme()
-			MaterialTheme(colorScheme = if (isDark) darkColorScheme() else lightColorScheme()) {
+			val colorScheme = if (isDark) darkColorScheme() else lightColorScheme()
+
+			val view = LocalView.current
+			if (!view.isInEditMode) {
+				SideEffect {
+					val window = (view.context as Activity).window
+					window.statusBarColor = android.graphics.Color.TRANSPARENT
+					window.navigationBarColor = android.graphics.Color.TRANSPARENT
+					WindowCompat.getInsetsController(window, view).apply {
+						isAppearanceLightStatusBars = !isDark
+						isAppearanceLightNavigationBars = !isDark
+					}
+				}
+			}
+
+			MaterialTheme(colorScheme = colorScheme) {
 				Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
 					MainSpaContainer()
 				}
@@ -57,7 +73,6 @@ class O : ComponentActivity() {
 	}
 }
 
-// 2. SPA 多页面核心总调度器
 @Composable
 fun MainSpaContainer() {
 	val navController = rememberNavController()
@@ -71,12 +86,10 @@ fun MainSpaContainer() {
 		logList.add(LogItem(time = timeStamp, target = target, message = message, type = type))
 	}
 
-	// 首次初始化投递一条系统就绪日志
 	LaunchedEffect(Unit) {
-		appendLog("系统引擎", "Fyan 纯原生双端内核架构初始化就绪", LogType.SUCCESS)
+		appendLog("系统引擎", "孚琰 原生双端内核架构初始化就绪", LogType.SUCCESS)
 	}
 
-	// 拦截返回键：只有在首页时执行二次退出弹窗
 	val currentBackStackEntry by navController.currentBackStackEntryAsState()
 	val currentRoute = currentBackStackEntry?.destination?.route
 	if (currentRoute == "home") {
@@ -100,7 +113,7 @@ fun MainSpaContainer() {
 	val config = LocalConfiguration.current
 	val isTV = (config.uiMode and Configuration.UI_MODE_TYPE_MASK) == Configuration.UI_MODE_TYPE_TELEVISION
 
-	Box(modifier = Modifier.fillMaxSize().padding(8.dp)) {
+	Box(modifier = Modifier.fillMaxSize()) {
 		NavHost(navController = navController, startDestination = "home") {
 			composable("home") {
 				HomeScreen(
@@ -132,7 +145,6 @@ fun MainSpaContainer() {
 			}
 		}
 
-		// 全局消息日志控制台
 		if (showLogPanelGlobal) {
 			FloatingLogPanel(
 				modifier = Modifier.align(Alignment.BottomCenter), 
@@ -143,7 +155,6 @@ fun MainSpaContainer() {
 	}
 }
 
-// 3. 首页视窗
 @Composable
 fun HomeScreen(
 	isTV: Boolean,
@@ -154,33 +165,36 @@ fun HomeScreen(
 ) {
 	Column(modifier = Modifier.fillMaxSize()) {
 		Row(
-			modifier = Modifier.fillMaxWidth().height(56.dp),
+			modifier = Modifier
+				.fillMaxWidth()
+				.statusBarsPadding() // 防状态栏遮挡
+				.height(48.dp) // 降低高度，节约空间
+				.padding(horizontal = 8.dp),
 			verticalAlignment = Alignment.CenterVertically,
 			horizontalArrangement = Arrangement.SpaceBetween
 		) {
-			Text("Fyan 双端总控制台", style = MaterialTheme.typography.titleLarge)
+			Text("孚琰 控制台", style = MaterialTheme.typography.titleMedium)
 			Row(verticalAlignment = Alignment.CenterVertically) {
 				Text(
-					text = if (isTV) "📺 智能电视端" else "📱 移动手机端", 
+					text = if (isTV) "电视" else "手机", 
 					style = MaterialTheme.typography.bodyMedium,
-					modifier = Modifier.padding(end = 8.dp)
+					modifier = Modifier.padding(end = 4.dp)
 				)
-				IconButton(onClick = { onToggleLog(!showLog) }) {
-					Icon(imageVector = if (showLog) Icons.Default.Visibility else Icons.Default.VisibilityOff, contentDescription = null)
+				IconButton(onClick = { onToggleLog(!showLog) }, modifier = Modifier.size(36.dp)) {
+					Icon(imageVector = if (showLog) Icons.Default.Visibility else Icons.Default.VisibilityOff, contentDescription = null, modifier = Modifier.size(20.dp))
 				}
 			}
 		}
 
-		Spacer(modifier = Modifier.height(16.dp))
-
-		// Mui 特效卡片
-		MuiCard(title = "自动化参数设置", desc = "内置无缝响应式卡片、表单策略与持久化管理", onClick = { onNavigate("setting") })
-		Spacer(modifier = Modifier.height(12.dp))
-		MuiCard(title = "手动投递诊断日志", desc = "向贴底面板追加一条模拟警告事件进行视图验证", onClick = onTriggerLogMock)
+		Column(modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp)) {
+			Spacer(modifier = Modifier.height(8.dp))
+			MuiCard(title = "自动化参数设置", desc = "内置无缝响应式卡片、表单策略与持久化管理", onClick = { onNavigate("setting") })
+			Spacer(modifier = Modifier.height(8.dp))
+			MuiCard(title = "手动投递诊断日志", desc = "向贴底面板追加一条模拟警告事件进行视图验证", onClick = onTriggerLogMock)
+		}
 	}
 }
 
-// 4. Mui 高级质感卡片组件（完美支持手机触控阴影与电视遥控器聚焦高亮边框）
 @Composable
 fun MuiCard(title: String, desc: String, onClick: () -> Unit) {
 	val focusRequester = remember { FocusRequester() }
@@ -190,59 +204,57 @@ fun MuiCard(title: String, desc: String, onClick: () -> Unit) {
 	Card(
 		modifier = Modifier
 			.fillMaxWidth()
-			.height(76.dp)
+			.height(68.dp) // 压缩卡片纵向高度，更加规整
 			.focusRequester(focusRequester)
 			.focusable(interactionSource = interactionSource)
-			.shadow(if (isFocused) 8.dp else 2.dp, RoundedCornerShape(12.dp))
+			.shadow(if (isFocused) 6.dp else 1.dp, RoundedCornerShape(8.dp))
 			.clickable { onClick() }
 			.border(
-				width = 2.dp, 
+				width = 1.5.dp, 
 				color = if (isFocused) MaterialTheme.colorScheme.primary else Color.Transparent, 
-				shape = RoundedCornerShape(12.dp)
+				shape = RoundedCornerShape(8.dp)
 			),
 		colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
 	) {
-		Box(modifier = Modifier.fillMaxSize().padding(12.dp), contentAlignment = Alignment.CenterStart) {
+		Box(modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp, vertical = 8.dp), contentAlignment = Alignment.CenterStart) {
 			Column {
 				Text(title, style = MaterialTheme.typography.titleMedium)
-				Text(desc, style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+				Text(desc, style = MaterialTheme.typography.bodySmall, color = Color.Gray, maxLines = 1)
 			}
 		}
 	}
 }
 
-// 5. 设置页视窗（大折叠表单，自动编辑保存逻辑）
 @Composable
 fun SettingScreen(onBack: () -> Unit, onSaveAction: (String, String) -> Unit) {
 	var isExpanded by remember { mutableStateOf(true) }
 	var configText by remember { mutableStateOf("") }
 
-	Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
-		Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.height(56.dp)) {
-			IconButton(onClick = onBack) { Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null) }
-			Text("系统级参数面板", style = MaterialTheme.typography.titleLarge)
+	Column(modifier = Modifier.fillMaxSize().statusBarsPadding().padding(horizontal = 8.dp).verticalScroll(rememberScrollState())) {
+		Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.height(48.dp)) {
+			IconButton(onClick = onBack, modifier = Modifier.size(36.dp)) { Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null, modifier = Modifier.size(20.dp)) }
+			Text("系统配置", style = MaterialTheme.typography.titleMedium)
 		}
 
-		Spacer(modifier = Modifier.height(8.dp))
+		Spacer(modifier = Modifier.height(4.dp))
 
 		Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))) {
-			Column(modifier = Modifier.padding(12.dp)) {
+			Column(modifier = Modifier.padding(10.dp)) {
 				Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
 					Text("核心参数联动区", style = MaterialTheme.typography.titleMedium)
-					IconButton(onClick = { isExpanded = !isExpanded }) {
+					IconButton(onClick = { isExpanded = !isExpanded }, modifier = Modifier.size(36.dp)) {
 						Icon(imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore, contentDescription = null)
 					}
 				}
 				if (isExpanded) {
-					HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+					HorizontalDivider(modifier = Modifier.padding(vertical = 6.dp))
 					OutlinedTextField(
 						value = configText,
 						onValueChange = { 
 							configText = it
-							// 每当用户输入改变，即时回调触发自动保存事件日志
 							onSaveAction("API_ENDPOINT", it)
 						},
-						label = { Text("云端接入端点 (修改时自动保存)") },
+						label = { Text("云端接入端点 (自动保存)") },
 						modifier = Modifier.fillMaxWidth(),
 						singleLine = true
 					)
@@ -252,7 +264,6 @@ fun SettingScreen(onBack: () -> Unit, onSaveAction: (String, String) -> Unit) {
 	}
 }
 
-// 6. 全自动拖拽到底折叠成横线、毛玻璃渲染的高颜值日志控制台
 @Composable
 fun FloatingLogPanel(modifier: Modifier = Modifier, logs: List<LogItem>, onDelete: (String) -> Unit) {
 	val configuration = LocalConfiguration.current
@@ -263,7 +274,6 @@ fun FloatingLogPanel(modifier: Modifier = Modifier, logs: List<LogItem>, onDelet
 	var isCollapsed by remember { mutableStateOf(false) }
 	val lazyListState = rememberLazyListState()
 
-	// 动态触底滚动：最新消息永远保持在最底部可见区域
 	LaunchedEffect(logs.size) {
 		if (logs.isNotEmpty()) {
 			lazyListState.animateScrollToItem(logs.size - 1)
@@ -275,72 +285,74 @@ fun FloatingLogPanel(modifier: Modifier = Modifier, logs: List<LogItem>, onDelet
 			modifier = modifier
 				.fillMaxWidth()
 				.height(screenHeight / 3)
+				.navigationBarsPadding()
 				.offset { IntOffset(0, offsetY.roundToInt()) }
-				.clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
-				// 毛玻璃混合半透明层
-				.background(MaterialTheme.colorScheme.surface.copy(alpha = 0.78f))
-				.border(1.dp, Color.Gray.copy(alpha = 0.2f), RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+				.clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
+				.background(MaterialTheme.colorScheme.surface.copy(alpha = 0.88f))
+				.border(1.dp, Color.Gray.copy(alpha = 0.15f), RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
 				.pointerInput(Unit) {
 					detectDragGestures(
 						onDragEnd = {
-							// 拖拽幅度超过阈值，直接下滑隐退为贴底细线
-							if (offsetY > maxHeightPx * 0.5f) {
-								isCollapsed = true
-							}
+							if (offsetY > maxHeightPx * 0.4f) isCollapsed = true
 							offsetY = 0f
 						},
 						onDrag = { change, dragAmount ->
 							change.consume()
-							if (offsetY + dragAmount.y >= 0) {
-								offsetY += dragAmount.y
-							}
+							if (offsetY + dragAmount.y >= 0) offsetY += dragAmount.y
 						}
 					)
 				}
 		) {
-			Column(modifier = Modifier.fillMaxSize().padding(8.dp)) {
-				// 面板顶部的防呆可拉拽手柄指示线
-				Box(modifier = Modifier.width(36.dp).height(4.dp).background(Color.Gray.copy(alpha = 0.5f), RoundedCornerShape(2.dp)).align(Alignment.CenterHorizontally))
-				Spacer(modifier = Modifier.height(8.dp))
+			Column(modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp, vertical = 4.dp)) {
+				Box(modifier = Modifier.width(32.dp).height(3.dp).background(Color.Gray.copy(alpha = 0.4f), RoundedCornerShape(1.5.dp)).align(Alignment.CenterHorizontally))
+				Spacer(modifier = Modifier.height(4.dp))
 				
 				LazyColumn(state = lazyListState, modifier = Modifier.fillMaxSize()) {
 					items(logs) { log ->
 						Row(
-							modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp), 
+							modifier = Modifier
+								.fillMaxWidth()
+								.padding(vertical = 2.dp),
 							horizontalArrangement = Arrangement.SpaceBetween, 
-							verticalAlignment = Alignment.CenterVertically
+							verticalAlignment = Alignment.Top
 						) {
-							// 精准映射：成功（绿）、错误（红）、警告（黄）、常规（默认色）
 							val logTextColor = when (log.type) {
 								LogType.SUCCESS -> Color(0xFF189B46)
 								LogType.ERROR -> Color(0xFFE7012F)
 								LogType.WARNING -> Color(0xFFFDD10D)
 								LogType.INFO -> MaterialTheme.colorScheme.onSurface
 							}
+							
 							Text(
-								text = "[${log.time}] ${log.target} -> ${log.message}",
+								text = "[${log.time}] ${log.target} ➜ ${log.message}",
 								color = logTextColor,
-								style = MaterialTheme.typography.bodySmall,
-								modifier = Modifier.weight(1f)
+								style = MaterialTheme.typography.bodySmall.copy(lineHeight = 1.2.em),
+								modifier = Modifier.weight(1f).padding(trailing = 4.dp)
 							)
-							IconButton(onClick = { onDelete(log.id) }, modifier = Modifier.size(24.dp)) {
-								Icon(imageVector = Icons.Default.Delete, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(14.dp))
+							IconButton(
+								onClick = { onDelete(log.id) }, 
+								modifier = Modifier.size(16.dp).align(Alignment.CenterVertically)
+							) {
+								Icon(imageVector = Icons.Default.Delete, contentDescription = null, tint = Color.Gray.copy(alpha = 0.7f), modifier = Modifier.size(12.dp))
 							}
 						}
-						HorizontalDivider(color = Color.Gray.copy(alpha = 0.15f))
+						HorizontalDivider(color = Color.Gray.copy(alpha = 0.08f))
 					}
 				}
 			}
 		}
 	} else {
-		// 完全隐藏后在极底化为细长的横线小胶囊，支持点击唤醒复原
 		Box(
 			modifier = modifier
-				.padding(bottom = 4.dp)
-				.width(110.dp)
-				.height(6.dp)
-				.background(Color.Gray.copy(alpha = 0.6f), RoundedCornerShape(3.dp))
+				.padding(bottom = 6.dp)
+				.navigationBarsPadding()
+				.width(80.dp)
+				.height(5pxToDp()) // 超小横条指示
+				.background(Color.Gray.copy(alpha = 0.5f), RoundedCornerShape(2.5.dp))
 				.clickable { isCollapsed = false }
 		)
 	}
 }
+
+@Composable
+fun 5pxToDp() = with(androidx.compose.ui.platform.LocalDensity.current) { 5.toDp() }

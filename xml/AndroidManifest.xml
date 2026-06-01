@@ -7,7 +7,7 @@
 	<application
 		android:allowBackup="true"
 		android:icon="@mipmap/icon"
-		android:label="Fyan SPA"
+		android:label="孚琰"
 		android:theme="@android:style/Theme.Material.NoActionBar"
 		android:banner="@drawable/tv">
 

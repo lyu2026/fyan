@@ -59,6 +59,8 @@ jobs:
         env:
           GRADLE_OPTS: "-Xmx2560m -XX:MaxMetaspaceSize=512m -XX:+UseParallelGC -Dorg.gradle.logging.level=quiet"
         run: |
+          rm -rf .gradle
+          rm -rf app/build
           find . -name "*.lock" -delete
           gradle wrapper --gradle-version 8.7
           chmod +x gradlew

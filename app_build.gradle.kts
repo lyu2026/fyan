@@ -27,9 +27,14 @@ android {
 	}
 
 	buildTypes {
+		debug {
+			isMinifyEnabled = false // 关闭混淆压缩
+			isShrinkResources = true // 移除无用资源
+		}
 		release {
-			isMinifyEnabled = false
-			proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+			isMinifyEnabled = true // 开启混淆压缩
+			isShrinkResources = true // 移除无用资源
+			proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"),"proguard-rules.pro")
 		}
 	}
 	compileOptions {

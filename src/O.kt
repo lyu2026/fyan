@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat
 
 import kotlin.math.roundToInt
 
+import android.view.View
 import android.os.Bundle
 import android.app.Activity
 import android.widget.EditText
@@ -120,12 +121,12 @@ class O:ComponentActivity(){
 		}
 	}
 	// 判断点击位置是否在输入框外部
-	private fun ni(view:View,event:MotionEvent):Boolean{
+	private fun ni(v:View,e:MotionEvent):Boolean{
 		val loc=IntArray(2)
-		view.getLocationOnScreen(loc)
-		val x=event.rawX.toInt()
-		val y=event.rawY.toInt()
-		return x<loc[0]||x>loc[0]+view.width||y<loc[1]||y>loc[1]+view.height
+		v.getLocationOnScreen(loc)
+		val x=e.rawX.toInt()
+		val y=e.rawY.toInt()
+		return x<loc[0]||x>(loc[0]+v.width)||y<loc[1]||y>(loc[1]+v.height)
 	}
 }
 
@@ -197,14 +198,14 @@ fun SPA(){ // 单页面应用结构
 fun Home(tv:Boolean,sg:Boolean,xg:(Boolean)->Unit,go:(String)->Unit){
 	Column(modifier=Modifier.fillMaxSize()){
 		Row(
-			modifier=Modifier.fillMaxWidth().statusBarsPadding().height(48.dp).padding(horizontal=8.dp),
+			modifier=Modifier.fillMaxWidth().statusBarsPadding().height(48.dp).padding(start=10.dp,end=1.dp),
 			horizontalArrangement=Arrangement.SpaceBetween,
 			verticalAlignment=Alignment.CenterVertically
 		){
 			Text("孚琰 控制台",style=MaterialTheme.typography.titleLarge)
 			Row(verticalAlignment=Alignment.CenterVertically){
 				Text(text=if(tv)"📺 TV"else"📱 手机",style=MaterialTheme.typography.bodyMedium,modifier=Modifier.padding(end=8.dp))
-				IconButton(onClick={xg(!sg)},modifier=Modifier.size(36.dp).offset(x=6.dp)){
+				IconButton(onClick={xg(!sg)},modifier=Modifier.size(36.dp)){
 					Icon(
 						painter=painterResource(if(sg)R.drawable.visibility else R.drawable.visibility_off),
 						contentDescription=null,modifier=Modifier.size(20.dp)
@@ -212,10 +213,10 @@ fun Home(tv:Boolean,sg:Boolean,xg:(Boolean)->Unit,go:(String)->Unit){
 				}
 			}
 		}
-		Column(modifier=Modifier.padding(horizontal=8.dp)){
-			Spacer(modifier=Modifier.height(6.dp))
+		Spacer(modifier=Modifier.height(8.dp)) // 间隔
+		Column(modifier=Modifier.padding(horizontal=10.dp)){
 			CD(title="自动化参数设置",desc="内置无缝响应式卡片、表单策略与持久化管理",click={go("setting")})
-			Spacer(modifier=Modifier.height(5.dp))
+			Spacer(modifier=Modifier.height(6.dp))
 			CD(title="手动投递诊断日志",desc="向贴底面板追加一条模拟警告事件进行视图验证",click={})
 		}
 	}
@@ -249,28 +250,28 @@ fun Setting(back:()->Unit,save:(String,String)->Unit){
 	var field by remember{mutableStateOf("")} // 关联的值
 	var show by remember{mutableStateOf(true)} // 展开状态
 
-	Column(modifier=Modifier.fillMaxSize().statusBarsPadding().padding(horizontal=10.dp).verticalScroll(rememberScrollState())){
+	Column(modifier=Modifier.fillMaxSize().statusBarsPadding().verticalScroll(rememberScrollState())){
 		// 顶部导航栏
-		Row(verticalAlignment=Alignment.CenterVertically,modifier=Modifier.height(48.dp)){
-			IconButton(onClick=back,modifier=Modifier.size(36.dp).offset(x=-8.dp)){
+		Row(verticalAlignment=Alignment.CenterVertically,modifier=Modifier.height(48.dp).padding(start=2.dp,end=10.dp)){
+			IconButton(onClick=back,modifier=Modifier.size(36.dp)){
 				Icon(painter=painterResource(R.drawable.arrow_back),contentDescription=null,modifier=Modifier.size(20.dp))
 			}
 			Text("系统配置",style=MaterialTheme.typography.titleLarge)
 		}
-		Spacer(modifier=Modifier.height(6.dp)) // 间隔
+		Spacer(modifier=Modifier.height(8.dp)) // 间隔
 		// 表单卡片
 		Card(modifier=Modifier.fillMaxWidth(),colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surfaceVariant.copy(alpha=0.5f))){
 			Column(modifier=Modifier.padding(6.dp)){
 				// 顶栏
 				Row(modifier=Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically){
 					Text("核心参数联动区",style=MaterialTheme.typography.titleMedium)
-					IconButton(onClick={show=!show},modifier=Modifier.size(34.dp)){
+					IconButton(onClick={show=!show},modifier=Modifier.size(30.dp)){
 						Icon(painter=painterResource(if(show)R.drawable.expand_less else R.drawable.expand_more),contentDescription=null)
 					}
 				}
 				if(show){ // 根据状态展示表单区域
 					// 分割线
-					HorizontalDivider(modifier=Modifier.padding(bottom=4.dp))
+					HorizontalDivider(modifier=Modifier.padding(bottom=6.dp))
 					// 输入框
 					OutlinedTextField(
 						value=field,onValueChange={field=it},
@@ -298,7 +299,7 @@ fun LP(modifier:Modifier=Modifier,list:List<LG>,remove:(String)->Unit){
 	}
 
 	if(!x){
-		Box(modifier=modifier.fillMaxWidth().height(h/3).padding(horizontal=3.dp)
+		Box(modifier=modifier.fillMaxWidth().height(h/3).padding(horizontal=1.dp)
 			.navigationBarsPadding().offset{IntOffset(0,y.roundToInt())}
 			.clip(RoundedCornerShape(topStart=8.dp,topEnd=8.dp))
 			.background(MaterialTheme.colorScheme.surface.copy(alpha=0.90f))
@@ -311,8 +312,7 @@ fun LP(modifier:Modifier=Modifier,list:List<LG>,remove:(String)->Unit){
 			}
 		){
 			Column(modifier=Modifier.fillMaxSize().padding(horizontal=5.dp,vertical=2.dp)){
-				Box(modifier=Modifier.width(64.dp).height(3.dp).background(Color.Gray.copy(alpha=0.4f),RoundedCornerShape(1.5.dp)).align(Alignment.CenterHorizontally))
-				Spacer(modifier=Modifier.height(3.dp)) // 间隔
+				Box(modifier=Modifier.width(64.dp).height(3.dp).background(Color.Gray.copy(alpha=0.4f),RoundedCornerShape(1.5.dp)).align(Alignment.CenterHorizontally).padding(bottom=3.dp))
 				LazyColumn(state=state,modifier=Modifier.fillMaxSize()){
 					items(list,key={it.i}){g->
 						Row(modifier=Modifier.fillMaxWidth().padding(vertical=1.dp),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.Top){

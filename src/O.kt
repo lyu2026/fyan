@@ -48,6 +48,8 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.input.pointer.pointerInput
 
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
@@ -61,9 +63,8 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.FocusRequester
 
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.input.pointer.pointerInput
 
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.LocalContext
@@ -310,8 +311,8 @@ fun LP(modifier:Modifier=Modifier,list:List<LG>,remove:(String)->Unit){
 			}
 		){
 			Column(modifier=Modifier.fillMaxSize().padding(horizontal=5.dp,vertical=2.dp)){
-				Box(modifier=Modifier.width(64.dp).height(3.dp).background(Color.Gray.copy(alpha=0.4f),RoundedCornerShape(1.5.dp)).align(Alignment.CenterHorizontally).padding(top=6.dp,bottom=8.dp))
-				LazyColumn(state=state,modifier=Modifier.fillMaxSize()){
+				Box(modifier=Modifier.width(64.dp).height(3.dp).background(Color.Gray.copy(alpha=0.4f),RoundedCornerShape(1.5.dp)).align(Alignment.CenterHorizontally))
+				LazyColumn(state=state,modifier=Modifier.fillMaxSize().padding(top=6.dp)){
 					items(list,key={it.i}){g->
 						Row(modifier=Modifier.fillMaxWidth().padding(vertical=1.dp),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.Top){
 							val color=when(g.c){
@@ -320,7 +321,7 @@ fun LP(modifier:Modifier=Modifier,list:List<LG>,remove:(String)->Unit){
 								LT.W->Color(0xFFFDD10D)
 								LT.I->MaterialTheme.colorScheme.onSurface
 							}
-							Text(text="[${g.t}] ${g.w} ➜ ${g.o}",color=color,style=MaterialTheme.typography.bodySmall.copy(lineHeight=1.2.em),modifier=Modifier.weight(1f).padding(PaddingValues(end=4.dp)))
+							Text(text="[${g.t}] ${g.w} ➜ ${g.o}",color=color,style=MaterialTheme.typography.bodySmall.copy(lineHeight=1.2.em,fontFamily=FontFamily.Monospace),modifier=Modifier.weight(1f).padding(PaddingValues(end=4.dp)))
 							IconButton(onClick={remove(g.i)},modifier=Modifier.size(14.dp).align(Alignment.CenterVertically)){
 								Icon(painter=painterResource(R.drawable.delete),contentDescription=null,tint=Color.Gray.copy(alpha=0.7f),modifier=Modifier.size(12.dp))
 							}

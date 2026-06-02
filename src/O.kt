@@ -102,7 +102,7 @@ class O:ComponentActivity(){
 					a.window.decorView.setOnTouchListener{_,event->
 						if(event.action==MotionEvent.ACTION_DOWN){
 							val fv=a.currentFocus
-							if(fv is EditText){
+							if(fv is EditText&&ni(fv,event)){
 								fv.clearFocus()
 								val im=a.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 								im.hideSoftInputFromWindow(fv.windowToken,0)
@@ -118,6 +118,14 @@ class O:ComponentActivity(){
 				}
 			}
 		}
+	}
+	// 判断点击位置是否在输入框外部
+	private fun ni(view:View,event:MotionEvent):Boolean{
+		val loc=IntArray(2)
+		view.getLocationOnScreen(loc)
+		val x=event.rawX.toInt()
+		val y=event.rawY.toInt()
+		return x<loc[0]||x>loc[0]+view.width||y<loc[1]||y>loc[1]+view.height
 	}
 }
 
@@ -204,7 +212,7 @@ fun Home(tv:Boolean,sg:Boolean,xg:(Boolean)->Unit,go:(String)->Unit){
 				}
 			}
 		}
-		Column(modifier=Modifier.fillMaxSize().padding(horizontal=8.dp)){
+		Column(modifier=Modifier.padding(horizontal=8.dp)){
 			Spacer(modifier=Modifier.height(6.dp))
 			CD(title="自动化参数设置",desc="内置无缝响应式卡片、表单策略与持久化管理",click={go("setting")})
 			Spacer(modifier=Modifier.height(5.dp))
@@ -241,7 +249,7 @@ fun Setting(back:()->Unit,save:(String,String)->Unit){
 	var field by remember{mutableStateOf("")} // 关联的值
 	var show by remember{mutableStateOf(true)} // 展开状态
 
-	Column(modifier=Modifier.fillMaxSize().statusBarsPadding().padding(horizontal=8.dp).verticalScroll(rememberScrollState())){
+	Column(modifier=Modifier.fillMaxSize().statusBarsPadding().padding(horizontal=10.dp).verticalScroll(rememberScrollState())){
 		// 顶部导航栏
 		Row(verticalAlignment=Alignment.CenterVertically,modifier=Modifier.height(48.dp)){
 			IconButton(onClick=back,modifier=Modifier.size(36.dp).offset(x=-8.dp)){
@@ -252,17 +260,17 @@ fun Setting(back:()->Unit,save:(String,String)->Unit){
 		Spacer(modifier=Modifier.height(6.dp)) // 间隔
 		// 表单卡片
 		Card(modifier=Modifier.fillMaxWidth(),colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surfaceVariant.copy(alpha=0.5f))){
-			Column(modifier=Modifier.padding(8.dp)){
+			Column(modifier=Modifier.padding(6.dp)){
 				// 顶栏
 				Row(modifier=Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically){
 					Text("核心参数联动区",style=MaterialTheme.typography.titleMedium)
-					IconButton(onClick={show=!show},modifier=Modifier.size(36.dp)){
+					IconButton(onClick={show=!show},modifier=Modifier.size(34.dp)){
 						Icon(painter=painterResource(if(show)R.drawable.expand_less else R.drawable.expand_more),contentDescription=null)
 					}
 				}
 				if(show){ // 根据状态展示表单区域
 					// 分割线
-					HorizontalDivider(modifier=Modifier.padding(vertical=6.dp))
+					HorizontalDivider(modifier=Modifier.padding(bottom=4.dp))
 					// 输入框
 					OutlinedTextField(
 						value=field,onValueChange={field=it},
@@ -303,7 +311,8 @@ fun LP(modifier:Modifier=Modifier,list:List<LG>,remove:(String)->Unit){
 			}
 		){
 			Column(modifier=Modifier.fillMaxSize().padding(horizontal=5.dp,vertical=2.dp)){
-				Box(modifier=Modifier.width(64.dp).height(3.dp).padding(vertical=2.dp).background(Color.Gray.copy(alpha=0.4f),RoundedCornerShape(1.5.dp)).align(Alignment.CenterHorizontally))
+				Box(modifier=Modifier.width(64.dp).height(3.dp).background(Color.Gray.copy(alpha=0.4f),RoundedCornerShape(1.5.dp)).align(Alignment.CenterHorizontally))
+				Spacer(modifier=Modifier.height(3.dp)) // 间隔
 				LazyColumn(state=state,modifier=Modifier.fillMaxSize()){
 					items(list,key={it.i}){g->
 						Row(modifier=Modifier.fillMaxWidth().padding(vertical=1.dp),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.Top){
@@ -314,7 +323,7 @@ fun LP(modifier:Modifier=Modifier,list:List<LG>,remove:(String)->Unit){
 								LT.I->MaterialTheme.colorScheme.onSurface
 							}
 							Text(text="[${g.t}] ${g.w} ➜ ${g.o}",color=color,style=MaterialTheme.typography.bodySmall.copy(lineHeight=1.2.em),modifier=Modifier.weight(1f).padding(PaddingValues(end=4.dp)))
-							IconButton(onClick={remove(g.i)},modifier=Modifier.size(16.dp).align(Alignment.CenterVertically)){
+							IconButton(onClick={remove(g.i)},modifier=Modifier.size(14.dp).align(Alignment.CenterVertically)){
 								Icon(painter=painterResource(R.drawable.delete),contentDescription=null,tint=Color.Gray.copy(alpha=0.7f),modifier=Modifier.size(12.dp))
 							}
 						}

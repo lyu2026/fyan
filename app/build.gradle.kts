@@ -22,7 +22,7 @@ android {
 
 	sourceSets {
 		getByName("main") {
-			res.srcDirs("src/main/res", "${project.rootDir}/ico")
+			res.srcDirs("src/main/res")
 		}
 	}
 

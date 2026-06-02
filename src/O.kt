@@ -261,9 +261,9 @@ fun Setting(back:()->Unit,save:(String,String)->Unit){
 		Spacer(modifier=Modifier.height(4.dp)) // 间隔
 		// 表单卡片
 		Card(modifier=Modifier.fillMaxWidth().padding(horizontal=10.dp),colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surfaceVariant.copy(alpha=0.5f))){
-			Column(modifier=Modifier.padding(6.dp)){
+			Column(modifier=Modifier.padding(vertical=8.dp)){
 				// 顶栏
-				Row(modifier=Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically){
+				Row(modifier=Modifier.fillMaxWidth().padding(horizontal=8.dp),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically){
 					Text("核心参数联动区",style=MaterialTheme.typography.titleMedium)
 					IconButton(onClick={show=!show},modifier=Modifier.size(30.dp)){
 						Icon(painter=painterResource(if(show)R.drawable.expand_less else R.drawable.expand_more),contentDescription=null)
@@ -271,12 +271,12 @@ fun Setting(back:()->Unit,save:(String,String)->Unit){
 				}
 				if(show){ // 根据状态展示表单区域
 					// 分割线
-					HorizontalDivider(modifier=Modifier.padding(bottom=6.dp))
+					HorizontalDivider(modifier=Modifier.padding(bottom=5.dp))
 					// 输入框
 					OutlinedTextField(
 						value=field,onValueChange={field=it},
 						label={Text("关联数据")},
-						modifier=Modifier.fillMaxWidth(),singleLine=true,
+						modifier=Modifier.fillMaxWidth().padding(3.dp),singleLine=true,
 						keyboardOptions=KeyboardOptions(imeAction=ImeAction.Done),
 						keyboardActions=KeyboardActions(onDone={save("TEST",field)})
 					)

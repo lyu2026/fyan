@@ -49,37 +49,49 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.roundToInt
 
-data class LogItem(
-	val id: String = UUID.randomUUID().toString(),
-	val time: String,
-	val target: String,
-	val message: String,
-	val type: LogType
+data class LG( // 日志类
+	val i:String=UUID.randomUUID().toString(), // 标识
+	val w:String, // 目标
+	val o:String, // 消息
+	val t:String, // 时间
+	val c:LT // 类型
 )
+enum class LT{S,E,W,I} // 日志类型枚举
 
-enum class LogType { SUCCESS, ERROR, WARNING, INFO }
-
-class O : ComponentActivity() {
-	override fun onCreate(savedInstanceState: Bundle?) {
-		super.onCreate(savedInstanceState)
-		setContent {
-			val isDark = isSystemInDarkTheme()
-			val colorScheme = if (isDark) darkColorScheme() else lightColorScheme()
-			val view = LocalView.current
-			if (!view.isInEditMode) {
-				SideEffect {
-					val window = (view.context as Activity).window
-					window.statusBarColor = android.graphics.Color.TRANSPARENT
-					window.navigationBarColor = android.graphics.Color.TRANSPARENT
-					WindowCompat.getInsetsController(window, view).apply {
-						isAppearanceLightStatusBars = !isDark
-						isAppearanceLightNavigationBars = !isDark
+// 入口主类
+class O:ComponentActivity(){
+	override fun onCreate(state:Bundle?){
+		super.onCreate(state)
+		setContent{
+			val view=LocalView.current // 当前 Composable 的宿主 View
+			val dark=isSystemInDarkTheme() // 当前系统是否为深色模式
+			val scheme=if(dark)darkColorScheme()else lightColorScheme() // 系统颜色主题
+			if(!view.isInEditMode){ // 预览时跳过的操作
+				val color=scheme.background
+				SideEffect{ // 每次重组后都会执行
+					val a=view.context as?Activity?:return@SideEffect
+					val w=(view.context as?Activity)?.window?:return@SideEffect
+					w.statusBarColor=color.toArgb() // 状态栏背景色
+					WindowCompat.getInsetsController(w,view).apply{
+						isAppearanceLightStatusBars=!dark
+					}
+					// 全局设置点击非输入区域时键盘消失
+					w.decorView.setOnTouchListener{_,event->
+						if(event.action==MotionEvent.ACTION_DOWN){
+							val fv=activity.currentFocus
+							if(fv is EditText){
+								fv.clearFocus()
+								val im=activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+								im.hideSoftInputFromWindow(fv.windowToken,0)
+							}
+						}
+						false
 					}
 				}
 			}
-			MaterialTheme(colorScheme = colorScheme) {
-				Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-					MainSpa()
+			MaterialTheme(colorScheme=scheme){
+				Surface(modifier=Modifier.fillMaxSize(),color=MaterialTheme.colorScheme.background){
+					SPA()
 				}
 			}
 		}
@@ -87,166 +99,154 @@ class O : ComponentActivity() {
 }
 
 @Composable
-fun MainSpa() {
-	val nav = rememberNavController()
-	val ctx = LocalContext.current
-	var showLog by remember { mutableStateOf(true) }
-	val logs = remember { mutableStateListOf<LogItem>() }
-
-	val addLog = remember {
-		{ tag: String, msg: String, type: LogType ->
-			val fmt = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
-			logs.add(LogItem(time = fmt, target = tag, message = msg, type = type))
+fun SPA(){ // 单页面应用结构
+	val ctx=LocalContext.current // 当前 Composable 所在环境的上下文
+	val nav=remember NavController() // 创建一个导航控制器并记住它
+	val gs=remember{mutableStateListOf<LG>()} // 可观察的日志列表，列表内容变化时会触发重组
+	var sg by remember{mutableStateOf(true)} // 可观察的认真面板显示状态，初始值为 true
+	val log=remember{ // 稳定的 Lambda 添加日志函数
+		{w:String,o:String,c:LT->
+			val t=SimpleDateFormat("HH:mm:ss",Locale.getDefault()).format(Date())
+			gs.add(LG(t=t,w=w,o=o,c=c))
 		}
 	}
 
-	LaunchedEffect(Unit) {
-		addLog("系统引擎", "孚琰 原生双端内核架构初始化就绪", LogType.SUCCESS)
-	}
+	LaunchedEffect(Unit){log("系统","孚琰 初始化就绪",LT.S)}
 
-	val curEntry by nav.currentBackStackEntryAsState()
-	if (curEntry?.destination?.route == "home") {
-		var showExit by remember { mutableStateOf(false) }
-		BackHandler(enabled = true) { showExit = true }
-		if (showExit) {
+	// 当前导航栈顶部的路由条目
+	val ce by nav.currentBackStackEntryAsState()
+	if(ce?.destination?.route=="home"){ // 当前是首页
+		var exit by remember{mutableStateOf(false)}
+		BackHandler(enabled=true){exit=true}
+		if(exit){ // 退出应用，弹框提示
 			AlertDialog(
-				onDismissRequest = { showExit = false },
-				title = { Text("提示") },
-				text = { Text("确定要彻底退出应用吗？") },
-				confirmButton = { TextButton(onClick = { (ctx as? Activity)?.finish() }) { Text("确认退出") } },
-				dismissButton = { TextButton(onClick = { showExit = false }) { Text("取消") } }
+				onDismissRequest={exit=false},
+				shape=RoundedCornerShape(4.dp),
+				title={Text("提示")},text={Text("确定要彻底退出应用吗？")},
+				confirmButton={TextButton(onClick={(ctx as? Activity)?.finish()}){Text("确认退出")}},
+				dismissButton={TextButton(onClick={exit=false}){Text("取消")}}
 			)
 		}
 	}
+	val cc=LocalConfiguration.current // 当前设备配置信息
+	val tv=cc.uiMode and Configuration.UI_MODE_TYPE_MASK==Configuration.UI_MODE_TYPE_TELEVISION
 
-	val cfg = LocalConfiguration.current
-	val isTV = cfg.uiMode and Configuration.UI_MODE_TYPE_MASK == Configuration.UI_MODE_TYPE_TELEVISION
-
-	Box(modifier = Modifier.fillMaxSize()) {
-		NavHost(navController = nav, startDestination = "home") {
-			composable("home") {
-				Home(
-					isTV = isTV,
-					showLog = showLog,
-					onToggleLog = {
-						showLog = it
-						addLog("界面设置", "全局消息面板开关变更为: $it", LogType.INFO)
+	Box(modifier=Modifier.fillMaxSize()){ // 注册所有页面
+		NavHost(navController=nav,startDestination="home"){
+			composable("home"){
+				Home(tv=tv,sg=sg,
+					xg={
+						sg=it
+						log("首页","日志面板显示开关变更为: $it",LT.I)
 					},
-					onMock = { addLog("模拟器", "手动触发高亮警告级系统排查事件！", LogType.WARNING) },
-					onNav = { route ->
-						addLog("路由导航", "正准备切换至原生页面: [$route]", LogType.SUCCESS)
+					go={route->
+						log("导航","准备切换至页面: [$route]",LT.S)
 						nav.navigate(route)
 					}
 				)
 			}
-			composable("setting") {
+			composable("setting"){
 				Setting(
-					onBack = {
-						addLog("路由导航", "从设置面板安全滑回主控制台", LogType.INFO)
+					back={
+						log("导航","返回至首页",LT.I)
 						nav.popBackStack()
 					},
-					onSave = { k, v -> addLog("存储引擎", "配置项 [$k] 自动保存成功: $v", LogType.SUCCESS) }
+					save={k,v->log("设置页","配置项 [$k] 已自动保存为: $v",LT.S)}
 				)
 			}
 		}
-		if (showLog) {
-			LogPanel(
-				modifier = Modifier.align(Alignment.BottomCenter),
-				logs = logs,
-				onDel = { id -> logs.removeAll { it.id == id } }
-			)
-		}
+		if(sg)LP( // 显示日志面板
+			modifier=Modifier.align(Alignment.BottomCenter),
+			list=gs,remove={i->gs.removeAll{it.i==i}}
+		)
 	}
 }
 
-@Composable
-fun Home(isTV: Boolean, showLog: Boolean, onToggleLog: (Boolean) -> Unit, onMock: () -> Unit, onNav: (String) -> Unit) {
-	Column(modifier = Modifier.fillMaxSize()) {
+@Composable // 首页
+fun Home(tv:Boolean,sg:Boolean,xg:(Boolean)->Unit,go:(String)->Unit){
+	Column(modifier=Modifier.fillMaxSize()){
 		Row(
-			modifier = Modifier.fillMaxWidth().statusBarsPadding().height(48.dp).padding(horizontal = 8.dp),
-			verticalAlignment = Alignment.CenterVertically,
-			horizontalArrangement = Arrangement.SpaceBetween
-		) {
-			Text("孚琰 控制台", style = MaterialTheme.typography.titleMedium)
-			Row(verticalAlignment = Alignment.CenterVertically) {
-				Text(text = if (isTV) "电视" else "手机", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(end = 4.dp))
-				IconButton(onClick = { onToggleLog(!showLog) }, modifier = Modifier.size(36.dp)) {
+			modifier=Modifier.fillMaxWidth().statusBarsPadding().height(48.dp).padding(horizontal=8.dp),
+			horizontalArrangement=Arrangement.SpaceBetween,
+			verticalAlignment=Alignment.CenterVertically
+		){
+			Text("孚琰 控制台",style=MaterialTheme.typography.titleLarge)
+			Row(verticalAlignment=Alignment.CenterVertically){
+				Text(text=if(tv)"📺 TV"else"📱 手机",style=MaterialTheme.typography.bodyMedium,modifier=Modifier.padding(end=8.dp))
+				IconButton(onClick={xg(!sg)},modifier=Modifier.size(36.dp).offset(x=6.dp)){
 					Icon(
-						painter = painterResource(if (showLog) R.drawable.visibility else R.drawable.visibility_off),
-						contentDescription = null,
-						modifier = Modifier.size(20.dp)
+						painter=painterResource(if(sg)R.drawable.visibility else R.drawable.visibility_off),
+						contentDescription=null,modifier=Modifier.size(20.dp)
 					)
 				}
 			}
 		}
-		Column(modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp)) {
-			Spacer(modifier = Modifier.height(8.dp))
-			CardItem(title = "自动化参数设置", desc = "内置无缝响应式卡片、表单策略与持久化管理", onClick = { onNav("setting") })
-			Spacer(modifier = Modifier.height(8.dp))
-			CardItem(title = "手动投递诊断日志", desc = "向贴底面板追加一条模拟警告事件进行视图验证", onClick = onMock)
+		Column(modifier=Modifier.fillMaxSize().padding(horizontal=8.dp)){
+			Spacer(modifier=Modifier.height(6.dp))
+			CD(title="自动化参数设置",desc="内置无缝响应式卡片、表单策略与持久化管理",click={go("setting")})
+			Spacer(modifier=Modifier.height(5.dp))
+			CD(title="手动投递诊断日志",desc="向贴底面板追加一条模拟警告事件进行视图验证",click={})
 		}
 	}
 }
 
-@Composable
-fun CardItem(title: String, desc: String, onClick: () -> Unit) {
-	val req = remember { FocusRequester() }
-	val src = remember { MutableInteractionSource() }
-	val focused by src.collectIsFocusedAsState()
-	
-	// 优化：直接利用 Card 固有的 onClick 和规范化的 Modifier 链，确保水波纹和边框严丝合缝
+@Composable // 卡片
+fun CD(title:String,desc:String,click:()->Unit){
+	val fr=remember{FocusRequester()} // 焦点请求器
+	val ms=remember{MutableInteractionSource()} // 交互事件源
+	val focused by ms.collectIsFocusedAsState() // 焦点状态
 	Card(
-		onClick = onClick,
-		interactionSource = src,
-		modifier = Modifier
-			.fillMaxWidth()
-			.height(68.dp)
-			.focusRequester(req)
-			.shadow(if (focused) 6.dp else 1.dp, RoundedCornerShape(8.dp))
-			.border(width = 1.5.dp, color = if (focused) MaterialTheme.colorScheme.primary else Color.Transparent, shape = RoundedCornerShape(8.dp)),
-		colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-	) {
-		Box(modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp, vertical = 8.dp), contentAlignment = Alignment.CenterStart) {
-			Column {
-				Text(title, style = MaterialTheme.typography.titleMedium)
-				Text(desc, style = MaterialTheme.typography.bodySmall, color = Color.Gray, maxLines = 1)
+		onClick=click,interactionSource=ms,
+		modifier=Modifier.fillMaxWidth().focusRequester(fr)
+			.shadow(if(focused)6.dp else 1.dp,RoundedCornerShape(8.dp))
+			.border(width=1.5.dp,color=if(focused)MaterialTheme.colorScheme.primary else Color.Transparent,shape=RoundedCornerShape(8.dp)),
+		colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surfaceVariant)
+	){
+		Box(modifier=Modifier.fillMaxSize().padding(horizontal=12.dp,vertical=8.dp),contentAlignment=Alignment.CenterStart){
+			Column{
+				Text(title,style=MaterialTheme.typography.titleMedium) // 标题
+				Spacer(modifier=Modifier.height(2.dp)) // 间隔
+				// 描述文本
+				Text(desc,style=MaterialTheme.typography.bodySmall,color=Color.Gray,maxLines=2)
 			}
 		}
 	}
 }
 
-@Composable
-fun Setting(onBack: () -> Unit, onSave: (String, String) -> Unit) {
-	var exp by remember { mutableStateOf(true) }
-	var txt by remember { mutableStateOf("") }
-	
-	Column(modifier = Modifier.fillMaxSize().statusBarsPadding().padding(horizontal = 8.dp).verticalScroll(rememberScrollState())) {
-		Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.height(48.dp)) {
-			IconButton(onClick = onBack, modifier = Modifier.size(36.dp)) {
-				Icon(painter = painterResource(R.drawable.arrow_back), contentDescription = null, modifier = Modifier.size(20.dp))
+@Composable // 设置页
+fun Setting(back:()->Unit,save:(String,String)->Unit){
+	var field by remember{mutableStateOf("")} // 关联的值
+	var show by remember{mutableStateOf(true)} // 展开状态
+
+	Column(modifier=Modifier.fillMaxSize().statusBarsPadding().padding(horizontal=8.dp).verticalScroll(rememberScrollState())){
+		// 顶部导航栏
+		Row(verticalAlignment=Alignment.CenterVertically,modifier=Modifier.height(48.dp)){
+			IconButton(onClick=back,modifier=Modifier.size(36.dp).offset(x=-8.dp)){
+				Icon(painter=painterResource(R.drawable.arrow_back),contentDescription=null,modifier=Modifier.size(20.dp))
 			}
-			Text("系统配置", style = MaterialTheme.typography.titleMedium)
+			Text("系统配置",style=MaterialTheme.typography.titleLarge)
 		}
-		Spacer(modifier = Modifier.height(4.dp))
-		Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))) {
-			Column(modifier = Modifier.padding(10.dp)) {
-				Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-					Text("核心参数联动区", style = MaterialTheme.typography.titleMedium)
-					IconButton(onClick = { exp = !exp }, modifier = Modifier.size(36.dp)) {
-						Icon(painter = painterResource(if (exp) R.drawable.expand_less else R.drawable.expand_more), contentDescription = null)
+		Spacer(modifier=Modifier.height(6.dp)) // 间隔
+		// 表单卡片
+		Card(modifier=Modifier.fillMaxWidth(),colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surfaceVariant.copy(alpha=0.5f))){
+			Column(modifier=Modifier.padding(8.dp)){
+				// 顶栏
+				Row(modifier=Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically){
+					Text("核心参数联动区",style=MaterialTheme.typography.titleMedium)
+					IconButton(onClick={show=!show},modifier=Modifier.size(36.dp)){
+						Icon(painter=painterResource(if(show)R.drawable.expand_less else R.drawable.expand_more),contentDescription=null)
 					}
 				}
-				if (exp) {
-					HorizontalDivider(modifier = Modifier.padding(vertical = 6.dp))
-					// 优化：键盘输入仅改变本地文案状态，只有当按下键盘“完成”键或提交时才保存，免除高频打字卡死
+				if(show){ // 根据状态展示表单区域
+					// 分割线
+					HorizontalDivider(modifier=Modifier.padding(vertical=6.dp))
+					// 输入框
 					OutlinedTextField(
-						value = txt,
-						onValueChange = { txt = it },
-						label = { Text("云端接入端点") },
-						modifier = Modifier.fillMaxWidth(),
-						singleLine = true,
-						keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-						keyboardActions = KeyboardActions(onDone = { onSave("API_ENDPOINT", txt) })
+						value=field,onValueChange={field=it},
+						label={Text("关联数据")},
+						modifier=Modifier.fillMaxWidth(),singleLine=true,
+						keyboardOptions=KeyboardOptions(imeAction=ImeAction.Done),
+						keyboardActions=KeyboardActions(onDone={save("TEST",field)})
 					)
 				}
 			}
@@ -254,56 +254,53 @@ fun Setting(onBack: () -> Unit, onSave: (String, String) -> Unit) {
 	}
 }
 
-@Composable
-fun LogPanel(modifier: Modifier = Modifier, logs: List<LogItem>, onDel: (String) -> Unit) {
-	val cfg = LocalConfiguration.current
-	val h = cfg.screenHeightDp.dp
-	var dy by remember { mutableStateOf(0f) }
-	var col by remember { mutableStateOf(false) }
-	val state = rememberLazyListState()
-	
-	LaunchedEffect(logs.size) {
-		if (logs.isNotEmpty()) state.animateScrollToItem(logs.size - 1)
+@Composable // 日志面板
+fun LP(modifier:Modifier=Modifier,list:List<LG>,remove:(String)->Unit){
+	val cc=LocalConfiguration.current // 设备信息
+	val h=cc.screenHeightDp.dp // 屏高(单位:dp)
+	var y by remember{mutableStateOf(0f)} // 垂直方向偏移量(浮点值)
+	var x by remember{mutableStateOf(false)} // 折叠状态
+	val state=rememberLazyListState() // 懒加载列表的滚动状态
+
+	LaunchedEffect(list.size){
+		if(list.isNotEmpty())state.animateScrollToItem(list.size-1)
 	}
-	
-	if (!col) {
-		Box(modifier = modifier
-			.fillMaxWidth()
-			.height(h / 3)
-			.navigationBarsPadding()
-			.offset { IntOffset(0, dy.roundToInt()) }
-			.clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
-			.background(MaterialTheme.colorScheme.surface.copy(alpha = 0.93f))
-			.border(1.dp, Color.Gray.copy(alpha = 0.15f), RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
-			.pointerInput(Unit) {
+
+	if(!x){
+		Box(modifier=modifier.fillMaxWidth().height(h/3).padding(horizontal=3.dp)
+			.navigationBarsPadding().offset{IntOffset(0,y.roundToInt())}
+			.clip(RoundedCornerShape(topStart=8.dp,topEnd=8.dp))
+			.background(MaterialTheme.colorScheme.surface.copy(alpha=0.90f))
+			.border(1.dp,Color.Gray.copy(alpha=0.15f),RoundedCornerShape(topStart=8.dp,topEnd=8.dp))
+			.pointerInput(Unit){
 				detectDragGestures(
-					onDragEnd = { if (dy > 150) col = true; dy = 0f },
-					onDrag = { change, drag -> change.consume(); if (dy + drag.y >= 0) dy += drag.y }
+					onDragEnd={if(y>150)x=true;y=0f},
+					onDrag={change,drag->change.consume();if(y+drag.y>=0)y+=drag.y}
 				)
 			}
-		) {
-			Column(modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp, vertical = 4.dp)) {
-				Box(modifier = Modifier.width(32.dp).height(3.dp).background(Color.Gray.copy(alpha = 0.4f), RoundedCornerShape(1.5.dp)).align(Alignment.CenterHorizontally))
-				LazyColumn(state = state, modifier = Modifier.fillMaxSize()) {
-					items(logs, key = { it.id }) { log ->
-						Row(modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Top) {
-							val color = when (log.type) {
-								LogType.SUCCESS -> Color(0xFF189B46)
-								LogType.ERROR -> Color(0xFFE7012F)
-								LogType.WARNING -> Color(0xFFFDD10D)
-								LogType.INFO -> MaterialTheme.colorScheme.onSurface
+		){
+			Column(modifier=Modifier.fillMaxSize().padding(horizontal=5.dp,vertical=2.dp)){
+				Box(modifier=Modifier.width(64.dp).height(3.dp).padding(vertical=2.dp).background(Color.Gray.copy(alpha=0.4f),RoundedCornerShape(1.5.dp)).align(Alignment.CenterHorizontally))
+				LazyColumn(state=state,modifier=Modifier.fillMaxSize()){
+					items(list,key={it.i}){g->
+						Row(modifier=Modifier.fillMaxWidth().padding(vertical=1.dp),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.Top){
+							val color=when(g.c){
+								LT.S->Color(0xFF189B46)
+								LT.E->Color(0xFFE7012F)
+								LT.W->Color(0xFFFDD10D)
+								LT.I->MaterialTheme.colorScheme.onSurface
 							}
-							Text(text = "[${log.time}] ${log.target} ➜ ${log.message}", color = color, style = MaterialTheme.typography.bodySmall.copy(lineHeight = 1.2.em), modifier = Modifier.weight(1f).padding(PaddingValues(end = 4.dp)))
-							IconButton(onClick = { onDel(log.id) }, modifier = Modifier.size(16.dp).align(Alignment.CenterVertically)) {
-								Icon(painter = painterResource(R.drawable.delete), contentDescription = null, tint = Color.Gray.copy(alpha = 0.7f), modifier = Modifier.size(12.dp))
+							Text(text="[${g.t}] ${g.w} ➜ ${g.o}",color=color,style=MaterialTheme.typography.bodySmall.copy(lineHeight=1.2.em),modifier=Modifier.weight(1f).padding(PaddingValues(end=4.dp)))
+							IconButton(onClick={remove(g.i)},modifier=Modifier.size(16.dp).align(Alignment.CenterVertically)){
+								Icon(painter=painterResource(R.drawable.delete),contentDescription=null,tint=Color.Gray.copy(alpha=0.7f),modifier=Modifier.size(12.dp))
 							}
 						}
-						HorizontalDivider(color = Color.Gray.copy(alpha = 0.08f))
+						HorizontalDivider(color=Color.Gray.copy(alpha=0.08f))
 					}
 				}
 			}
 		}
-	} else {
-		Box(modifier = modifier.padding(bottom = 6.dp).navigationBarsPadding().width(80.dp).height(5.dp).background(Color.Gray.copy(alpha = 0.5f), RoundedCornerShape(2.5.dp)).clickable { col = false })
+	}else{
+		Box(modifier=modifier.padding(bottom=6.dp).navigationBarsPadding().width(80.dp).height(5.dp).background(Color.Gray.copy(alpha=0.5f),RoundedCornerShape(2.5.dp)).clickable{x=false})
 	}
 }

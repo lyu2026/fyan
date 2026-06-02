@@ -231,8 +231,8 @@ fun CD(title:String,desc:String,click:()->Unit){
 	Card(
 		onClick=click,interactionSource=ms,
 		modifier=Modifier.fillMaxWidth().focusRequester(fr).padding(bottom=10.dp)
-			.shadow(if(focused)6.dp else 1.dp,RoundedCornerShape(8.dp))
-			.border(width=1.5.dp,color=if(focused)MaterialTheme.colorScheme.primary else Color.Transparent,shape=RoundedCornerShape(8.dp)),
+			.shadow(if(focused)6.dp else 1.dp,RoundedCornerShape(5.dp))
+			.border(width=1.5.dp,color=if(focused)MaterialTheme.colorScheme.primary else Color.Transparent,shape=RoundedCornerShape(5.dp)),
 		colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surfaceVariant)
 	){
 		Box(modifier=Modifier.fillMaxWidth().padding(horizontal=12.dp,vertical=10.dp),contentAlignment=Alignment.CenterStart){
@@ -300,9 +300,9 @@ fun LP(modifier:Modifier=Modifier,list:List<LG>,remove:(String)->Unit){
 	if(!x){
 		Box(modifier=modifier.fillMaxWidth().height(h/3).padding(horizontal=1.dp)
 			.navigationBarsPadding().offset{IntOffset(0,y.roundToInt())}
-			.clip(RoundedCornerShape(topStart=8.dp,topEnd=8.dp))
+			.clip(RoundedCornerShape(topStart=5.dp,topEnd=5.dp))
 			.background(MaterialTheme.colorScheme.surface.copy(alpha=0.90f))
-			.border(1.dp,Color.Gray.copy(alpha=0.15f),RoundedCornerShape(topStart=8.dp,topEnd=8.dp))
+			.border(1.dp,Color.Gray.copy(alpha=0.15f),RoundedCornerShape(topStart=5.dp,topEnd=5.dp))
 			.pointerInput(Unit){
 				detectDragGestures(
 					onDragEnd={if(y>150)x=true;y=0f},
@@ -311,7 +311,7 @@ fun LP(modifier:Modifier=Modifier,list:List<LG>,remove:(String)->Unit){
 			}
 		){
 			Column(modifier=Modifier.fillMaxSize().padding(horizontal=5.dp,vertical=2.dp)){
-				Box(modifier=Modifier.width(64.dp).height(3.dp).background(Color.Gray.copy(alpha=0.4f),RoundedCornerShape(1.5.dp)).align(Alignment.CenterHorizontally))
+				Box(modifier=Modifier.width(64.dp).height(3.dp).background(Color.Gray.copy(alpha=0.4f),RoundedCornerShape(1.5.dp)).align(Alignment.CenterHorizontally).padding(top=0.5.dp))
 				LazyColumn(state=state,modifier=Modifier.fillMaxSize().padding(top=6.dp)){
 					items(list,key={it.i}){g->
 						Row(modifier=Modifier.fillMaxWidth().padding(vertical=1.dp),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.Top){

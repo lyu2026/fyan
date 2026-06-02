@@ -192,7 +192,7 @@ fun SPA(){
 		NavHost(navController=nav,startDestination="home"){
 			composable("home"){
 				EG(ctx)
-				Home(tv=tv,
+				Home(tv=tv,sg=sg,
 					tg={
 						sg=!sg
 						log("首页","日志面板显示开关变更为: $sg",LT.I)
@@ -209,7 +209,9 @@ fun SPA(){
 						log("导航","返回至首页",LT.I)
 						nav.popBackStack()
 					},
-					save={k,v->log("设置页","配置项 [$k] 已自动保存为:$v",LT.S)}
+					save={k,v->
+						log("设置页","配置项 [$k] 已存为: $v",LT.S)
+					}
 				)
 			}
 		}
@@ -222,7 +224,7 @@ fun SPA(){
 }
 
 @Composable // 首页
-fun Home(tv:Boolean,tg:()->Unit,go:(String)->Unit){
+fun Home(tv:Boolean,sg:Boolean,tg:()->Unit,go:(String)->Unit){
 	Column(modifier=Modifier.fillMaxSize()){
 		Row(
 			modifier=Modifier.fillMaxWidth().statusBarsPadding()
@@ -230,7 +232,7 @@ fun Home(tv:Boolean,tg:()->Unit,go:(String)->Unit){
 			horizontalArrangement=Arrangement.SpaceBetween,
 			verticalAlignment=Alignment.CenterVertically
 		){
-			Text("孚琰 控制台",style=MaterialTheme.typography.titleLarge)
+			Text("首页",style=MaterialTheme.typography.titleLarge)
 			Row(verticalAlignment=Alignment.CenterVertically){
 				Text(
 					text=if(tv)"📺 TV"else"📱 MB",
@@ -239,7 +241,7 @@ fun Home(tv:Boolean,tg:()->Unit,go:(String)->Unit){
 				)
 				IconButton(onClick=tg,modifier=Modifier.size(36.dp)){
 					Icon(
-						painter=painterResource(R.drawable.visibility),
+						painter=painterResource(if(sg)R.drawable.visibility else R.drawable.visibility_off),
 						contentDescription="切换日志面板显示开关",
 						modifier=Modifier.size(20.dp)
 					)
@@ -250,7 +252,9 @@ fun Home(tv:Boolean,tg:()->Unit,go:(String)->Unit){
 		Column(modifier=Modifier.padding(horizontal=10.dp)){
 			CD(title="自动化参数设置",desc="内置无缝响应式卡片、表单策略与持久化管理",click={go("setting")})
 			Spacer(modifier=Modifier.height(6.dp))
-			CD(title="手动投递诊断日志",desc="向贴底面板追加一条模拟警告事件进行视图验证",click={})
+			CD(title="手动投递诊断日志",desc="向贴底面板追加一条模拟警告事件进行视图验证",click={
+				log("测试","模拟点击卡片操作",LT.S)
+			})
 		}
 	}
 }
@@ -337,7 +341,7 @@ fun Setting(back:()->Unit,save:(String,String)->Unit){
 					}
 				}
 				if(s){
-					HorizontalDivider(modifier=Modifier.offset(y=(-2).dp))
+					HorizontalDivider(modifier=Modifier.offset(y=(4).dp))
 					OutlinedTextField(
 						value=field,onValueChange={field=it},label={Text("关联数据")},
 						modifier=Modifier.fillMaxWidth()

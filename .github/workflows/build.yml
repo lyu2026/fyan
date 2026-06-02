@@ -65,9 +65,9 @@ jobs:
         env:
           GRADLE_OPTS: "-Xmx3072m -XX:MaxMetaspaceSize=1024m -Dorg.gradle.logging.level=quiet"
         run: |
-          gradle wrapper --gradle-version 8.7 > /dev/null
+          gradle wrapper --gradle-version 8.7 > /dev/null 2>&1
           chmod +x gradlew
-          ./gradlew :app:assembleDebug --no-daemon --console=plain -Dkotlin.incremental=false
+          ./gradlew :app:assembleDebug --no-daemon --console=plain -Dkotlin.incremental=false > /dev/null
 
       - name: 提取产物
         id: copy

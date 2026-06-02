@@ -333,7 +333,7 @@ fun Setting(back:()->Unit,save:(String,String)->Unit){
 					verticalAlignment=Alignment.CenterVertically
 				){
 					Text("测试数据",style=MaterialTheme.typography.titleMedium)
-					IconButton(onClick={s=!s},modifier=Modifier.size(30.dp)){
+					IconButton(onClick={s=!s},modifier=Modifier.size(24.dp)){
 						Icon(
 							painter=painterResource(if(s)R.drawable.expand_less else R.drawable.expand_more),
 							contentDescription=if(s)"折叠"else"展开"
@@ -341,7 +341,7 @@ fun Setting(back:()->Unit,save:(String,String)->Unit){
 					}
 				}
 				if(s){
-					HorizontalDivider(modifier=Modifier.offset(y=(4).dp))
+					HorizontalDivider(color=MaterialTheme.colorScheme.outlineVariant.copy(alpha=0.7f))
 					OutlinedTextField(
 						value=field,onValueChange={field=it},label={Text("关联数据")},
 						modifier=Modifier.fillMaxWidth()
@@ -436,7 +436,7 @@ fun LPX(modifier:Modifier,height:androidx.compose.ui.unit.Dp,list:List<LG>,remov
 							)
 						}
 					}
-					HorizontalDivider(color=Color.Gray.copy(alpha=0.08f))
+					HorizontalDivider(color=MaterialTheme.colorScheme.outlineVariant.copy(alpha=0.5f))
 				}
 			}
 		}

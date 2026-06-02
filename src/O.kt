@@ -198,7 +198,7 @@ fun SPA(){ // 单页面应用结构
 fun Home(tv:Boolean,sg:Boolean,xg:(Boolean)->Unit,go:(String)->Unit){
 	Column(modifier=Modifier.fillMaxSize()){
 		Row(
-			modifier=Modifier.fillMaxWidth().statusBarsPadding().height(48.dp).padding(start=10.dp,end=2.dp),
+			modifier=Modifier.fillMaxWidth().statusBarsPadding().height(48.dp).padding(start=10.dp,end=3.dp),
 			horizontalArrangement=Arrangement.SpaceBetween,
 			verticalAlignment=Alignment.CenterVertically
 		){
@@ -234,7 +234,7 @@ fun CD(title:String,desc:String,click:()->Unit){
 			.border(width=1.5.dp,color=if(focused)MaterialTheme.colorScheme.primary else Color.Transparent,shape=RoundedCornerShape(8.dp)),
 		colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surfaceVariant)
 	){
-		Box(modifier=Modifier.fillMaxWidth().padding(horizontal=12.dp,vertical=8.dp),contentAlignment=Alignment.CenterStart){
+		Box(modifier=Modifier.fillMaxWidth().padding(horizontal=12.dp,vertical=10.dp),contentAlignment=Alignment.CenterStart){
 			Column{
 				Text(title,style=MaterialTheme.typography.titleMedium) // 标题
 				Spacer(modifier=Modifier.height(2.dp)) // 间隔
@@ -252,7 +252,7 @@ fun Setting(back:()->Unit,save:(String,String)->Unit){
 
 	Column(modifier=Modifier.fillMaxSize().statusBarsPadding().verticalScroll(rememberScrollState())){
 		// 顶部导航栏
-		Row(verticalAlignment=Alignment.CenterVertically,modifier=Modifier.height(48.dp).padding(start=2.dp,end=10.dp)){
+		Row(verticalAlignment=Alignment.CenterVertically,modifier=Modifier.height(48.dp).padding(start=1.dp,end=10.dp)){
 			IconButton(onClick=back,modifier=Modifier.size(36.dp)){
 				Icon(painter=painterResource(R.drawable.arrow_back),contentDescription=null,modifier=Modifier.size(20.dp))
 			}
@@ -261,22 +261,20 @@ fun Setting(back:()->Unit,save:(String,String)->Unit){
 		Spacer(modifier=Modifier.height(4.dp)) // 间隔
 		// 表单卡片
 		Card(modifier=Modifier.fillMaxWidth().padding(horizontal=10.dp),colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surfaceVariant.copy(alpha=0.5f))){
-			Column(modifier=Modifier.padding(vertical=8.dp)){
+			Column(){
 				// 顶栏
-				Row(modifier=Modifier.fillMaxWidth().padding(start=10.dp,end=8.dp),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically){
+				Row(modifier=Modifier.fillMaxWidth().padding(start=10.dp,end=8.dp,top=10.dp,bottom=10.dp),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically){
 					Text("核心参数联动区",style=MaterialTheme.typography.titleMedium)
 					IconButton(onClick={show=!show},modifier=Modifier.size(30.dp)){
 						Icon(painter=painterResource(if(show)R.drawable.expand_less else R.drawable.expand_more),contentDescription=null)
 					}
 				}
 				if(show){ // 根据状态展示表单区域
-					// 分割线
-					HorizontalDivider(modifier=Modifier.padding(vertical=8.dp))
-					// 输入框
-					OutlinedTextField(
+					HorizontalDivider() // 分割线
+					OutlinedTextField( // 输入框
 						value=field,onValueChange={field=it},
 						label={Text("关联数据")},
-						modifier=Modifier.fillMaxWidth().padding(horizontal=8.dp),singleLine=true,
+						modifier=Modifier.fillMaxWidth().padding(10.dp),singleLine=true,
 						keyboardOptions=KeyboardOptions(imeAction=ImeAction.Done),
 						keyboardActions=KeyboardActions(onDone={save("TEST",field)})
 					)
@@ -312,7 +310,7 @@ fun LP(modifier:Modifier=Modifier,list:List<LG>,remove:(String)->Unit){
 			}
 		){
 			Column(modifier=Modifier.fillMaxSize().padding(horizontal=5.dp,vertical=2.dp)){
-				Box(modifier=Modifier.width(36.dp).height(4.dp).background(Color.Gray.copy(alpha=0.4f),RoundedCornerShape(1.5.dp)).align(Alignment.CenterHorizontally).padding(top=6.dp,bottom=8.dp))
+				Box(modifier=Modifier.width(64.dp).height(3.dp).background(Color.Gray.copy(alpha=0.4f),RoundedCornerShape(1.5.dp)).align(Alignment.CenterHorizontally).padding(top=6.dp,bottom=8.dp))
 				LazyColumn(state=state,modifier=Modifier.fillMaxSize()){
 					items(list,key={it.i}){g->
 						Row(modifier=Modifier.fillMaxWidth().padding(vertical=1.dp),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.Top){

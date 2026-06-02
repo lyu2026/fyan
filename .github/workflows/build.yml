@@ -57,7 +57,7 @@ jobs:
 
       - name: 执行构建
         env:
-          GRADLE_OPTS: "-Xmx2560m -XX:MaxMetaspaceSize=512m -XX:+UseParallelGC -Dorg.gradle.logging.level=quiet"
+          GRADLE_OPTS: "-Xmx4096m -XX:MaxMetaspaceSize=2048m -XX:+UseParallelGC -Dorg.gradle.logging.level=quiet"
         run: |
           rm -rf .gradle
           rm -rf app/build

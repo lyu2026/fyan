@@ -213,7 +213,7 @@ fun Home(tv:Boolean,sg:Boolean,xg:(Boolean)->Unit,go:(String)->Unit){
 				}
 			}
 		}
-		Spacer(modifier=Modifier.height(8.dp)) // 间隔
+		Spacer(modifier=Modifier.height(4.dp)) // 间隔
 		Column(modifier=Modifier.padding(horizontal=10.dp)){
 			CD(title="自动化参数设置",desc="内置无缝响应式卡片、表单策略与持久化管理",click={go("setting")})
 			Spacer(modifier=Modifier.height(6.dp))
@@ -234,7 +234,7 @@ fun CD(title:String,desc:String,click:()->Unit){
 			.border(width=1.5.dp,color=if(focused)MaterialTheme.colorScheme.primary else Color.Transparent,shape=RoundedCornerShape(8.dp)),
 		colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surfaceVariant)
 	){
-		Box(modifier=Modifier.fillMaxSize().padding(horizontal=12.dp,vertical=8.dp),contentAlignment=Alignment.CenterStart){
+		Box(modifier=Modifier.fillMaxWidth().padding(horizontal=12.dp,vertical=8.dp),contentAlignment=Alignment.CenterStart){
 			Column{
 				Text(title,style=MaterialTheme.typography.titleMedium) // 标题
 				Spacer(modifier=Modifier.height(2.dp)) // 间隔
@@ -258,9 +258,9 @@ fun Setting(back:()->Unit,save:(String,String)->Unit){
 			}
 			Text("系统配置",style=MaterialTheme.typography.titleLarge)
 		}
-		Spacer(modifier=Modifier.height(8.dp)) // 间隔
+		Spacer(modifier=Modifier.height(4.dp)) // 间隔
 		// 表单卡片
-		Card(modifier=Modifier.fillMaxWidth(),colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surfaceVariant.copy(alpha=0.5f))){
+		Card(modifier=Modifier.fillMaxWidth().padding(horizontal=10.dp),colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surfaceVariant.copy(alpha=0.5f))){
 			Column(modifier=Modifier.padding(6.dp)){
 				// 顶栏
 				Row(modifier=Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically){

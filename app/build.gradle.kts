@@ -26,7 +26,7 @@ android {
     }
 
     dexOptions {
-        javaMaxHeapSize = "3g"
+        javaMaxHeapSize = "2g"
         preDexLibraries = true
     }
 }

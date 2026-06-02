@@ -2,6 +2,10 @@ package com.fyan // 修复：必须保持全小写
 
 import android.app.Activity
 import android.os.Bundle
+import android.widget.EditText
+import android.view.MotionEvent
+import android.view.inputmethod.InputMethodManager
+import android.content.Context
 import android.content.res.Configuration
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
@@ -31,6 +35,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -41,6 +46,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.core.view.WindowCompat
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -70,18 +76,17 @@ class O:ComponentActivity(){
 				val color=scheme.background
 				SideEffect{ // 每次重组后都会执行
 					val a=view.context as?Activity?:return@SideEffect
-					val w=(view.context as?Activity)?.window?:return@SideEffect
-					w.statusBarColor=color.toArgb() // 状态栏背景色
-					WindowCompat.getInsetsController(w,view).apply{
+					a.window.statusBarColor=color.toArgb() // 状态栏背景色
+					WindowCompat.getInsetsController(a.window,view).apply{
 						isAppearanceLightStatusBars=!dark
 					}
 					// 全局设置点击非输入区域时键盘消失
-					w.decorView.setOnTouchListener{_,event->
+					a.window.decorView.setOnTouchListener{_,event->
 						if(event.action==MotionEvent.ACTION_DOWN){
-							val fv=activity.currentFocus
+							val fv=a.currentFocus
 							if(fv is EditText){
 								fv.clearFocus()
-								val im=activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+								val im=a.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 								im.hideSoftInputFromWindow(fv.windowToken,0)
 							}
 						}
@@ -102,9 +107,9 @@ class O:ComponentActivity(){
 fun SPA(){ // 单页面应用结构
 	val ctx=LocalContext.current // 当前 Composable 所在环境的上下文
 	val nav=remember NavController() // 创建一个导航控制器并记住它
-	val gs=remember{mutableStateListOf<LG>()} // 可观察的日志列表，列表内容变化时会触发重组
-	var sg by remember{mutableStateOf(true)} // 可观察的认真面板显示状态，初始值为 true
-	val log=remember{ // 稳定的 Lambda 添加日志函数
+	val gs=remember {mutableStateListOf<LG>()} // 可观察的日志列表，列表内容变化时会触发重组
+	var sg by remember {mutableStateOf(true)} // 可观察的认真面板显示状态，初始值为 true
+	val log=remember { // 稳定的 Lambda 添加日志函数
 		{w:String,o:String,c:LT->
 			val t=SimpleDateFormat("HH:mm:ss",Locale.getDefault()).format(Date())
 			gs.add(LG(t=t,w=w,o=o,c=c))

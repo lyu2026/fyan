@@ -229,7 +229,7 @@ fun CD(title:String,desc:String,click:()->Unit){
 	val focused by ms.collectIsFocusedAsState() // 焦点状态
 	Card(
 		onClick=click,interactionSource=ms,
-		modifier=Modifier.fillMaxWidth().focusRequester(fr)
+		modifier=Modifier.fillMaxWidth().focusRequester(fr).padding(bottom=10.dp)
 			.shadow(if(focused)6.dp else 1.dp,RoundedCornerShape(8.dp))
 			.border(width=1.5.dp,color=if(focused)MaterialTheme.colorScheme.primary else Color.Transparent,shape=RoundedCornerShape(8.dp)),
 		colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surfaceVariant)

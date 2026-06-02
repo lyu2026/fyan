@@ -238,7 +238,7 @@ fun CD(title:String,desc:String,click:()->Unit){
 			.border(width=1.5.dp,color=if(focused)MaterialTheme.colorScheme.primary else Color.Transparent,shape=RoundedCornerShape(5.dp)), // 焦点时显示主色边框
 		colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surfaceVariant) // 卡片背景色
 	){
-		Box(modifier=Modifier.fillMaxWidth().padding(horizontal=12.dp,vertical=10.dp),contentAlignment=Alignment.CenterStart){ // 内容容器，左对齐居中
+		Box(modifier=Modifier.fillMaxWidth().padding(horizontal=12.dp,vertical=10.dp).clip(RoundedCornerShape(5.dp)),contentAlignment=Alignment.CenterStart){ // 内容容器，左对齐居中
 			Column{ // 标题和描述垂直排列
 				Text(title,style=MaterialTheme.typography.titleMedium) // 卡片标题
 				Spacer(modifier=Modifier.height(2.dp)) // 标题与描述间隔
@@ -264,7 +264,7 @@ fun Setting(back:()->Unit,save:(String,String)->Unit){
 		Spacer(modifier=Modifier.height(4.dp)) // 与内容间隔
 		// 表单卡片
 		Card(modifier=Modifier.fillMaxWidth().padding(horizontal=10.dp),colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surfaceVariant.copy(alpha=0.5f))){ // 半透明背景卡片
-			Column(){ // 卡片内容垂直排列
+			Column{ // 卡片内容垂直排列
 				// 卡片顶栏
 				Row(modifier=Modifier.fillMaxWidth().padding(start=10.dp,end=8.dp,top=10.dp,bottom=10.dp),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically){
 					Text("核心参数联动区",style=MaterialTheme.typography.titleMedium) // 区块标题
@@ -273,11 +273,11 @@ fun Setting(back:()->Unit,save:(String,String)->Unit){
 					}
 				}
 				if(show){ // 根据状态展示或隐藏表单区域
-					HorizontalDivider() // 分割线
+					HorizontalDivider(modifier=Modifier.offset(y=-2.dp)) // 分割线
 					OutlinedTextField( // 输入框
 						value=field,onValueChange={field=it}, // 双向绑定
 						label={Text("关联数据")}, // 标签文字
-						modifier=Modifier.fillMaxWidth().padding(10.dp),singleLine=true, // 宽度填满、内边距、单行模式
+						modifier=Modifier.fillMaxWidth().padding(top=6.dp,bottom=10.dp,horizontal=10.dp),singleLine=true, // 宽度填满、内边距、单行模式
 						keyboardOptions=KeyboardOptions(imeAction=ImeAction.Done), // 键盘完成按钮
 						keyboardActions=KeyboardActions(onDone={save("TEST",field)}) // 点击完成时保存
 					)

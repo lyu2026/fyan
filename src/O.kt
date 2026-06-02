@@ -8,9 +8,9 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -39,7 +39,10 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.core.view.WindowCompat
-import androidx.navigation.compose.*
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.roundToInt
@@ -59,7 +62,7 @@ class O:ComponentActivity(){ // 主入口类：托管全屏Spa容器的唯一活
 		super.onCreate(savedInstanceState)
 		setContent{
 			val isDark=isSystemInDarkTheme() // 重要变量：监听并捕获系统当前的暗黑主题状态
-			val colorScheme=if(isDark)darkColorScheme()elselightColorScheme() // 重要变量：自适应双色调色板
+			val colorScheme=if(isDark)darkColorScheme() else lightColorScheme() // 【修复】恢复必要的空格断句，解决语法块错误
 			val view=LocalView.current // 重要变量：持有当前窗口的最底层原生视图引用
 			if(!view.isInEditMode){ // 逻辑拦截：仅在非IDE预览的真实终端渲染沉浸式状态栏
 				SideEffect{
@@ -165,7 +168,7 @@ fun Home(isTV:Boolean,showLog:Boolean,onToggleLog:(Boolean)->Unit,onMock:()->Uni
 				Text(text=if(isTV)"电视"else"手机",style=MaterialTheme.typography.bodyMedium,modifier=Modifier.padding(end=4.dp)) // 终端标注
 				IconButton(onClick={onToggleLog(!showLog)},modifier=Modifier.size(36.dp)){
 					Icon(
-						painter=painterResource(if(showLog)R.drawable.visibility else R.drawable.visibility_off), // 资源优化：丢弃大包，走本地动态资源路径
+						painter=painterResource(if(showLog) R.drawable.visibility else R.drawable.visibility_off), // 【更正】去除包名前缀，采用标准全局资源映射路径
 						contentDescription=null,
 						modifier=Modifier.size(20.dp) // 样式修正：锁定图标物理尺寸
 					)
@@ -221,7 +224,7 @@ fun Setting(onBack:()->Unit,onSave:(String,String)->Unit){ // 参数调节与设
 					Text("核心参数联动区",style=MaterialTheme.typography.titleMedium) // 分区小标题
 					IconButton(onClick={exp=!exp},modifier=Modifier.size(36.dp)){
 						Icon(
-							painter=painterResource(if(exp)R.drawable.expand_less else R.drawable.expand_more), // 动态指示：上下箭头的本地动态无损切图
+							painter=painterResource(if(exp) R.drawable.expand_less else R.drawable.expand_more), // 动态指示：上下箭头的本地动态无损切图
 							contentDescription=null
 						)
 					}

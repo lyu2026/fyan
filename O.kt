@@ -200,6 +200,9 @@ fun SPA(){
 					go={route->
 						log("导航","准备切换至页面: [$route]",LT.S)
 						nav.navigate(route)
+					},
+					test={
+						log("测试","模拟点击卡片操作",LT.S)
 					}
 				)
 			}
@@ -224,7 +227,7 @@ fun SPA(){
 }
 
 @Composable // 首页
-fun Home(tv:Boolean,sg:Boolean,tg:()->Unit,go:(String)->Unit){
+fun Home(tv:Boolean,sg:Boolean,tg:()->Unit,go:(String)->Unit,test:()->Unit){
 	Column(modifier=Modifier.fillMaxSize()){
 		Row(
 			modifier=Modifier.fillMaxWidth().statusBarsPadding()
@@ -252,9 +255,7 @@ fun Home(tv:Boolean,sg:Boolean,tg:()->Unit,go:(String)->Unit){
 		Column(modifier=Modifier.padding(horizontal=10.dp)){
 			CD(title="自动化参数设置",desc="内置无缝响应式卡片、表单策略与持久化管理",click={go("setting")})
 			Spacer(modifier=Modifier.height(6.dp))
-			CD(title="手动投递诊断日志",desc="向贴底面板追加一条模拟警告事件进行视图验证",click={
-				log("测试","模拟点击卡片操作",LT.S)
-			})
+			CD(title="手动投递诊断日志",desc="向贴底面板追加一条模拟警告事件进行视图验证",click={test()})
 		}
 	}
 }
@@ -263,28 +264,26 @@ fun Home(tv:Boolean,sg:Boolean,tg:()->Unit,go:(String)->Unit){
 fun CD(title:String,desc:String,click:()->Unit){
 	val fr=remember{FocusRequester()}
 	val ms=remember{MutableInteractionSource()}
-	val focused by ms.collectIsFocusedAsState()
+	val fs by ms.collectIsFocusedAsState()
+	val sp=RoundedCornerShape(5.dp)
 	val ss by animateDpAsState(
-		targetValue=if(focused)6.dp else 1.dp,
+		targetValue=if(fs)6.dp else 1.dp,
 		label="card_shadow"
 	)
 
 	Card(
 		onClick=click,
-		interactionSource=ms,
+		interactionSource=ms,shape=sp,
 		modifier=Modifier.fillMaxWidth().focusRequester(fr)
-			.padding(bottom=10.dp).shadow(ss,RoundedCornerShape(5.dp))
-			.border(
-				width=1.5.dp,
-				shape=RoundedCornerShape(5.dp),
-				color=if(focused)MaterialTheme.colorScheme.primary else Color.Transparent
+			.padding(bottom=10.dp).shadow(ss,sp).border(
+				width=1.5.dp,shape=sp,
+				color=if(fs)MaterialTheme.colorScheme.primary else Color.Transparent
 			),
 		colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surfaceVariant)
 	){
 		Box(
 			modifier=Modifier.fillMaxWidth()
-				.padding(horizontal=12.dp,vertical=10.dp)
-				.clip(RoundedCornerShape(5.dp)),
+				.padding(horizontal=12.dp,vertical=10.dp).clip(sp),
 			contentAlignment=Alignment.CenterStart
 		){
 			Column{
@@ -300,7 +299,7 @@ fun CD(title:String,desc:String,click:()->Unit){
 fun Setting(back:()->Unit,save:(String,String)->Unit){
 	var field by remember{mutableStateOf("")}
 	var s by remember{mutableStateOf(true)}
-
+	val sp=RoundedCornerShape(5.dp)
 	Column(
 		modifier=Modifier.fillMaxSize()
 			.statusBarsPadding().verticalScroll(rememberScrollState())
@@ -320,12 +319,13 @@ fun Setting(back:()->Unit,save:(String,String)->Unit){
 		}
 		Spacer(modifier=Modifier.height(4.dp))
 		Card(
+			shape=sp,
 			modifier=Modifier.fillMaxWidth().padding(horizontal=10.dp),
 			colors=CardDefaults.cardColors(
 				containerColor=MaterialTheme.colorScheme.surfaceVariant.copy(alpha=0.5f)
 			)
 		){
-			Column(modifier=Modifier.animateContentSize()){
+			Column(modifier=Modifier.animateContentSize().clip(sp)){
 				Row(
 					modifier=Modifier.fillMaxWidth()
 						.padding(start=10.dp,end=8.dp,top=10.dp,bottom=10.dp),
@@ -374,6 +374,7 @@ fun LP(modifier:Modifier=Modifier,list:List<LG>,remove:(String)->Unit){
 // 展开态独立 Composable：拖拽偏移状态 y 仅影响此层，不触发 LP 父层重组
 @Composable
 fun LPX(modifier:Modifier,height:androidx.compose.ui.unit.Dp,list:List<LG>,remove:(String)->Unit,click:()->Unit){
+	val sp=RoundedCornerShape(topStart=6.dp,topEnd=6.dp)
 	var y by remember{mutableStateOf(0f)}
 	val s=rememberLazyListState()
 	LaunchedEffect(list.lastOrNull()?.i){
@@ -381,11 +382,10 @@ fun LPX(modifier:Modifier,height:androidx.compose.ui.unit.Dp,list:List<LG>,remov
 	}
 	Box(
 		modifier=modifier.fillMaxWidth().height(height)
-			.padding(horizontal=1.dp).navigationBarsPadding()
-			.offset{IntOffset(0,y.roundToInt())}
-			.clip(RoundedCornerShape(topStart=5.dp,topEnd=5.dp))
+			.padding(horizontal=0.5.dp).navigationBarsPadding()
+			.offset{IntOffset(0,y.roundToInt())}.clip(sp)
 			.background(MaterialTheme.colorScheme.surface.copy(alpha=0.90f))
-			.border(1.dp,Color.Gray.copy(alpha=0.15f),RoundedCornerShape(topStart=5.dp,topEnd=5.dp))
+			.border(1.dp,Color.Gray.copy(alpha=0.15f),sp)
 			.pointerInput(Unit){
 				detectDragGestures(
 					// 松手偏移超过 150px 则折叠，偏移归零

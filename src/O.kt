@@ -263,7 +263,7 @@ fun Setting(back:()->Unit,save:(String,String)->Unit){
 		Card(modifier=Modifier.fillMaxWidth().padding(horizontal=10.dp),colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surfaceVariant.copy(alpha=0.5f))){
 			Column(modifier=Modifier.padding(vertical=8.dp)){
 				// 顶栏
-				Row(modifier=Modifier.fillMaxWidth().padding(horizontal=8.dp),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically){
+				Row(modifier=Modifier.fillMaxWidth().padding(start=10.dp,end=8.dp),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically){
 					Text("核心参数联动区",style=MaterialTheme.typography.titleMedium)
 					IconButton(onClick={show=!show},modifier=Modifier.size(30.dp)){
 						Icon(painter=painterResource(if(show)R.drawable.expand_less else R.drawable.expand_more),contentDescription=null)

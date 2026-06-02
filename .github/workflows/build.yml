@@ -51,7 +51,7 @@ jobs:
           
           mkdir -p app/src/main/res/xml
           mv AndroidManifest.xml app/src/main/ || true
-          find *.xml -type f ! -name 'AndroidManifest.xml' -exec mv {} app/src/main/res/xml/ \; || true
+          find . -maxdepth 1 -name "*.xml" -type f ! -name "AndroidManifest.xml" -exec mv {} app/src/main/res/xml/ \;
           
           mv app_build.gradle.kts app/build.gradle.kts || true
 

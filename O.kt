@@ -341,7 +341,7 @@ fun Setting(back:()->Unit,save:(String,String)->Unit){
 					OutlinedTextField(
 						value=field,onValueChange={field=it},label={Text("关联数据")},
 						modifier=Modifier.fillMaxWidth()
-							.padding(top=6.dp,bottom=10.dp,horizontal=10.dp),
+							.padding(top=6.dp,bottom=10.dp,start=10.dp,end=10.dp),
 						singleLine=true,
 						keyboardOptions=KeyboardOptions(imeAction=ImeAction.Done),
 						keyboardActions=KeyboardActions(onDone={save("TEST",field)})

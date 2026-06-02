@@ -67,7 +67,7 @@ jobs:
         run: |
           gradle wrapper --gradle-version 8.7 > /dev/null
           chmod +x gradlew
-          ./gradlew clean :app:assembleDebug --no-daemon --console=plain -Dkotlin.incremental=false
+          ./gradlew :app:assembleDebug --no-daemon --console=plain -Dkotlin.incremental=false
 
       - name: 提取产物
         id: copy

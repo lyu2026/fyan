@@ -29,7 +29,7 @@ android {
 	buildTypes {
 		debug {
 			isMinifyEnabled = false // 关闭混淆压缩
-			isShrinkResources = true // 移除无用资源
+			isShrinkResources = false // 移除无用资源
 		}
 		release {
 			isMinifyEnabled = true // 开启混淆压缩

@@ -198,7 +198,7 @@ fun SPA(){ // 单页面应用结构
 fun Home(tv:Boolean,sg:Boolean,xg:(Boolean)->Unit,go:(String)->Unit){
 	Column(modifier=Modifier.fillMaxSize()){
 		Row(
-			modifier=Modifier.fillMaxWidth().statusBarsPadding().height(48.dp).padding(start=10.dp,end=1.dp),
+			modifier=Modifier.fillMaxWidth().statusBarsPadding().height(48.dp).padding(start=10.dp,end=2.dp),
 			horizontalArrangement=Arrangement.SpaceBetween,
 			verticalAlignment=Alignment.CenterVertically
 		){

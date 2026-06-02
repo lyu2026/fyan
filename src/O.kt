@@ -271,12 +271,12 @@ fun Setting(back:()->Unit,save:(String,String)->Unit){
 				}
 				if(show){ // 根据状态展示表单区域
 					// 分割线
-					HorizontalDivider(modifier=Modifier.padding(bottom=5.dp))
+					HorizontalDivider(modifier=Modifier.padding(vertical=8.dp))
 					// 输入框
 					OutlinedTextField(
 						value=field,onValueChange={field=it},
 						label={Text("关联数据")},
-						modifier=Modifier.fillMaxWidth().padding(3.dp),singleLine=true,
+						modifier=Modifier.fillMaxWidth().padding(horizontal=8.dp),singleLine=true,
 						keyboardOptions=KeyboardOptions(imeAction=ImeAction.Done),
 						keyboardActions=KeyboardActions(onDone={save("TEST",field)})
 					)
@@ -312,7 +312,7 @@ fun LP(modifier:Modifier=Modifier,list:List<LG>,remove:(String)->Unit){
 			}
 		){
 			Column(modifier=Modifier.fillMaxSize().padding(horizontal=5.dp,vertical=2.dp)){
-				Box(modifier=Modifier.width(36.dp).height(3.dp).background(Color.Gray.copy(alpha=0.4f),RoundedCornerShape(1.5.dp)).align(Alignment.CenterHorizontally).padding(top=3.dp,bottom=6.dp))
+				Box(modifier=Modifier.width(36.dp).height(4.dp).background(Color.Gray.copy(alpha=0.4f),RoundedCornerShape(1.5.dp)).align(Alignment.CenterHorizontally).padding(top=6.dp,bottom=8.dp))
 				LazyColumn(state=state,modifier=Modifier.fillMaxSize()){
 					items(list,key={it.i}){g->
 						Row(modifier=Modifier.fillMaxWidth().padding(vertical=1.dp),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.Top){

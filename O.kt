@@ -275,7 +275,7 @@ fun CD(title:String,desc:String,click:()->Unit){
 		onClick=click,
 		interactionSource=ms,shape=sp,
 		modifier=Modifier.fillMaxWidth().focusRequester(fr)
-			.padding(bottom=10.dp).shadow(ss,sp).border(
+			.padding(bottom=6.dp).shadow(ss,sp).border(
 				width=1.5.dp,shape=sp,
 				color=if(fs)MaterialTheme.colorScheme.primary else Color.Transparent
 			),
@@ -400,7 +400,7 @@ fun LPX(modifier:Modifier,height:androidx.compose.ui.unit.Dp,list:List<LG>,remov
 				modifier=Modifier
 					.width(64.dp).height(3.dp)
 					.background(Color.Gray.copy(alpha=0.4f),RoundedCornerShape(1.5.dp))
-					.align(Alignment.CenterHorizontally).padding(top=0.5.dp)
+					.align(Alignment.CenterHorizontally).padding(top=1.dp)
 			)
 			LazyColumn(state=s,modifier=Modifier.fillMaxSize().padding(top=6.dp)){
 				items(list,key={it.i}){g->

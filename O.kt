@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -277,7 +278,7 @@ fun CD(title:String,desc:String,click:()->Unit){
 			)
 			.clickable(
 				interactionSource=ms,
-				indication=ripple(), // 保留涟漪视觉
+				indication=null, // 保留涟漪视觉
 				onClick=click
 			),
 		colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surfaceVariant)

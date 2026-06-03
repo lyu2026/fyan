@@ -295,7 +295,7 @@ fun CD(modifier:Modifier=Modifier,title:String,desc:String,click:()->Unit){
 		){
 			Column{
 				Text(title,style=MaterialTheme.typography.titleMedium)
-				if(desc&&desc!=""){
+				if(!desc.isNullOrBlank()){
 					Spacer(modifier=Modifier.height(2.dp))
 					Text(desc,style=MaterialTheme.typography.bodySmall,color=Color.Gray,maxLines=2)
 				}

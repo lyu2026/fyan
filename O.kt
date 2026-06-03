@@ -381,7 +381,7 @@ fun LPX(modifier:Modifier,height:androidx.compose.ui.unit.Dp,list:List<LG>,remov
 		if(list.isNotEmpty())s.animateScrollToItem(list.size-1)
 	}
 	Box(
-		modifier=modifier.fillMaxWidth().height(height)
+		modifier=modifier.fillMaxWidth().heightIn(max=height)
 			.padding(horizontal=0.5.dp).navigationBarsPadding()
 			.offset{IntOffset(0,y.roundToInt())}.clip(sp)
 			.background(MaterialTheme.colorScheme.surface.copy(alpha=0.90f))

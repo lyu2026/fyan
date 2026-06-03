@@ -21,18 +21,18 @@ jobs:
         env:
           DEBIAN_FRONTEND: noninteractive
         run: |
+          sudo apt-get install -y -qq librsvg2-bin > /dev/null 2>&1
+          
           rm -rf app .gradle *.lock
           mkdir -p app/src/main/res/{mipmap-anydpi-v26,drawable}
           mv icon.xml app/src/main/res/mipmap-anydpi-v26/
           mv icon_*.xml tv.xml app/src/main/res/drawable/
-          if [ -d "ico" ]; then
-            for svg in ico/*.svg; do
-              if [ -f "$svg" ]; then
-                fn=$(basename "$svg" .svg)
-                rsvg-convert -w 96 -h 96 "$svg" -o "app/src/main/res/drawable/${fn}.png"
-              fi
-            done
-          fi
+          for svg in ico/*.svg; do
+            if [ -f "$svg" ]; then
+              fn=$(basename "$svg" .svg)
+              rsvg-convert -w 96 -h 96 "$svg" -o "app/src/main/res/drawable/${fn}.png"
+            fi
+          done
           rm -rf ico
 
       - name: 整理配置

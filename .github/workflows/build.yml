@@ -87,14 +87,14 @@ jobs:
           for f in ico/*.svg;do
             [ -e "$f" ]||continue
             n=$(basename "$f" .svg)
-            vb=$(grep -oiP '(?<=viewBox=")[^"]*' "$f"|head -n1|awk '{print $3,$4}')
+            vb=$(grep -oiP 'viewBox="\K[^"]*' "$f"|head -n1|awk '{print $3,$4}')
             [ -z "$vb" ]&&vb="200 200"
-            svg_fill=$(grep -oiP '(?<=<svg[^>]*fill=")[^"]*' "$f"|head -n1||true)
+            svg_fill=$(grep -oiP 'fill="\K[^"]*' "$f"|head -n1||true)
             [ -z "$svg_fill" ]&&svg_fill="#FFFFFF"
             echo "<?xml version=\"1.0\" encoding=\"utf-8\"?><vector xmlns:android=\"http://schemas.android.com/apk/res/android\" android:width=\"200dp\" android:height=\"200dp\" android:viewportWidth=\"${vb% *}\" android:viewportHeight=\"${vb#* }\">">"app/src/main/res/drawable/$n.xml"
-            grep -oiP '<path[^>]*/>' "$f"|while read -r p;do
-              d=$(echo "$p"|grep -oiP '(?<=d=")[^"]*'||true)
-              path_fill=$(echo "$p"|grep -oiP '(?<=fill=")[^"]*'||true)
+            grep -oi '<path[^>]*/>' "$f"|while read -r p;do
+              d=$(echo "$p"|grep -oiP 'd="\K[^"]*'||true)
+              path_fill=$(echo "$p"|grep -oiP 'fill="\K[^"]*'||true)
               if [ "$path_fill" = "none" ];then
                 echo "<path android:pathData=\"$d\" />">>"app/src/main/res/drawable/$n.xml"
               elif [ -z "$path_fill" ];then

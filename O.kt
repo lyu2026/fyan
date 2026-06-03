@@ -107,7 +107,6 @@ class O:ComponentActivity(){
 
 	override fun onCreate(state:Bundle?){
 		super.onCreate(state)
-		window.decorView.isLongClickable=false
 		setContent{
 			val view=LocalView.current
 			val dark=isSystemInDarkTheme()
@@ -122,11 +121,9 @@ class O:ComponentActivity(){
 					}
 				}
 			}
-			CompositionLocalProvider(LocalIndication provides null){
-				MaterialTheme(colorScheme=scheme){
-					Surface(modifier=Modifier.fillMaxSize(),color=MaterialTheme.colorScheme.background){
-						SPA()
-					}
+			MaterialTheme(colorScheme=scheme){
+				Surface(modifier=Modifier.fillMaxSize(),color=MaterialTheme.colorScheme.background){
+					SPA()
 				}
 			}
 		}

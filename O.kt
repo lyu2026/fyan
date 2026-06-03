@@ -331,7 +331,8 @@ fun Setting(back:()->Unit,save:(String,String)->Unit){
 					Icon(
 						painter=painterResource(if(s)R.drawable.expand_less else R.drawable.expand_more),
 						contentDescription=if(s)"折叠"else"展开",
-						modifier=Modifier.size(24.dp).clickable(indication=null){s=!s}
+						modifier=Modifier.size(24.dp)
+							.clickable(interactionSource=remember{MutableInteractionSource()},indication=null){s=!s}
 					)
 				}
 				if(s){
@@ -390,7 +391,7 @@ fun LPX(modifier:Modifier,tv:Boolean,height:Dp,list:List<LG>,remove:(String)->Un
 					.width(64.dp).height(12.dp)
 					.align(Alignment.CenterHorizontally)
 					.pointerInput(tv){if(!tv)detectTapGestures(onTap={click()})} // 触屏零延迟 tap，TV 跳过避免双触
-					.clickable(indication=null,enabled=tv){click()}, // TV 遥控器确认键触发
+					.clickable(interactionSource=remember{MutableInteractionSource()},indication=null,enabled=tv){click()}, // TV 遥控器确认键触发
 				contentAlignment=Alignment.Center
 			){
 				Box( // 视觉横线（与点击热区解耦）
@@ -447,6 +448,6 @@ fun LPO(modifier:Modifier,click:()->Unit){
 		modifier=modifier.padding(bottom=6.dp)
 			.navigationBarsPadding().width(80.dp).height(5.dp)
 			.background(Color.Gray.copy(alpha=0.5f),RoundedCornerShape(2.5.dp))
-			.clickable(indication=null){click()}
+			.clickable(interactionSource=remember{MutableInteractionSource()},indication=null){click()}
 	)
 }

@@ -198,7 +198,7 @@ fun SPA(){
 					},
 					go={route->
 						log("导航","准备切换至页面: [$route]",LT.S)
-						nav.navigate(route)
+						if(route=="home"||route=="setting")nav.navigate(route)
 					},
 					test={
 						log("测试","模拟点击卡片操作",LT.S)
@@ -253,14 +253,14 @@ fun Home(tv:Boolean,sg:Boolean,tg:()->Unit,go:(String)->Unit,test:()->Unit){
 		Spacer(modifier=Modifier.height(4.dp))
 		Column(modifier=Modifier.padding(horizontal=10.dp)){
 			Row(verticalAlignment=Alignment.CenterVertically){
-				CD(modifier=Modifier.fillMaxWidth(0.33f).padding(end=3.dp),title="努努",desc="",click={go("nunu")})
+				CD(modifier=Modifier.fillMaxWidth(0.33f).padding(end=3.dp),title="努努",desc="",click={go("nnu")})
 				Spacer(modifier=Modifier.width(4.dp))
-				CD(modifier=Modifier.fillMaxWidth(0.33f),title="欧乐",desc="",click={go("oule")})
+				CD(modifier=Modifier.fillMaxWidth(0.33f),title="欧乐",desc="",click={go("ole")})
 				Spacer(modifier=Modifier.width(4.dp))
-				CD(modifier=Modifier.fillMaxWidth(0.33f).padding(start=3.dp),title="爱壹帆",desc="",click={go("aiyf")})
+				CD(modifier=Modifier.fillMaxWidth(0.33f).padding(start=3.dp),title="爱壹帆",desc="",click={go("ayf")})
 			}
 			Spacer(modifier=Modifier.height(6.dp))
-			CD(modifier=Modifier.fillMaxWidth(),title="游戏大全",desc="本地益智小游戏",click={test()})
+			CD(modifier=Modifier.fillMaxWidth(),title="游戏大全",desc="本地益智小游戏",click={go("setting")})
 			Spacer(modifier=Modifier.height(6.dp))
 			CD(modifier=Modifier.fillMaxWidth(),title="科学书城",desc="向贴底面板追加一条模拟警告事件进行视图验证",click={test()})
 			Spacer(modifier=Modifier.height(6.dp))
@@ -295,8 +295,10 @@ fun CD(modifier:Modifier=Modifier,title:String,desc:String,click:()->Unit){
 		){
 			Column{
 				Text(title,style=MaterialTheme.typography.titleMedium)
-				Spacer(modifier=Modifier.height(2.dp))
-				Text(desc,style=MaterialTheme.typography.bodySmall,color=Color.Gray,maxLines=2)
+				if(desc&&desc!=""){
+					Spacer(modifier=Modifier.height(2.dp))
+					Text(desc,style=MaterialTheme.typography.bodySmall,color=Color.Gray,maxLines=2)
+				}
 			}
 		}
 	}

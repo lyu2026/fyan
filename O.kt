@@ -264,22 +264,17 @@ fun CD(title:String,desc:String,click:()->Unit){
 	val fr=remember{FocusRequester()}
 	val ms=remember{MutableInteractionSource()}
 	val fs by ms.collectIsFocusedAsState()
-	val ps by ms.collectIsPressedAsState() // 监听按下状态，驱动即时视觉反馈
+	val ps by ms.collectIsPressedAsState()
 	val sp=RoundedCornerShape(5.dp)
 	val ss by animateDpAsState(
 		targetValue=if(fs||ps)6.dp else 1.dp,
 		label="card_shadow"
 	)
-	val bc=when{
-		ps->MaterialTheme.colorScheme.primary.copy(alpha=0.12f) // 按下：主色调浅色背景
-		else->MaterialTheme.colorScheme.surfaceVariant
-	}
 	val ec=when{
 		fs->MaterialTheme.colorScheme.primary // 焦点：主色边框
-		ps->MaterialTheme.colorScheme.primary.copy(alpha=0.6f) // 按下：半透明主色边框
+		ps->MaterialTheme.colorScheme.primary // 按下：主色边框
 		else->Color.Transparent
 	}
-
 	Card(
 		shape=sp,
 		modifier=Modifier.fillMaxWidth().focusRequester(fr)
@@ -287,7 +282,7 @@ fun CD(title:String,desc:String,click:()->Unit){
 				width=1.5.dp,shape=sp,color=ec
 			)
 			.clickable(interactionSource=ms,indication=null,onClick=click),
-		colors=CardDefaults.cardColors(containerColor=bc)
+		colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surfaceVariant)
 	){
 		Box(
 			modifier=Modifier.fillMaxWidth()
@@ -307,7 +302,14 @@ fun CD(title:String,desc:String,click:()->Unit){
 fun Setting(back:()->Unit,save:(String,String)->Unit){
 	var field by remember{mutableStateOf("")}
 	var s by remember{mutableStateOf(true)}
+	val fs by ms.collectIsFocusedAsState()
+	val ps by ms.collectIsPressedAsState()
 	val sp=RoundedCornerShape(5.dp)
+	val ec=when{
+		fs->MaterialTheme.colorScheme.primary // 焦点：主色边框
+		ps->MaterialTheme.colorScheme.primary // 按下：主色边框
+		else->Color.Transparent
+	}
 	Column(
 		modifier=Modifier.fillMaxSize()
 			.statusBarsPadding().verticalScroll(rememberScrollState())
@@ -328,9 +330,11 @@ fun Setting(back:()->Unit,save:(String,String)->Unit){
 		Spacer(modifier=Modifier.height(4.dp))
 		Card(
 			shape=sp,
-			modifier=Modifier.fillMaxWidth().padding(horizontal=10.dp),
+			modifier=Modifier.fillMaxWidth()
+				.padding(horizontal=10.dp)
+				.border(width=1.5.dp,color=ec),
 			colors=CardDefaults.cardColors(
-				containerColor=MaterialTheme.colorScheme.surfaceVariant.copy(alpha=0.5f)
+				containerColor=MaterialTheme.colorScheme.surfaceVariant
 			)
 		){
 			Column(modifier=Modifier.animateContentSize().clip(sp)){

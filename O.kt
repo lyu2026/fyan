@@ -253,24 +253,24 @@ fun Home(tv:Boolean,sg:Boolean,tg:()->Unit,go:(String)->Unit,test:()->Unit){
 		Spacer(modifier=Modifier.height(4.dp))
 		Column(modifier=Modifier.padding(horizontal=10.dp)){
 			Row(verticalAlignment=Alignment.CenterVertically){
-				CD(title="努努",desc="",click={go("nunu")})
+				CD(modifier=Modifier.fillMaxWidth(0.33f).padding(end=3.dp),title="努努",desc="",click={go("nunu")})
 				Spacer(modifier=Modifier.width(4.dp))
-				CD(title="欧乐",desc="",click={go("oule")})
+				CD(modifier=Modifier.fillMaxWidth(0.33f),title="欧乐",desc="",click={go("oule")})
 				Spacer(modifier=Modifier.width(4.dp))
-				CD(title="爱壹帆",desc="",click={go("aiyf")})
+				CD(modifier=Modifier.fillMaxWidth(0.33f).padding(start=3.dp),title="爱壹帆",desc="",click={go("aiyf")})
 			}
 			Spacer(modifier=Modifier.height(6.dp))
-			CD(title="游戏大全",desc="本地益智小游戏",click={test()})
+			CD(modifier=Modifier.fillMaxWidth(),title="游戏大全",desc="本地益智小游戏",click={test()})
 			Spacer(modifier=Modifier.height(6.dp))
-			CD(title="科学书城",desc="向贴底面板追加一条模拟警告事件进行视图验证",click={test()})
+			CD(modifier=Modifier.fillMaxWidth(),title="科学书城",desc="向贴底面板追加一条模拟警告事件进行视图验证",click={test()})
 			Spacer(modifier=Modifier.height(6.dp))
-			CD(title="私人日记",desc="随心散记",click={test()})
+			CD(modifier=Modifier.fillMaxWidth(),title="私人日记",desc="随心散记",click={test()})
 		}
 	}
 }
 
 @Composable // 卡片
-fun CD(title:String,desc:String,click:()->Unit){
+fun CD(modifier:Modifier=Modifier,title:String,desc:String,click:()->Unit){
 	val fr=remember{FocusRequester()}
 	val m=remember{MutableInteractionSource()}
 	val fs by m.collectIsFocusedAsState()
@@ -283,7 +283,7 @@ fun CD(title:String,desc:String,click:()->Unit){
 	}
 	Card(
 		shape=sp,
-		modifier=Modifier.fillMaxWidth().focusRequester(fr)
+		modifier=modifier.focusRequester(fr)
 			.padding(bottom=6.dp).border(width=1.dp,shape=sp,color=ec)
 			.clickable(interactionSource=m,indication=null,onClick=click),
 		colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surfaceVariant.copy(alpha=0.6f))

@@ -252,9 +252,19 @@ fun Home(tv:Boolean,sg:Boolean,tg:()->Unit,go:(String)->Unit,test:()->Unit){
 		}
 		Spacer(modifier=Modifier.height(4.dp))
 		Column(modifier=Modifier.padding(horizontal=10.dp)){
-			CD(title="自动化参数设置",desc="内置无缝响应式卡片、表单策略与持久化管理",click={go("setting")})
+			Row(verticalAlignment=Alignment.CenterVertically){
+				CD(title="努努",desc="",click={go("nunu")})
+				Spacer(modifier=Modifier.with(4.dp))
+				CD(title="欧乐",desc="",click={go("oule")})
+				Spacer(modifier=Modifier.with(4.dp))
+				CD(title="爱壹帆",desc="",click={go("aiyf")})
+			}
 			Spacer(modifier=Modifier.height(6.dp))
-			CD(title="手动投递诊断日志",desc="向贴底面板追加一条模拟警告事件进行视图验证",click={test()})
+			CD(title="游戏大全",desc="本地益智小游戏",click={test()})
+			Spacer(modifier=Modifier.height(6.dp))
+			CD(title="科学书城",desc="向贴底面板追加一条模拟警告事件进行视图验证",click={test()})
+			Spacer(modifier=Modifier.height(6.dp))
+			CD(title="私人日记",desc="随心散记",click={test()})
 		}
 	}
 }

@@ -157,7 +157,7 @@ jobs:
         with:
           files: ${{ steps.copy.outputs.apk }}
           tag_name: ${{ github.ref_name }}
-          name: 孚琰 ${{ github.ref_name }}
+          name: 仏琰 ${{ github.ref_name }}
           body: |
             - **引擎架构**：原生双端自适应内核
             - **更新内容**：${{ steps.commit.outputs.message }}

@@ -282,7 +282,7 @@ fun CD(title:String,desc:String,click:()->Unit){
 				width=1.5.dp,shape=sp,color=ec
 			)
 			.clickable(interactionSource=m,indication=null,onClick=click),
-		colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surfaceVariant)
+		colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surfaceVariant.copy(alpha=0.6f))
 	){
 		Box(
 			modifier=Modifier.fillMaxWidth()
@@ -324,8 +324,8 @@ fun Setting(back:()->Unit,save:(String,String)->Unit){
 		Card(
 			shape=sp,
 			modifier=Modifier.fillMaxWidth().padding(horizontal=10.dp),
-			colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surfaceVariant)
-		){
+			colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surfaceVariant.copy(alpha=0.6f))
+	){
 			Column(modifier=Modifier.animateContentSize().clip(sp)){
 				Row(
 					modifier=Modifier.fillMaxWidth()
@@ -334,7 +334,6 @@ fun Setting(back:()->Unit,save:(String,String)->Unit){
 					verticalAlignment=Alignment.CenterVertically
 				){
 					Text("测试数据",style=MaterialTheme.typography.titleMedium)
-					// IconButton → Icon：避免与外层 Row.clickable 形成双重点击区域
 					Icon(
 						painter=painterResource(if(s)R.drawable.expand_less else R.drawable.expand_more),
 						contentDescription=if(s)"折叠"else"展开",
@@ -342,7 +341,7 @@ fun Setting(back:()->Unit,save:(String,String)->Unit){
 					)
 				}
 				if(s){
-					HorizontalDivider(color=MaterialTheme.colorScheme.outlineVariant.copy(alpha=0.7f))
+					HorizontalDivider(color=MaterialTheme.colorScheme.background.copy(alpha=0.5f))
 					OutlinedTextField(
 						value=field,onValueChange={field=it},label={Text("关联数据")},
 						modifier=Modifier.fillMaxWidth()

@@ -250,19 +250,15 @@ fun Home(tv:Boolean,sg:Boolean,tg:()->Unit,go:(String)->Unit,test:()->Unit){
 				}
 			}
 		}
-		Spacer(modifier=Modifier.height(4.dp))
-		Column(modifier=Modifier.padding(horizontal=10.dp)){
+		Column(modifier=Modifier.padding(start=10.dp,end=10.dp,top=4.dp)){
 			Row(verticalAlignment=Alignment.CenterVertically){
 				CD(center=true,modifier=Modifier.fillMaxWidth(1f/3f).padding(end=2.dp),title="努努",desc="",click={go("nnu")})
 				CD(center=true,modifier=Modifier.fillMaxWidth(1f/3f).padding(horizontal=2.dp),title="欧乐",desc="",click={go("ole")})
 				CD(center=true,modifier=Modifier.fillMaxWidth(1f/3f).padding(start=2.dp),title="爱壹帆",desc="",click={go("ayf")})
 			}
-			Spacer(modifier=Modifier.height(6.dp))
-			CD(modifier=Modifier.fillMaxWidth(),title="游戏大全",desc="本地益智小游戏",click={go("setting")})
-			Spacer(modifier=Modifier.height(6.dp))
-			CD(modifier=Modifier.fillMaxWidth(),title="科学书城",desc="向贴底面板追加一条模拟警告事件进行视图验证",click={test()})
-			Spacer(modifier=Modifier.height(6.dp))
-			CD(modifier=Modifier.fillMaxWidth(),title="私人日记",desc="随心散记",click={test()})
+			CD(center=false,modifier=Modifier.fillMaxWidth().padding(top=6.dp),title="游戏大全",desc="本地益智小游戏",click={go("setting")})
+			CD(center=false,modifier=Modifier.fillMaxWidth().padding(top=6.dp),title="科学书城",desc="向贴底面板追加一条模拟警告事件进行视图验证",click={test()})
+			CD(center=false,modifier=Modifier.fillMaxWidth().padding(top=6.dp),title="私人日记",desc="随心散记",click={test()})
 		}
 	}
 }

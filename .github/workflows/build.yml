@@ -78,27 +78,29 @@ jobs:
           node-version: 20
 
       - name: 资源准备
-        env:
-          DEBIAN_FRONTEND: noninteractive
         run: |
           rm -rf app .gradle *.lock
           mkdir -p app/src/main/res/{mipmap-{anydpi-v26,mdpi,hdpi,xhdpi,xxhdpi,xxxhdpi},drawable,drawable-nodpi}
           
           mv icon.xml app/src/main/res/mipmap-anydpi-v26/
           mv icon_*.xml tv.xml app/src/main/res/drawable/
-          for f in ico/*.svg; do
-            if [ -f "$f" ]; then
-              n=$(basename "$f" .svg)
-              sed -i 's/'\''/"/g' "$f"
-              if ! grep -q 'width=' "$f"; then
-                sed -i 's/<svg/<svg width="200" height="200"/g' "$f"
-              fi
-              npx --yes svg2vectordrawable -i "$f" -o "app/src/main/res/drawable/$n.xml" > /dev/null 2>&1
-              sed -i 's/<?xml[^>]*?>//g' "app/src/main/res/drawable/$n.xml"
-              sed -i '/^$/d' "app/src/main/res/drawable/$n.xml"
-            fi
-          done
           
+          for f in ico/*.svg; do
+            [ -e "$f" ] || continue
+            n=$(basename "$f" .svg)
+            fill_color=$(grep -oiP '(?<=fill=")[^"]*' "$f" | head -n 1 || echo "#000000")
+            vb=$(grep -oiP '(?<=viewBox=")[^"]*' "$f" | head -n 1 | cut -d' ' -f3,4 --output-delimiter=' ')
+            [ -z "$vb" ] && vb="200 200"
+            cat > "app/src/main/res/drawable/$n.xml" <<EOF
+            <vector xmlns:android="http://schemas.android.com/apk/res/android"
+                android:width="200dp" android:height="200dp"
+                android:viewportWidth="$(echo $vb | cut -d' ' -f1)" android:viewportHeight="$(echo $vb | cut -d' ' -f2)">
+            EOF
+            grep -oiP '(?<=d=")[^"]*' "$f" | while read -r path_data; do
+              echo "<path android:fillColor=\"$fill_color\" android:pathData=\"$path_data\" />" >> "app/src/main/res/drawable/$n.xml"
+            done
+            echo "</vector>" >> "app/src/main/res/drawable/$n.xml"
+          done
           rm -rf ico
 
       - name: 整理配置

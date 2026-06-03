@@ -91,8 +91,8 @@ jobs:
             [ -z "$vb" ]&&vb="200 200"
             echo "<?xml version=\"1.0\" encoding=\"utf-8\"?><vector xmlns:android=\"http://schemas.android.com/apk/res/android\" android:width=\"200dp\" android:height=\"200dp\" android:viewportWidth=\"${vb% *}\" android:viewportHeight=\"${vb#* }\">">"app/src/main/res/drawable/$n.xml"
             grep -oiP '<path[^>]*/>' "$f"|while read -r p;do
-              d=$(echo "$p"|grep -oiP '(?<=d=")[^"]*')
-              fill=$(echo "$p"|grep -oiP '(?<=fill=")[^"]*')
+              d=$(echo "$p"|grep -oiP '(?<=d=")[^"]*'||true)
+              fill=$(echo "$p"|grep -oiP '(?<=fill=")[^"]*'||true)
               [ "$fill" = "none" -o -z "$fill" ]&&echo "<path android:pathData=\"$d\" />">>"app/src/main/res/drawable/$n.xml"||echo "<path android:fillColor=\"$fill\" android:pathData=\"$d\" />">>"app/src/main/res/drawable/$n.xml"
             done
             echo "</vector>">>"app/src/main/res/drawable/$n.xml"

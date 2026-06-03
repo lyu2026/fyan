@@ -221,7 +221,7 @@ fun SPA(){
 
 		if(sg)LP(
 			modifier=Modifier.align(Alignment.BottomCenter),
-			list=gs,remove={id->gs.removeAll{it.i==id}}
+			tv=tv,list=gs,remove={id->gs.removeAll{it.i==id}}
 		)
 	}
 }
@@ -357,14 +357,14 @@ fun Setting(back:()->Unit,save:(String,String)->Unit){
 }
 
 @Composable // 日志面板
-fun LP(modifier:Modifier=Modifier,list:List<LG>,remove:(String)->Unit){
+fun LP(modifier:Modifier=Modifier,tv:Boolean,list:List<LG>,remove:(String)->Unit){
 	var s by remember{mutableStateOf(false)}
 	val c=LocalConfiguration.current
 	val h=c.screenHeightDp.dp
 	if(!s){
 		LPX(
 			modifier=modifier,height=h/3,
-			list=list,remove=remove,click={s=true}
+			tv=tv,list=list,remove=remove,click={s=true}
 		)
 	}else{
 		LPO(modifier=modifier,click={s=false})
@@ -373,7 +373,7 @@ fun LP(modifier:Modifier=Modifier,list:List<LG>,remove:(String)->Unit){
 
 // 展开态独立 Composable：拖拽偏移状态 y 仅影响此层，不触发 LP 父层重组
 @Composable
-fun LPX(modifier:Modifier,height:androidx.compose.ui.unit.Dp,list:List<LG>,remove:(String)->Unit,click:()->Unit){
+fun LPX(modifier:Modifier,tv:Boolean,height:androidx.compose.ui.unit.Dp,list:List<LG>,remove:(String)->Unit,click:()->Unit){
 	val sp=RoundedCornerShape(topStart=6.dp,topEnd=6.dp)
 	var y by remember{mutableStateOf(0f)}
 	val s=rememberLazyListState()
@@ -400,7 +400,7 @@ fun LPX(modifier:Modifier,height:androidx.compose.ui.unit.Dp,list:List<LG>,remov
 				modifier=Modifier
 					.width(64.dp).height(3.dp)
 					.background(Color.Gray.copy(alpha=0.4f),RoundedCornerShape(1.5.dp))
-					.align(Alignment.CenterHorizontally).padding(top=1.dp)
+					.align(Alignment.CenterHorizontally).padding(top=1.6.dp).clickable(enabled=tv){click()}
 			)
 			LazyColumn(state=s,modifier=Modifier.fillMaxSize().padding(top=6.dp)){
 				items(list,key={it.i}){g->

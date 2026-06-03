@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-	<item><shape><solid android:color="@color/icon_bg"/></shape></item>
+	<item><shape><solid android:color="#FFFFFF"/></shape></item>
 	<item>
 		<animated-vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt">
 			<aapt:attr name="android:drawable">

@@ -9,7 +9,62 @@ permissions:
   contents: write
 
 jobs:
-  o:
+  clear:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - name: 清理无效执行
+        run: |
+          echo ">>> 获取仓库所有 workflow runs"
+          ALL_RUNS=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/runs?per_page=100" \
+            | jq -r '.workflow_runs[] | "\(.id)|\(.head_branch)|\(.status)|\(.conclusion)|\(.display_title)"')
+          if [ -z "$ALL_RUNS" ]; then
+            echo ">>> 没有找到任何 workflow runs"
+            exit 0
+          fi
+          echo ">>> 当前 tag: ${{ github.ref_name }}"
+          echo ">>> 当前 run: #${{ github.run_number }} (ID: ${{ github.run_id }})"
+          DELETE_IDS=""
+          while IFS= read -r line; do
+            ID=$(echo "$line" | cut -d'|' -f1)
+            BRANCH=$(echo "$line" | cut -d'|' -f2)
+            STATUS=$(echo "$line" | cut -d'|' -f3)
+            CONCLUSION=$(echo "$line" | cut -d'|' -f4)
+            TITLE=$(echo "$line" | cut -d'|' -f5)
+            if [ "$ID" = "${{ github.run_id }}" ]; then
+              echo ">>> 跳过当前 run: #${{ github.run_number }} $ID"
+              continue
+            fi
+            if [ "$CONCLUSION" = "failure" ] || [ "$CONCLUSION" = "cancelled" ] || [ "$STATUS" = "cancelled" ] || [ "$BRANCH" = "${{ github.ref_name }}" ]; then
+              echo ">>> 标记删除: $ID ($BRANCH, $STATUS, $CONCLUSION)"
+              DELETE_IDS="$DELETE_IDS $ID"
+            fi
+          done <<< "$ALL_RUNS"
+          if [ -z "$DELETE_IDS" ]; then
+            echo ">>> 没有需要清理的 runs"
+          else
+            echo ">>> 正在删除..."
+            for ID in $DELETE_IDS; do
+              echo ">>> 删除 run $ID"
+              STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X DELETE \
+                -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+                -H "Accept: application/vnd.github+json" \
+                -H "X-GitHub-Api-Version: 2022-11-28" \
+                "https://api.github.com/repos/${{ github.repository }}/actions/runs/$ID")
+              if [ "$STATUS_CODE" = "204" ]; then
+                echo "    ✅ 删除成功"
+              else
+                echo "    ❌ 删除失败 (HTTP $STATUS_CODE)"
+              fi
+            done
+            echo ">>> 清理完成"
+          fi
+
+  build_and_release:
     runs-on: ubuntu-latest
     steps:
       - name: 拉取代码

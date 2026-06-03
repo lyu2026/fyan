@@ -22,11 +22,9 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           rm -rf app .gradle *.lock
-          mkdir -p app/src/main/res/{mipmap-anydpi-v26,drawable,color,color/color-night}
+          mkdir -p app/src/main/res/{mipmap-anydpi-v26,drawable}
           mv icon.xml app/src/main/res/mipmap-anydpi-v26/
-          mv icon_bg_dark.xml app/src/main/res/color/color-night/
-          mv icon_bg.xml app/src/main/res/color/
-          mv icon_*.xml app/src/main/res/drawable/
+          mv icon_*.xml tv.xml app/src/main/res/drawable/
           if [ -d "ico" ]; then
             for svg in ico/*.svg; do
               if [ -f "$svg" ]; then

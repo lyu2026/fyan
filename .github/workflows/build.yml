@@ -92,10 +92,10 @@ jobs:
             vb=$(grep -oiP '(?<=viewBox=")[^"]*' "$f" | head -n 1 | cut -d' ' -f3,4 --output-delimiter=' ')
             [ -z "$vb" ] && vb="200 200"
             cat > "app/src/main/res/drawable/$n.xml" <<EOF
-            <vector xmlns:android="http://schemas.android.com/apk/res/android"
-                android:width="200dp" android:height="200dp"
-                android:viewportWidth="$(echo $vb | cut -d' ' -f1)" android:viewportHeight="$(echo $vb | cut -d' ' -f2)">
-            EOF
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+	android:width="200dp" android:height="200dp"
+	android:viewportWidth="$(echo $vb | cut -d' ' -f1)" android:viewportHeight="$(echo $vb | cut -d' ' -f2)">
+EOF
             grep -oiP '(?<=d=")[^"]*' "$f" | while read -r path_data; do
               echo "<path android:fillColor=\"$fill_color\" android:pathData=\"$path_data\" />" >> "app/src/main/res/drawable/$n.xml"
             done

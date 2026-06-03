@@ -148,10 +148,10 @@ fun EG(ctx:Context){
 			shape=RoundedCornerShape(4.dp),
 			title={Text("提示")},text={Text("确定要彻底退出应用吗？")},
 			confirmButton={
-				TextButton(onClick={(ctx as?Activity)?.finish()}){Text("确认退出")}
+				TextButton(modifier=Modifier.padding(bottom=0.dp),onClick={(ctx as?Activity)?.finish()}){Text("确认退出")}
 			},
 			dismissButton={
-				TextButton(onClick={exit=false}){Text("取消")}
+				TextButton(modifier=Modifier.padding(bottom=0.dp),onClick={exit=false}){Text("取消")}
 			}
 		)
 	}

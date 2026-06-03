@@ -84,18 +84,18 @@ jobs:
           
           mv icon.xml app/src/main/res/mipmap-anydpi-v26/
           mv icon_*.xml tv.xml app/src/main/res/drawable/
-          
-          for f in ico/*.svg; do
-            [ -e "$f" ] || continue
+          for f in ico/*.svg;do
+            [ -e "$f" ]||continue
             n=$(basename "$f" .svg)
-            fill_color=$(grep -oiP '(?<=fill=")[^"]*' "$f" | head -n 1 || echo "#000000")
-            vb=$(grep -oiP '(?<=viewBox=")[^"]*' "$f" | head -n 1 | cut -d' ' -f3,4 --output-delimiter=' ')
-            [ -z "$vb" ] && vb="200 200"
-            echo "<vector xmlns:android=\"http://schemas.android.com/apk/res/android\" android:width=\"200dp\" android:height=\"200dp\" android:viewportWidth=\"$(echo $vb | cut -d' ' -f1)\" android:viewportHeight=\"$(echo $vb | cut -d' ' -f2)\">" > "app/src/main/res/drawable/$n.xml"
-            grep -oiP '(?<=d=")[^"]*' "$f" | while read -r path_data; do
-              echo "<path android:fillColor=\"$fill_color\" android:pathData=\"$path_data\" />" >> "app/src/main/res/drawable/$n.xml"
+            vb=$(grep -oiP '(?<=viewBox=")[^"]*' "$f"|head -n1|awk '{print $3,$4}')
+            [ -z "$vb" ]&&vb="200 200"
+            echo "<vector xmlns:android=\"http://schemas.android.com/apk/res/android\" android:width=\"200dp\" android:height=\"200dp\" android:viewportWidth=\"${vb% *}\" android:viewportHeight=\"${vb#* }\">">"app/src/main/res/drawable/$n.xml"
+            grep -oiP '<path[^>]*/>' "$f"|while read -r p;do
+              d=$(echo "$p"|grep -oiP '(?<=d=")[^"]*')
+              fill=$(echo "$p"|grep -oiP '(?<=fill=")[^"]*')
+              [ "$fill" = "none" -o -z "$fill" ]&&echo "<path android:pathData=\"$d\" />">>"app/src/main/res/drawable/$n.xml"||echo "<path android:fillColor=\"$fill\" android:pathData=\"$d\" />">>"app/src/main/res/drawable/$n.xml"
             done
-            echo "</vector>" >> "app/src/main/res/drawable/$n.xml"
+            echo "</vector>">>"app/src/main/res/drawable/$n.xml"
           done
           rm -rf ico
 

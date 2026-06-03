@@ -262,9 +262,9 @@ fun Home(tv:Boolean,sg:Boolean,tg:()->Unit,go:(String)->Unit,test:()->Unit){
 @Composable // 卡片
 fun CD(title:String,desc:String,click:()->Unit){
 	val fr=remember{FocusRequester()}
-	val ms=remember{MutableInteractionSource()}
-	val fs by ms.collectIsFocusedAsState()
-	val ps by ms.collectIsPressedAsState()
+	val m=remember{MutableInteractionSource()}
+	val fs by m.collectIsFocusedAsState()
+	val ps by m.collectIsPressedAsState()
 	val sp=RoundedCornerShape(5.dp)
 	val ss by animateDpAsState(
 		targetValue=if(fs||ps)6.dp else 1.dp,
@@ -281,7 +281,7 @@ fun CD(title:String,desc:String,click:()->Unit){
 			.padding(bottom=6.dp).shadow(ss,sp).border(
 				width=1.5.dp,shape=sp,color=ec
 			)
-			.clickable(interactionSource=ms,indication=null,onClick=click),
+			.clickable(interactionSource=m,indication=null,onClick=click),
 		colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surfaceVariant)
 	){
 		Box(
@@ -302,14 +302,7 @@ fun CD(title:String,desc:String,click:()->Unit){
 fun Setting(back:()->Unit,save:(String,String)->Unit){
 	var field by remember{mutableStateOf("")}
 	var s by remember{mutableStateOf(true)}
-	val fs by ms.collectIsFocusedAsState()
-	val ps by ms.collectIsPressedAsState()
 	val sp=RoundedCornerShape(5.dp)
-	val ec=when{
-		fs->MaterialTheme.colorScheme.primary // 焦点：主色边框
-		ps->MaterialTheme.colorScheme.primary // 按下：主色边框
-		else->Color.Transparent
-	}
 	Column(
 		modifier=Modifier.fillMaxSize()
 			.statusBarsPadding().verticalScroll(rememberScrollState())
@@ -330,18 +323,13 @@ fun Setting(back:()->Unit,save:(String,String)->Unit){
 		Spacer(modifier=Modifier.height(4.dp))
 		Card(
 			shape=sp,
-			modifier=Modifier.fillMaxWidth()
-				.padding(horizontal=10.dp)
-				.border(width=1.5.dp,color=ec),
-			colors=CardDefaults.cardColors(
-				containerColor=MaterialTheme.colorScheme.surfaceVariant
-			)
+			modifier=Modifier.fillMaxWidth().padding(horizontal=10.dp),
+			colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surfaceVariant)
 		){
 			Column(modifier=Modifier.animateContentSize().clip(sp)){
 				Row(
 					modifier=Modifier.fillMaxWidth()
-						.padding(start=10.dp,end=8.dp,top=10.dp,bottom=10.dp)
-						.clickable{s=!s}, // padding 在前，整行含边距区域均可点击
+						.padding(start=10.dp,end=8.dp,top=10.dp,bottom=10.dp),
 					horizontalArrangement=Arrangement.SpaceBetween,
 					verticalAlignment=Alignment.CenterVertically
 				){
@@ -350,7 +338,7 @@ fun Setting(back:()->Unit,save:(String,String)->Unit){
 					Icon(
 						painter=painterResource(if(s)R.drawable.expand_less else R.drawable.expand_more),
 						contentDescription=if(s)"折叠"else"展开",
-						modifier=Modifier.size(24.dp)
+						modifier=Modifier.size(24.dp).clickable{s=!s}
 					)
 				}
 				if(s){

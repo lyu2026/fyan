@@ -89,7 +89,7 @@ jobs:
           for f in ico/*.svg; do
             if [ -f "$f" ]; then
               n=$(basename "$f" .svg)
-              npx svg2vectordrawable "$f" "app/src/main/res/drawable/$n.xml"
+              npx svg2vectordrawable -i "$f" -o "app/src/main/res/drawable/$n.xml"
               sed -i '/<?xml/d' "app/src/main/res/drawable/$n.xml"
               sed -i '/^$/d' "app/src/main/res/drawable/$n.xml"
             fi

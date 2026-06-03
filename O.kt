@@ -337,7 +337,7 @@ fun Setting(back:()->Unit,save:(String,String)->Unit){
 					Icon(
 						painter=painterResource(if(s)R.drawable.expand_less else R.drawable.expand_more),
 						contentDescription=if(s)"折叠"else"展开",
-						modifier=Modifier.size(24.dp).clickable{s=!s}
+						modifier=Modifier.size(24.dp).clickable(indication=null){s=!s}
 					)
 				}
 				if(s){
@@ -391,13 +391,13 @@ fun LPX(modifier:Modifier,tv:Boolean,height:Dp,list:List<LG>,remove:(String)->Un
 				)
 			}
 	){
-		Column(modifier=Modifier.fillMaxSize().padding(horizontal=5.dp,vertical=2.dp)){
+		Column(modifier=modifier.fillMaxWidth().padding(horizontal=5.dp,vertical=2.dp)){
 			Box( // 顶部拖拽指示横线：tap 收起（触屏）+ TV 遥控器点击，热区高度 12dp 便于命中
 				modifier=Modifier
 					.width(64.dp).height(12.dp)
 					.align(Alignment.CenterHorizontally)
 					.pointerInput(tv){if(!tv)detectTapGestures(onTap={click()})} // 触屏零延迟 tap，TV 跳过避免双触
-					.clickable(enabled=tv){click()}, // TV 遥控器确认键触发
+					.clickable(indication=null,enabled=tv){click()}, // TV 遥控器确认键触发
 				contentAlignment=Alignment.Center
 			){
 				Box( // 视觉横线（与点击热区解耦）
@@ -406,7 +406,7 @@ fun LPX(modifier:Modifier,tv:Boolean,height:Dp,list:List<LG>,remove:(String)->Un
 						.background(Color.Gray.copy(alpha=0.4f),RoundedCornerShape(1.5.dp))
 				)
 			}
-			LazyColumn(state=s,modifier=Modifier.fillMaxSize().padding(top=4.dp)){
+			LazyColumn(state=s,modifier=modifier.fillMaxWidth().padding(top=4.dp)){
 				items(list,key={it.i}){g->
 					Row(
 						modifier=Modifier.fillMaxWidth().padding(vertical=1.dp),
@@ -454,6 +454,6 @@ fun LPO(modifier:Modifier,click:()->Unit){
 		modifier=modifier.padding(bottom=6.dp)
 			.navigationBarsPadding().width(80.dp).height(5.dp)
 			.background(Color.Gray.copy(alpha=0.5f),RoundedCornerShape(2.5.dp))
-			.clickable{click()}
+			.clickable(indication=null){click()}
 	)
 }

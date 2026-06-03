@@ -148,10 +148,10 @@ fun EG(ctx:Context){
 			shape=RoundedCornerShape(4.dp),
 			title={Text("提示")},text={Text("确定要彻底退出应用吗？")},
 			confirmButton={
-				TextButton(modifier=Modifier.padding(bottom=0.dp),onClick={(ctx as?Activity)?.finish()}){Text("确认退出")}
+				TextButton(indication=null,modifier=Modifier.padding(bottom=0.dp),onClick={(ctx as?Activity)?.finish()}){Text("确认退出")}
 			},
 			dismissButton={
-				TextButton(modifier=Modifier.padding(bottom=0.dp),onClick={exit=false}){Text("取消")}
+				TextButton(indication=null,modifier=Modifier.padding(bottom=0.dp),onClick={exit=false}){Text("取消")}
 			}
 		)
 	}
@@ -183,7 +183,7 @@ fun SPA(){
 			}
 		}
 
-		LaunchedEffect(Unit){log("系统","孚琰 初始化就绪",LT.S)}
+		LaunchedEffect(Unit){log("系统","仏琰 初始化就绪",LT.S)}
 
 		val c=LocalConfiguration.current
 		val ce by nav.currentBackStackEntryAsState()
@@ -242,7 +242,7 @@ fun Home(tv:Boolean,sg:Boolean,tg:()->Unit,go:(String)->Unit,test:()->Unit){
 					style=MaterialTheme.typography.bodyMedium,
 					modifier=Modifier.padding(end=8.dp)
 				)
-				IconButton(onClick=tg,modifier=Modifier.size(36.dp)){
+				IconButton(indication=null,onClick=tg,modifier=Modifier.size(36.dp)){
 					Icon(
 						painter=painterResource(if(sg)R.drawable.visibility else R.drawable.visibility_off),
 						contentDescription="切换日志面板显示开关",
@@ -272,7 +272,7 @@ fun CD(title:String,desc:String,click:()->Unit){
 	)
 
 	Card(
-		onClick=click,
+		indication=null,onClick=click,
 		interactionSource=ms,shape=sp,
 		modifier=Modifier.fillMaxWidth().focusRequester(fr)
 			.padding(bottom=6.dp).shadow(ss,sp).border(
@@ -308,7 +308,7 @@ fun Setting(back:()->Unit,save:(String,String)->Unit){
 			verticalAlignment=Alignment.CenterVertically,
 			modifier=Modifier.height(48.dp).padding(start=1.dp,end=10.dp)
 		){
-			IconButton(onClick=back,modifier=Modifier.size(36.dp)){
+			IconButton(indication=null,onClick=back,modifier=Modifier.size(36.dp)){
 				Icon(
 					painter=painterResource(R.drawable.arrow_back),
 					contentDescription="返回",
@@ -333,7 +333,7 @@ fun Setting(back:()->Unit,save:(String,String)->Unit){
 					verticalAlignment=Alignment.CenterVertically
 				){
 					Text("测试数据",style=MaterialTheme.typography.titleMedium)
-					IconButton(onClick={s=!s},modifier=Modifier.size(24.dp)){
+					IconButton(indication=null,onClick={s=!s},modifier=Modifier.size(24.dp)){
 						Icon(
 							painter=painterResource(if(s)R.drawable.expand_less else R.drawable.expand_more),
 							contentDescription=if(s)"折叠"else"展开"
@@ -400,7 +400,7 @@ fun LPX(modifier:Modifier,tv:Boolean,height:androidx.compose.ui.unit.Dp,list:Lis
 				modifier=Modifier
 					.width(64.dp).height(3.dp)
 					.background(Color.Gray.copy(alpha=0.4f),RoundedCornerShape(1.5.dp))
-					.align(Alignment.CenterHorizontally).padding(top=1.6.dp).clickable(enabled=tv){click()}
+					.align(Alignment.CenterHorizontally).padding(top=1.6.dp).clickable(indication=null,enabled=tv){click()}
 			)
 			LazyColumn(state=s,modifier=Modifier.fillMaxSize().padding(top=6.dp)){
 				items(list,key={it.i}){g->
@@ -425,7 +425,7 @@ fun LPX(modifier:Modifier,tv:Boolean,height:androidx.compose.ui.unit.Dp,list:Lis
 							modifier=Modifier.weight(1f).padding(PaddingValues(end=4.dp))
 						)
 						IconButton(
-							onClick={remove(g.i)},
+							indication=null,onClick={remove(g.i)},
 							modifier=Modifier.size(14.dp).align(Alignment.CenterVertically)
 						){
 							Icon(
@@ -450,6 +450,6 @@ fun LPO(modifier:Modifier,click:()->Unit){
 		modifier=modifier.padding(bottom=6.dp)
 			.navigationBarsPadding().width(80.dp).height(5.dp)
 			.background(Color.Gray.copy(alpha=0.5f),RoundedCornerShape(2.5.dp))
-			.clickable{click()} // 点击展开面板
+			.clickable(indication=null){click()} // 点击展开面板
 	)
 }

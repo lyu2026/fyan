@@ -277,7 +277,7 @@ fun CD(title:String,desc:String,click:()->Unit){
 			)
 			.clickable(
 				interactionSource=ms,
-				indication=LocalIndication.current, // 保留涟漪视觉
+				indication=null,
 				onClick=click
 			),
 		colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surfaceVariant)

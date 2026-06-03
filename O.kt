@@ -266,21 +266,15 @@ fun CD(title:String,desc:String,click:()->Unit){
 	val fs by m.collectIsFocusedAsState()
 	val ps by m.collectIsPressedAsState()
 	val sp=RoundedCornerShape(5.dp)
-	val ss by animateDpAsState(
-		targetValue=if(fs||ps)6.dp else 1.dp,
-		label="card_shadow"
-	)
 	val ec=when{
 		fs->MaterialTheme.colorScheme.primary // 焦点：主色边框
-		ps->MaterialTheme.colorScheme.primary // 按下：主色边框
+		ps->MaterialTheme.colorScheme.primary.copy(alpha=0.6f) // 按下：主色边框
 		else->Color.Transparent
 	}
 	Card(
 		shape=sp,
 		modifier=Modifier.fillMaxWidth().focusRequester(fr)
-			.padding(bottom=6.dp).shadow(ss,sp).border(
-				width=1.5.dp,shape=sp,color=ec
-			)
+			.padding(bottom=6.dp).border(width=1.dp,shape=sp,color=ec)
 			.clickable(interactionSource=m,indication=null,onClick=click),
 		colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surfaceVariant.copy(alpha=0.6f))
 	){

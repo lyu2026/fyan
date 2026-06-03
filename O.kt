@@ -30,7 +30,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -45,6 +44,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.interaction.MutableInteractionSource
 
 import androidx.compose.ui.Modifier
@@ -54,6 +54,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.changedToDown
 import androidx.compose.ui.input.pointer.PointerEventPass
 
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.IntOffset
@@ -147,7 +148,7 @@ fun EG(ctx:Context){
 			shape=RoundedCornerShape(4.dp),
 			title={Text("提示")},text={Text("确定要彻底退出应用吗？")},
 			confirmButton={
-				TextButton(onClick={(ctx as?Activity)?.finish()}){Text("确认退出")}
+				TextButton(onClick={(ctx as?Activity)?.finish()?:run{exit=false}}){Text("确认退出")}
 			},
 			dismissButton={
 				TextButton(onClick={exit=false}){Text("取消")}
@@ -185,7 +186,7 @@ fun SPA(){
 		LaunchedEffect(Unit){log("系统","仏琰 初始化就绪",LT.S)}
 
 		val c=LocalConfiguration.current
-		val tv=c.uiMode and Configuration.UI_MODE_TYPE_MASK==Configuration.UI_MODE_TYPE_TELEVISION
+		val tv=(c.uiMode and Configuration.UI_MODE_TYPE_MASK)==Configuration.UI_MODE_TYPE_TELEVISION
 
 		NavHost(navController=nav,startDestination="home"){
 			composable("home"){
@@ -263,30 +264,34 @@ fun CD(title:String,desc:String,click:()->Unit){
 	val fr=remember{FocusRequester()}
 	val ms=remember{MutableInteractionSource()}
 	val fs by ms.collectIsFocusedAsState()
+	val ps by ms.collectIsPressedAsState() // 监听按下状态，驱动即时视觉反馈
 	val sp=RoundedCornerShape(5.dp)
 	val ss by animateDpAsState(
-		targetValue=if(fs)6.dp else 1.dp,
+		targetValue=if(fs||ps)6.dp else 1.dp,
 		label="card_shadow"
 	)
+	val bc=when{
+		ps->MaterialTheme.colorScheme.primary.copy(alpha=0.12f) // 按下：主色调浅色背景
+		else->MaterialTheme.colorScheme.surfaceVariant
+	}
+	val ec=when{
+		fs->MaterialTheme.colorScheme.primary // 焦点：主色边框
+		ps->MaterialTheme.colorScheme.primary.copy(alpha=0.6f) // 按下：半透明主色边框
+		else->Color.Transparent
+	}
 
 	Card(
 		shape=sp,
 		modifier=Modifier.fillMaxWidth().focusRequester(fr)
 			.padding(bottom=6.dp).shadow(ss,sp).border(
-				width=1.5.dp,shape=sp,
-				color=if(fs)MaterialTheme.colorScheme.primary else Color.Transparent
+				width=1.5.dp,shape=sp,color=ec
 			)
-			.clickable(
-				interactionSource=ms,
-				indication=null, // 保留涟漪视觉
-				onClick=click
-			),
-		colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surfaceVariant)
+			.clickable(interactionSource=ms,indication=null,onClick=click),
+		colors=CardDefaults.cardColors(containerColor=bc)
 	){
 		Box(
 			modifier=Modifier.fillMaxWidth()
 				.padding(horizontal=12.dp,vertical=10.dp),
-			// 去掉内层 .clip(sp)：Card 自身 shape=sp 已经 clip，无需重复
 			contentAlignment=Alignment.CenterStart
 		){
 			Column{
@@ -331,8 +336,8 @@ fun Setting(back:()->Unit,save:(String,String)->Unit){
 			Column(modifier=Modifier.animateContentSize().clip(sp)){
 				Row(
 					modifier=Modifier.fillMaxWidth()
-						.clickable{s=!s} // 整行可点击，替代仅 IconButton 可点击
-						.padding(start=10.dp,end=8.dp,top=10.dp,bottom=10.dp),
+						.padding(start=10.dp,end=8.dp,top=10.dp,bottom=10.dp)
+						.clickable{s=!s}, // padding 在前，整行含边距区域均可点击
 					horizontalArrangement=Arrangement.SpaceBetween,
 					verticalAlignment=Alignment.CenterVertically
 				){
@@ -373,7 +378,7 @@ fun LP(modifier:Modifier=Modifier,tv:Boolean,list:List<LG>,remove:(String)->Unit
 
 // 展开态：拖拽偏移状态 y 独立在此层，不触发 LP 父层重组
 @Composable
-fun LPX(modifier:Modifier,tv:Boolean,height:androidx.compose.ui.unit.Dp,list:List<LG>,remove:(String)->Unit,click:()->Unit){
+fun LPX(modifier:Modifier,tv:Boolean,height:Dp,list:List<LG>,remove:(String)->Unit,click:()->Unit){
 	val sp=RoundedCornerShape(topStart=6.dp,topEnd=6.dp)
 	var y by remember{mutableStateOf(0f)}
 	val s=rememberLazyListState()
@@ -400,7 +405,7 @@ fun LPX(modifier:Modifier,tv:Boolean,height:androidx.compose.ui.unit.Dp,list:Lis
 				modifier=Modifier
 					.width(64.dp).height(12.dp)
 					.align(Alignment.CenterHorizontally)
-					.pointerInput(Unit){detectTapGestures(onTap={click()})} // 触屏零延迟 tap
+					.pointerInput(tv){if(!tv)detectTapGestures(onTap={click()})} // 触屏零延迟 tap，TV 跳过避免双触
 					.clickable(enabled=tv){click()}, // TV 遥控器确认键触发
 				contentAlignment=Alignment.Center
 			){

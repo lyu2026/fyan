@@ -254,9 +254,9 @@ fun Home(tv:Boolean,sg:Boolean,tg:()->Unit,go:(String)->Unit,test:()->Unit){
 		Column(modifier=Modifier.padding(horizontal=10.dp)){
 			Row(verticalAlignment=Alignment.CenterVertically){
 				CD(title="努努",desc="",click={go("nunu")})
-				Spacer(modifier=Modifier.with(4.dp))
+				Spacer(modifier=Modifier.width(4.dp))
 				CD(title="欧乐",desc="",click={go("oule")})
-				Spacer(modifier=Modifier.with(4.dp))
+				Spacer(modifier=Modifier.width(4.dp))
 				CD(title="爱壹帆",desc="",click={go("aiyf")})
 			}
 			Spacer(modifier=Modifier.height(6.dp))

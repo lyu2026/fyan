@@ -325,7 +325,7 @@ fun Setting(back:()->Unit,save:(String,String)->Unit){
 			shape=sp,
 			modifier=Modifier.fillMaxWidth().padding(horizontal=10.dp),
 			colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surfaceVariant.copy(alpha=0.6f))
-	){
+		){
 			Column(modifier=Modifier.animateContentSize().clip(sp)){
 				Row(
 					modifier=Modifier.fillMaxWidth()

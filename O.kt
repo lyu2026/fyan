@@ -335,11 +335,10 @@ fun Setting(back:()->Unit,save:(String,String)->Unit){
 					)
 				}
 				if(s){
-					HorizontalDivider(color=MaterialTheme.colorScheme.background.copy(alpha=0.5f))
+					HorizontalDivider(color=MaterialTheme.colorScheme.background.copy(alpha=0.7f))
 					OutlinedTextField(
 						value=field,onValueChange={field=it},label={Text("关联数据")},
-						modifier=Modifier.fillMaxWidth()
-							.padding(top=6.dp,bottom=10.dp,start=10.dp,end=10.dp),
+						modifier=Modifier.fillMaxWidth().padding(top=6.dp,bottom=10.dp,start=10.dp,end=10.dp),
 						singleLine=true,
 						keyboardOptions=KeyboardOptions(imeAction=ImeAction.Done),
 						keyboardActions=KeyboardActions(onDone={save("TEST",field)})

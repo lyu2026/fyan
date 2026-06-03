@@ -9,7 +9,6 @@ import android.view.View
 import android.os.Bundle
 import android.app.Activity
 import android.graphics.Rect
-import android.widget.EditText
 
 import android.content.Context
 import android.content.res.Configuration
@@ -34,6 +33,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectDragGestures
 
 import androidx.compose.foundation.text.KeyboardActions
@@ -50,6 +50,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.changedToDown
+import androidx.compose.ui.input.pointer.PointerEventPass
 
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
@@ -62,7 +64,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.FocusManager
 
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
@@ -75,7 +76,6 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.compose.currentBackStackEntryAsState
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateDpAsState
@@ -95,11 +95,9 @@ class O:ComponentActivity(){
 	override fun dispatchTouchEvent(e:MotionEvent):Boolean{
 		if(e.action==MotionEvent.ACTION_DOWN){
 			val f=currentFocus
-			// 有焦点 View 且点击在其外部时，收起键盘（不再判断 EditText 类型）
 			if(f!=null&&ni(f,e)){
 				val im=getSystemService(Context.INPUT_METHOD_SERVICE)as InputMethodManager
 				im.hideSoftInputFromWindow(f.windowToken,0)
-				// Compose 侧焦点由 SPA 层的 pointerInput 调用 FocusManager.clearFocus() 处理
 			}
 		}
 		return super.dispatchTouchEvent(e)
@@ -137,7 +135,7 @@ class O:ComponentActivity(){
 	}
 }
 
-// 退出确认弹窗提取为独立 Composable，避免 SPA 层因路由变化时反复订阅/取消 BackHandler
+// 退出确认弹窗：独立 Composable 避免 SPA 层因路由变化反复订阅/取消 BackHandler
 @Composable
 fun EG(ctx:Context){
 	var exit by remember{mutableStateOf(false)}
@@ -163,15 +161,15 @@ fun SPA(){
 	val nav=rememberNavController()
 	val gs=remember{mutableStateListOf<LG>()}
 	var sg by remember{mutableStateOf(true)}
-	val fm=LocalFocusManager.current // 获取 Compose 焦点管理器
+	val fm=LocalFocusManager.current
 
 	Box(
 		modifier=Modifier.fillMaxSize().pointerInput(Unit){
 			awaitPointerEventScope{
 				while(true){
-					val e=awaitPointerEvent()
-					// 仅在按下阶段触发，避免干扰滑动/长按等手势
-					if(e.changes.any{it.pressed})fm.clearFocus()
+					val e=awaitPointerEvent(PointerEventPass.Initial)
+					// 不过滤 PointerType，兼容触屏/鼠标/触控板（TV 场景）
+					if(e.changes.any{it.changedToDown()})fm.clearFocus()
 				}
 			}
 		}
@@ -186,7 +184,6 @@ fun SPA(){
 		LaunchedEffect(Unit){log("系统","仏琰 初始化就绪",LT.S)}
 
 		val c=LocalConfiguration.current
-		val ce by nav.currentBackStackEntryAsState()
 		val tv=c.uiMode and Configuration.UI_MODE_TYPE_MASK==Configuration.UI_MODE_TYPE_TELEVISION
 
 		NavHost(navController=nav,startDestination="home"){
@@ -272,18 +269,23 @@ fun CD(title:String,desc:String,click:()->Unit){
 	)
 
 	Card(
-		onClick=click,
-		interactionSource=ms,shape=sp,
+		shape=sp,
 		modifier=Modifier.fillMaxWidth().focusRequester(fr)
 			.padding(bottom=6.dp).shadow(ss,sp).border(
 				width=1.5.dp,shape=sp,
 				color=if(fs)MaterialTheme.colorScheme.primary else Color.Transparent
+			)
+			.clickable(
+				interactionSource=ms,
+				indication=LocalIndication.current, // 保留涟漪视觉
+				onClick=click
 			),
 		colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surfaceVariant)
 	){
 		Box(
 			modifier=Modifier.fillMaxWidth()
-				.padding(horizontal=12.dp,vertical=10.dp).clip(sp),
+				.padding(horizontal=12.dp,vertical=10.dp),
+			// 去掉内层 .clip(sp)：Card 自身 shape=sp 已经 clip，无需重复
 			contentAlignment=Alignment.CenterStart
 		){
 			Column{
@@ -328,17 +330,18 @@ fun Setting(back:()->Unit,save:(String,String)->Unit){
 			Column(modifier=Modifier.animateContentSize().clip(sp)){
 				Row(
 					modifier=Modifier.fillMaxWidth()
+						.clickable{s=!s} // 整行可点击，替代仅 IconButton 可点击
 						.padding(start=10.dp,end=8.dp,top=10.dp,bottom=10.dp),
 					horizontalArrangement=Arrangement.SpaceBetween,
 					verticalAlignment=Alignment.CenterVertically
 				){
 					Text("测试数据",style=MaterialTheme.typography.titleMedium)
-					IconButton(onClick={s=!s},modifier=Modifier.size(24.dp)){
-						Icon(
-							painter=painterResource(if(s)R.drawable.expand_less else R.drawable.expand_more),
-							contentDescription=if(s)"折叠"else"展开"
-						)
-					}
+					// IconButton → Icon：避免与外层 Row.clickable 形成双重点击区域
+					Icon(
+						painter=painterResource(if(s)R.drawable.expand_less else R.drawable.expand_more),
+						contentDescription=if(s)"折叠"else"展开",
+						modifier=Modifier.size(24.dp)
+					)
 				}
 				if(s){
 					HorizontalDivider(color=MaterialTheme.colorScheme.outlineVariant.copy(alpha=0.7f))
@@ -356,22 +359,18 @@ fun Setting(back:()->Unit,save:(String,String)->Unit){
 	}
 }
 
-@Composable // 日志面板
+@Composable // 日志面板（状态路由层）
 fun LP(modifier:Modifier=Modifier,tv:Boolean,list:List<LG>,remove:(String)->Unit){
 	var s by remember{mutableStateOf(false)}
-	val c=LocalConfiguration.current
-	val h=c.screenHeightDp.dp
+	val h=LocalConfiguration.current.screenHeightDp.dp
 	if(!s){
-		LPX(
-			modifier=modifier,height=h/3,
-			tv=tv,list=list,remove=remove,click={s=true}
-		)
+		LPX(modifier=modifier,height=h/3,tv=tv,list=list,remove=remove,click={s=true})
 	}else{
 		LPO(modifier=modifier,click={s=false})
 	}
 }
 
-// 展开态独立 Composable：拖拽偏移状态 y 仅影响此层，不触发 LP 父层重组
+// 展开态：拖拽偏移状态 y 独立在此层，不触发 LP 父层重组
 @Composable
 fun LPX(modifier:Modifier,tv:Boolean,height:androidx.compose.ui.unit.Dp,list:List<LG>,remove:(String)->Unit,click:()->Unit){
 	val sp=RoundedCornerShape(topStart=6.dp,topEnd=6.dp)
@@ -386,23 +385,31 @@ fun LPX(modifier:Modifier,tv:Boolean,height:androidx.compose.ui.unit.Dp,list:Lis
 			.offset{IntOffset(0,y.roundToInt())}.clip(sp)
 			.background(MaterialTheme.colorScheme.surface.copy(alpha=0.90f))
 			.border(1.dp,Color.Gray.copy(alpha=0.15f),sp)
+			// 仅处理拖拽；tap 收起只挂在指示横线上，避免干扰日志列表内的点击
 			.pointerInput(Unit){
 				detectDragGestures(
-					// 松手偏移超过 150px 则折叠，偏移归零
-					onDragEnd={if(y>150f)click();y=0f},
-					// 向下拖时累加偏移，不允许向上拖（y 不低于 0）
+					// 松手超过 150px 才折叠，否则弹回（y 归零）
+					onDragEnd={if(y>150f)click()else y=0f},
 					onDrag={change,drag->change.consume();if(y+drag.y>=0f)y+=drag.y}
 				)
 			}
 	){
 		Column(modifier=Modifier.fillMaxSize().padding(horizontal=5.dp,vertical=2.dp)){
-			Box( // 顶部拖拽指示横线
+			Box( // 顶部拖拽指示横线：tap 收起（触屏）+ TV 遥控器点击，热区高度 12dp 便于命中
 				modifier=Modifier
-					.width(64.dp).height(3.dp)
-					.background(Color.Gray.copy(alpha=0.4f),RoundedCornerShape(1.5.dp))
-					.align(Alignment.CenterHorizontally).padding(top=1.6.dp).clickable(enabled=tv){click()}
-			)
-			LazyColumn(state=s,modifier=Modifier.fillMaxSize().padding(top=6.dp)){
+					.width(64.dp).height(12.dp)
+					.align(Alignment.CenterHorizontally)
+					.pointerInput(Unit){detectTapGestures(onTap={click()})} // 触屏零延迟 tap
+					.clickable(enabled=tv){click()}, // TV 遥控器确认键触发
+				contentAlignment=Alignment.Center
+			){
+				Box( // 视觉横线（与点击热区解耦）
+					modifier=Modifier
+						.width(64.dp).height(3.dp)
+						.background(Color.Gray.copy(alpha=0.4f),RoundedCornerShape(1.5.dp))
+				)
+			}
+			LazyColumn(state=s,modifier=Modifier.fillMaxSize().padding(top=4.dp)){
 				items(list,key={it.i}){g->
 					Row(
 						modifier=Modifier.fillMaxWidth().padding(vertical=1.dp),
@@ -443,13 +450,13 @@ fun LPX(modifier:Modifier,tv:Boolean,height:androidx.compose.ui.unit.Dp,list:Lis
 	}
 }
 
-// 折叠态独立 Composable，状态极简，展开态重组时完全不影响此处
+// 折叠态：状态极简，展开态重组时完全不影响此处
 @Composable
 fun LPO(modifier:Modifier,click:()->Unit){
 	Box(
 		modifier=modifier.padding(bottom=6.dp)
 			.navigationBarsPadding().width(80.dp).height(5.dp)
 			.background(Color.Gray.copy(alpha=0.5f),RoundedCornerShape(2.5.dp))
-			.clickable{click()} // 点击展开面板
+			.clickable{click()}
 	)
 }

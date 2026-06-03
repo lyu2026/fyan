@@ -79,23 +79,26 @@ jobs:
           sudo apt-get install -y -qq librsvg2-bin > /dev/null 2>&1
           
           rm -rf app .gradle *.lock
-          mkdir -p app/src/main/res/{mipmap-{mipmap-anydpi-v26,mdpi,hdpi,xhdpi,xxhdpi,xxxhdpi},drawable}
+          mkdir -p app/src/main/res/{mipmap-{mipmap-anydpi-v26,mdpi,hdpi,xhdpi,xxhdpi,xxxhdpi},drawable,drawable-nodpi}
           
+          mv icon.xml app/src/main/res/mipmap-anydpi-v26/
+          mv icon_*.xml app/src/main/res/drawable/
           rsvg-convert -w 48 -h 48 icon.svg -o app/src/main/res/mipmap-mdpi/icon.png
           rsvg-convert -w 72 -h 72 icon.svg -o app/src/main/res/mipmap-hdpi/icon.png
           rsvg-convert -w 96 -h 96 icon.svg -o app/src/main/res/mipmap-xhdpi/icon.png
           rsvg-convert -w 144 -h 144 icon.svg -o app/src/main/res/mipmap-xxhdpi/icon.png
           rsvg-convert -w 192 -h 192 icon.svg -o app/src/main/res/mipmap-xxxhdpi/icon.png
           
-          mv icon.xml app/src/main/res/mipmap-anydpi-v26/
-          mv icon_*.xml tv.xml app/src/main/res/drawable/
+          rsvg-convert -w 320 -h 180 tv.svg -o app/src/main/res/drawable-nodpi/tv.png
+          
           for svg in ico/*.svg; do
             if [ -f "$svg" ]; then
               fn=$(basename "$svg" .svg)
               rsvg-convert -w 96 -h 96 "$svg" -o "app/src/main/res/drawable/${fn}.png"
             fi
           done
-          rm -rf ico icon.svg
+          
+          rm -rf ico icon.svg tv.svg
 
       - name: 整理配置
         run: |

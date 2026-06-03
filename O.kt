@@ -303,10 +303,7 @@ fun Setting(back:()->Unit,save:(String,String)->Unit){
 	var field by remember{mutableStateOf("")}
 	var s by remember{mutableStateOf(true)}
 	val sp=RoundedCornerShape(5.dp)
-	Column(
-		modifier=Modifier.fillMaxSize()
-			.statusBarsPadding().verticalScroll(rememberScrollState())
-	){
+	Column(modifier=Modifier.fillMaxSize().statusBarsPadding().verticalScroll(rememberScrollState())){
 		Row(
 			verticalAlignment=Alignment.CenterVertically,
 			modifier=Modifier.height(48.dp).padding(start=1.dp,end=10.dp)
@@ -320,10 +317,9 @@ fun Setting(back:()->Unit,save:(String,String)->Unit){
 			}
 			Text("系统配置",style=MaterialTheme.typography.titleLarge)
 		}
-		Spacer(modifier=Modifier.height(4.dp))
 		Card(
 			shape=sp,
-			modifier=Modifier.fillMaxWidth().padding(horizontal=10.dp),
+			modifier=Modifier.fillMaxWidth().padding(start=10.dp,end=10.dp,top=4.dp),
 			colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surfaceVariant.copy(alpha=0.6f))
 		){
 			Column(modifier=Modifier.animateContentSize().clip(sp)){

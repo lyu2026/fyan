@@ -1,7 +1,7 @@
 @build.gradle.kts
 plugins {
-	id("com.android.library") version "9.2.0" apply false
-	id("com.android.application") version "9.2.0" apply false
+	id("com.android.library") version "8.8.1" apply false
+	id("com.android.application") version "8.8.1" apply false
 	id("org.jetbrains.kotlin.android") version "2.1.20" apply false
 	id("org.jetbrains.kotlin.plugin.compose") version "2.1.20" apply false
 }
@@ -32,12 +32,12 @@ android {
 	}
 	buildTypes {
 		debug {
-			isMinifyEnabled = false // 关闭混淆压缩
-			isShrinkResources = false // 移除无用资源
+			isMinifyEnabled = false
+			isShrinkResources = false
 		}
 		release {
-			isMinifyEnabled = true // 开启混淆压缩
-			isShrinkResources = true // 移除无用资源
+			isMinifyEnabled = true
+			isShrinkResources = true
 			proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"),"proguard-rules.pro")
 		}
 	}
@@ -51,10 +51,10 @@ android {
 }
 dependencies {
 	implementation(platform("androidx.compose:compose-bom:2026.05.00"))
-	implementation("androidx.core:core-ktx:1.19.0")
-	implementation("androidx.activity:activity-compose:1.13.0")
-	implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.10.0")
-	implementation("androidx.navigation:navigation-compose:2.9.8")
+	implementation("androidx.core:core-ktx:1.15.0")
+	implementation("androidx.activity:activity-compose:1.10.1")
+	implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
+	implementation("androidx.navigation:navigation-compose:2.8.8")
 	implementation("androidx.compose.ui:ui")
 	implementation("androidx.compose.ui:ui-graphics")
 	implementation("androidx.compose.material3:material3")

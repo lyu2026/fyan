@@ -21,7 +21,9 @@ import androidx.core.view.WindowCompat
 import androidx.compose.runtime.*
 import androidx.compose.material3.*
 
+import androidx.activity.SystemBarStyle
 import androidx.activity.ComponentActivity
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.compose.setContent
 import androidx.activity.compose.BackHandler
 
@@ -114,11 +116,15 @@ class O:ComponentActivity(){
 			if(!view.isInEditMode){
 				val color=scheme.background
 				SideEffect{
-					val a=view.context as?Activity?:return@SideEffect
-					a.window.statusBarColor=color.toArgb()
-					WindowCompat.getInsetsController(a.window,view).apply{
-						isAppearanceLightStatusBars=!dark
-					}
+					val a=view.context as?ComponentActivity?:return@SideEffect
+					val t=android.graphics.Color.TRANSPARENT
+					a.enableEdgeToEdge(
+						statusBarStyle=if(dark){
+							SystemBarStyle.dark(t)
+						}else{
+							SystemBarStyle.light(t,t)
+						}
+					)
 				}
 			}
 			MaterialTheme(colorScheme=scheme){

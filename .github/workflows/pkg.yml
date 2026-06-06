@@ -61,6 +61,7 @@ jobs:
           K_PSWD: ${{ secrets.K_PSWD }}
         run: |
           chmod +x gradlew
+          echo "......."
           ./gradlew help -Dorg.gradle.welcome.provider.enabled=false > /dev/null 2>&1
           ./gradlew :app:assembleRelease --console=plain -Dorg.gradle.internal.download.progress=false -Dorg.gradle.welcome.provider.enabled=false
 

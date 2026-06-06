@@ -55,7 +55,7 @@ jobs:
       - name: 执行构建
         env:
           GRADLE_OPTS: "-Xmx4g -XX:MaxMetaspaceSize=1024m -XX:+UseG1GC"
-          KS_PATH: "$GITHUB_WORKSPACE/fyan.keystore"
+          KS_PATH: "${{ github.workspace }}/fyan.keystore"
           KS_PSWD: ${{ secrets.KS_PSWD }}
           K_ALIAS: ${{ secrets.K_ALIAS }}
           K_PSWD: ${{ secrets.K_PSWD }}

@@ -2,7 +2,7 @@
 
 rm -rf app .gradle *.lock
 
-echo -e "android.useAndroidX=true\nandroid.enableJetifier=true">>gradle.properties
+echo -e "android.useAndroidX=true\nandroid.enableJetifier=true\norg.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1024m -XX:+UseG1GC\nandroid.experimental.runInProcess=true">>gradle.properties
 mkdir -p app/src/main/res/{xml,mipmap-anydpi-v26,drawable}
 mkdir -p app/src/main/kotlin/com/fyan
 cp *.kt app/src/main/kotlin/com/fyan/

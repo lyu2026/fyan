@@ -50,7 +50,7 @@ jobs:
 
       - name: 执行构建
         env:
-          GRADLE_OPTS: "-Xmx3072m -XX:MaxMetaspaceSize=1024m"
+          GRADLE_OPTS: "-Xmx4g -XX:MaxMetaspaceSize=1024m -XX:+UseG1GC"
         run: |
           gradle wrapper --gradle-version 8.10.2
           chmod +x gradlew

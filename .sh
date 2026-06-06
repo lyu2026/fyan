@@ -42,3 +42,5 @@ for f in .xml .zml;do
 		fi
 	}
 done
+
+rm -r .xml .zml .sh

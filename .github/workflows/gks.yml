@@ -30,7 +30,7 @@ jobs:
             -keypass Fyan2026 \
             -dname "CN=Fyan, OU=Dev, O=Fyan, L=City, ST=State, C=CN"
           KS_B64=$(base64 -w 0 fyan.keystore)
-          echo "ks_b64=$KEYSTORE_BASE64" >> $GITHUB_OUTPUT
+          echo "ks_b64=$KS_B64" >> $GITHUB_OUTPUT
           echo "✅ Keystore 生成完成"
 
       - name: 写入加密脚本
@@ -87,7 +87,7 @@ jobs:
 
           # 上传
           export GITHUB_TOKEN REPO KEY_ID KEY
-          ./upload_secret.sh "KS_B64" "$KEYSTORE_BASE64"
+          ./upload_secret.sh "KS_B64" "$KS_B64"
           echo "🎉 完成！"
 
       - name: 清空

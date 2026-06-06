@@ -44,6 +44,7 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: 'gradle'
 
       - name: 整理配置
         run: chmod +x ./.sh;./.sh

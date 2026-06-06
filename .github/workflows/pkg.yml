@@ -49,19 +49,18 @@ jobs:
         run: chmod +x ./.sh;./.sh
 
       - name: 解密签名
-        run: |
-          echo "${{ secrets.KS_B64 }}" | base64 --decode > "$GITHUB_WORKSPACE/fyan.keystore"
+        run: echo "${{ secrets.KS_B64 }}" | base64 --decode > "${{ github.workspace }}/fyan.keystore"
 
       - name: 执行构建
         env:
           GRADLE_OPTS: "-Xmx4g -XX:MaxMetaspaceSize=1024m -XX:+UseG1GC"
-          KS_PATH: "$GITHUB_WORKSPACE/fyan.keystore"
+          KS_PATH: "${{ github.workspace }}/fyan.keystore"
           KS_PSWD: ${{ secrets.KS_PSWD }}
           K_ALIAS: ${{ secrets.K_ALIAS }}
           K_PSWD: ${{ secrets.K_PSWD }}
         run: |
           chmod +x gradlew
-          ./gradlew :app:assembleRelease --no-daemon --console=plain
+          ./gradlew :app:assembleRelease --no-daemon --console=plain -Dorg.gradle.internal.download.progress=false
 
       - name: 提取产物
         id: copy

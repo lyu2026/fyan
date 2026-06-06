@@ -66,7 +66,7 @@ jobs:
       - name: 提取产物
         id: copy
         run: |
-          APK_FILE=$(find app/build/outputs/apk/debug/ -name "*.apk" | head -n 1)
+          APK_FILE=$(find app/build/outputs/apk/**/ -name "*.apk" | head -n 1)
           cp "$APK_FILE" fyan.apk
           echo "apk=fyan.apk" >> $GITHUB_OUTPUT
 

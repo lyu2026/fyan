@@ -15,6 +15,15 @@ plugins {
 android {
 	namespace = "com.fyan"
 	compileSdk = 35
+	signingConfigs {
+		create("release") {
+			val e = System.getenv("KS_PATH")
+			storeFile = if (!e.isNullOrEmpty()) file(e) else file("../fyan.keystore")
+			storePassword = System.getenv("KS_PSWD") ?: ""
+			keyAlias = System.getenv("K_ALIAS") ?: ""
+			keyPassword = System.getenv("K_PSWD") ?: ""
+		}
+	}
 	defaultConfig {
 		applicationId = "com.fyan"
 		minSdk = 23

@@ -1,0 +1,94 @@
+name: 生成签名
+
+on:
+  workflow_dispatch:
+
+jobs:
+  generate-keystore:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: 生成签名
+        id: keystore
+        run: |
+          keytool -genkeypair -v \
+            -keystore fyan.keystore \
+            -alias fyan \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 9999 \
+            -storepass Fyan2026 \
+            -keypass Fyan2026 \
+            -dname "CN=Fyan, OU=Dev, O=Fyan, L=City, ST=State, C=CN"
+          KS_B64=$(base64 -w 0 fyan.keystore)
+          echo "ks_b64=$KEYSTORE_BASE64" >> $GITHUB_OUTPUT
+          echo "✅ Keystore 生成完成"
+
+      - name: 写入加密脚本
+        run: |
+          cat > encrypt_secret.py << 'EOF'
+          import sys
+          import base64
+          from nacl import encoding, public
+
+          key = sys.argv[1]
+          val = sys.argv[2]
+
+          pk = public.PublicKey(key.encode('utf-8'), encoding.Base64Encoder())
+          box = public.SealedBox(pk)
+          enc = box.encrypt(val.encode('utf-8'))
+          print(base64.b64encode(enc).decode('utf-8'))
+          EOF
+
+      - name: 写入上传脚本
+        run: |
+          cat > upload_secret.sh << 'EOF'
+          #!/bin/bash
+          set -e
+          name="$1"
+          value="$2"
+          ENCRYPTED=$(python3 encrypt_secret.py "$KEY" "$value")
+          STATUS=$(curl -s -X PUT \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H "Content-Type: application/json" \
+            "https://api.github.com/repos/$REPO/actions/secrets/$name" \
+            -d "{\"encrypted_value\":\"$ENCRYPTED\",\"key_id\":\"$KEY_ID\"}" \
+            -w "%{http_code}" -o /dev/null)
+          echo "上传 $name: HTTP $STATUS"
+          EOF
+          chmod +x upload_secret.sh
+
+      - name: 上传 Secrets
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+          REPO: ${{ github.repository }}
+          KS_B64: ${{ steps.keystore.outputs.ks_b64 }}
+        run: |
+          pip3 install pynacl --quiet
+
+          # 获取公钥
+          PUBLIC_KEY=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/$REPO/actions/secrets/public-key")
+
+          export KEY_ID=$(echo "$PUBLIC_KEY" | jq -r '.key_id')
+          export KEY=$(echo "$PUBLIC_KEY" | jq -r '.key')
+          echo "Key ID: $KEY_ID"
+
+          # 上传
+          export GITHUB_TOKEN REPO KEY_ID KEY
+          ./upload_secret.sh "KS_B64" "$KEYSTORE_BASE64"
+          echo "🎉 完成！"
+
+      - name: 清空
+        run: rm -f fyan.keystore encrypt_secret.py upload_secret.sh

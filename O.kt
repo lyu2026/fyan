@@ -105,8 +105,8 @@ class O:ComponentActivity(){
 		return super.dispatchTouchEvent(e)
 	}
 
-	override fun onCreate(state:Bundle?){
-		super.onCreate(state)
+	override fun onCreate(savedInstanceState:Bundle?){
+		super.onCreate(savedInstanceState)
 		setContent{
 			val view=LocalView.current
 			val dark=isSystemInDarkTheme()

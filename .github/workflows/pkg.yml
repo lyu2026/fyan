@@ -48,12 +48,20 @@ jobs:
       - name: 整理配置
         run: chmod +x ./.sh;./.sh
 
+      - name: 解密签名
+        run: |
+          echo "${{ secrets.KS_B64 }}" | base64 --decode > "$GITHUB_WORKSPACE/fyan.keystore"
+
       - name: 执行构建
         env:
           GRADLE_OPTS: "-Xmx4g -XX:MaxMetaspaceSize=1024m -XX:+UseG1GC"
+          KS_PATH: "$GITHUB_WORKSPACE/fyan.keystore"
+          KS_PSWD: ${{ secrets.KS_PSWD }}
+          K_ALIAS: ${{ secrets.K_ALIAS }}
+          K_PSWD: ${{ secrets.K_PSWD }}
         run: |
           chmod +x gradlew
-          ./gradlew :app:assembleDebug --no-daemon --console=plain
+          ./gradlew :app:assembleRelease --no-daemon --console=plain
 
       - name: 提取产物
         id: copy
@@ -62,11 +70,19 @@ jobs:
           cp "$APK_FILE" fyan.apk
           echo "apk=fyan.apk" >> $GITHUB_OUTPUT
 
-      - name: 变更说明
+      - name: 更新明细
         id: commit
         run: |
-          MSG=$(git log -1 --pretty=%s)
-          echo "message=${MSG:-尚未补充}" >> $GITHUB_OUTPUT
+          cm=$(git log --pretty=format:"%s" | while read m; do
+            if [ -n "$m" ] && [ "$m" != "." ] && [ "$m" != " " ]; then
+              echo "$m"
+              break
+            fi
+          done)
+          if [ -z "$m" ]; then
+            m="尚未补充"
+          fi
+          echo "message=$m" >> $GITHUB_OUTPUT
 
       - name: 正式发布
         uses: softprops/action-gh-release@v2

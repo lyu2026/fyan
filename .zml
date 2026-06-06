@@ -98,7 +98,7 @@ include(":app")
 @gradle.properties
 android.useAndroidX=true
 android.enableJetifier=false
-org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1024m -XX:+UseG1GC -XX:+ActionsMicroarchitecture
+org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1024m -XX:+UseG1GC
 org.gradle.parallel=true
 org.gradle.caching=true
 org.gradle.configuration-cache=true

@@ -52,22 +52,7 @@ jobs:
         env:
           GRADLE_OPTS: "-Xmx4g -XX:MaxMetaspaceSize=1024m -XX:+UseG1GC"
         run: |
-          gradle wrapper --gradle-version 8.10.2
           chmod +x gradlew
-
-      - name: 上传附件
-        uses: actions/upload-artifact@v4
-        with:
-          name: gradlew
-          path: |
-            gradlew
-            gradlew.bat
-            gradle/wrapper/
-
-      - name: 执行构建2
-        env:
-          GRADLE_OPTS: "-Xmx4g -XX:MaxMetaspaceSize=1024m -XX:+UseG1GC"
-        run: |
           ./gradlew :app:assembleDebug --no-daemon --console=plain
 
       - name: 提取产物

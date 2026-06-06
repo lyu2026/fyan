@@ -49,7 +49,8 @@ jobs:
         run: chmod +x ./.sh;./.sh
 
       - name: 解密签名
-        run: echo "${{ secrets.KS_B64 }}" | base64 --decode > "$GITHUB_WORKSPACE/fyan.keystore"
+        run: |
+          echo "${{ secrets.KS_B64 }}" | base64 --decode > "$GITHUB_WORKSPACE/fyan.keystore"
 
       - name: 执行构建
         env:

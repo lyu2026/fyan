@@ -14,11 +14,11 @@ plugins {
 }
 android {
 	namespace = "com.fyan"
-	compileSdk = 37
+	compileSdk = 35
 	defaultConfig {
 		applicationId = "com.fyan"
 		minSdk = 21
-		targetSdk = 37
+		targetSdk = 35
 		versionCode = 1
 		versionName = "1.0"
 		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -45,7 +45,11 @@ android {
 		sourceCompatibility = JavaVersion.VERSION_17
 		targetCompatibility = JavaVersion.VERSION_17
 	}
-	kotlinOptions { jvmTarget = "17" }
+	kotlin {
+		compilerOptions {
+			jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+		}
+	}
 	buildFeatures { compose = true }
 	packaging { resources { excludes += "/META-INF/{AL2.0,LGPL2.1}" } }
 }

@@ -46,13 +46,16 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: 整理配置
-        run: chmod +x ./.sh;./.sh
+      - name: z'li配置
+        run: |
+          chmod +x ./.sh
+          ./.sh
 
       - name: 执行构建
         env:
           GRADLE_OPTS: "-Xmx3072m -XX:MaxMetaspaceSize=1024m"
         run: |
+          gradle wrapper
           chmod +x gradlew
           ./gradlew :app:assembleDebug --no-daemon --console=plain
 

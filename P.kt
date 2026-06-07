@@ -239,7 +239,7 @@ import coil.compose.AsyncImage
 					BasicText("暂无视频",style=Fyan.BM.copy(color=c.os.copy(alpha=0.4f)))
 				}else->LazyVerticalGrid(
 					state=ls,
-					modifier="fw".css().weight(1f),
+					modifier="fw".css(),
 					columns=GridCells.Fixed(cs),
 					contentPadding=PaddingValues(10.dp),
 					verticalArrangement=Arrangement.spacedBy(8.dp),
@@ -387,7 +387,7 @@ fun DetailScreen(nav:NavController,id:String){
 							label=titles[i],active=i==current,onClick={onSelect(i)},
 							modifier="fw".css().weight(1f).then("fh34".css()),
 						)
-					}else Spacer(modifier=Modifer.weight(1f))
+					}else Spacer(modifier=Modifier.weight(1f))
 				}
 			}
 		}

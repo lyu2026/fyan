@@ -87,8 +87,8 @@ object Fyan{
 
 	// ── 日志 ────────────────────────────────────────────────────
 	val logs=mutableStateListOf<String>()
-	var logs_fold by mutableStateOf(true)
-	var logs_hide by mutableStateOf(true)
+	var logs_fold by mutableStateOf(false)
+	var logs_hide by mutableStateOf(false)
 	var logs_y by mutableStateOf(0f)
 
 	fun log(m:String,o:String,c:Char='i'){
@@ -105,7 +105,7 @@ object Fyan{
 	fun log_clear()=logs.clear()
 	fun log_remove(i:String)=logs.removeAll{it.startsWith(i)}
 
-	@Composable fun LogPanel(){if(logs_fold) LogHide() else LogShow()}
+	@Composable fun LogPanel(){if(logs_fold)LogHide()else LogShow()}
 	@Composable private fun LogHide(){
 		Box(
 			modifier="fw h5 c2.5".css().background(Color(0x80808080)).clickable{logs_fold=false},

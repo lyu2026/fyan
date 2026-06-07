@@ -207,7 +207,7 @@ import coil.compose.AsyncImage
 	}
 
 	Column(modifier="fs".css().background(c.b)){
-		if(!embedded)TopBar(title=tab?.label ?:"",onBack={nav.popBackStack()})
+		if(!embedded)TopBar(title=tab?.label?:"",onBack={nav.popBackStack()})
 		// 筛选 Tab 栏
 		if(gs.isNotEmpty()){
 			Column(modifier="fw".css().background(c.s).border(0.5.dp,c.ov)){

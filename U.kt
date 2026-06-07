@@ -385,29 +385,26 @@ fun FilterTabRow(
 ){
 	val c=Fyan.LC.current
 	Row(
-		modifier="fw h40".css().background(c.s),
+		modifier="fw h32".css().background(c.s),
 		verticalAlignment=Alignment.CenterVertically,
 	){
 		// 固定列
 		Box(
-			modifier="fh ph10".css().background(c.s)
-				.border(0.5.dp,c.ov),
+			modifier="fh ph10".css().background(c.s).border(0.5.dp,c.ov),
 			contentAlignment=Alignment.Center,
 		){
 			BasicText(fixedLabel,style=Fyan.BS.copy(color=c.os.copy(alpha=0.5f)))
 		}
 		// 滚动列
 		Row(
-			modifier="fh".css()
-				.horizontalScroll(rememberScrollState())
-				.weight(1f),
+			modifier="fh".css().horizontalScroll(rememberScrollState()).weight(1f),
 			verticalAlignment=Alignment.CenterVertically,
 		){
 			tabs.forEach{(id,label)->
 				val active=id==selected
 				Box(
-					modifier="fh ph14".css()
-						.background(if(active) c.p.copy(alpha=0.15f) else Color.Transparent)
+					modifier="fh ph10".css()
+						.background(if(active)c.p.copy(alpha=0.15f)else Color.Transparent)
 						.clickable{onSelect(id)},
 					contentAlignment=Alignment.Center,
 				){

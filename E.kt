@@ -139,12 +139,12 @@ withContext(Dispatchers.IO){
 	}
 }
 // 获取视频集源
-suspend fun fetchVideoSource(id:String):String?=
+suspend fun fetchVideoSource(id:String):String=
 withContext(Dispatchers.IO){
 	runCatching{
 		val o=JSONObject(URL("$YF/video/getplaydata?mediaKey=$id").readText())
 		val s=o.optJSONObject("data")?.optJSONArray("list")?:return@runCatching null
-		var u:String?=null
+		var u:String=""
 		for(i in 0 until s.length()){
 			val mu=s.optJSONObject(i)?.optString("mediaUrl","")
 			if(!mu.isNullOrEmpty()){u=mu;break}
@@ -152,7 +152,7 @@ withContext(Dispatchers.IO){
 		u
 	}.getOrElse{e->
 		Fyan.log("拉取视频集源",e.message?:"未知错误",'e')
-		null
+		""
 	}
 }
 

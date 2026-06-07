@@ -73,6 +73,7 @@ import coil.compose.AsyncImage
 				}
 			}
 		}
+		Fyan.LogPanel()
 	}
 }
 

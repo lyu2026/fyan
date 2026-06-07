@@ -35,16 +35,15 @@ import coil.compose.AsyncImage
 	// 从缓存恢复或默认 history
 	var tab by remember{mutableStateOf(Prefs.lastTab)}
 	Column(modifier="fs".css().background(c.b)){
-		// 顶部 Tab 栏
-		Row(
-			modifier="fw h48 psb".css().background(c.s).border(0.5.dp,c.ov),
+		Row( // 顶部 Tab 栏
+			modifier="fw h56 psb".css().background(c.s).border(0.5.dp,c.ov),
 			verticalAlignment=Alignment.CenterVertically,
 		){
 			Row(modifier="fh".css().weight(1f).horizontalScroll(rememberScrollState())){
 				NAV_TABS.forEach{o->
 					val x=o.id==tab
 					Box(
-						modifier="fh ph14".css()
+						modifier="fh ph10".css()
 							.background(if(x)c.p.copy(alpha=0.15f)else androidx.compose.ui.graphics.Color.Transparent)
 							.clickable{
 								tab=o.id
@@ -54,7 +53,7 @@ import coil.compose.AsyncImage
 						contentAlignment=Alignment.Center,
 					){
 						BasicText(
-							o.label,style=Fyan.BS.copy(
+							o.label,style=Fyan.TM.copy(
 								color=if(x)c.p else c.os.copy(alpha=0.7f),
 								fontWeight=if(x)androidx.compose.ui.text.font.FontWeight.W600
 									else androidx.compose.ui.text.font.FontWeight.W400,
@@ -94,23 +93,18 @@ import coil.compose.AsyncImage
 		if(!embedded){
 			TopBar(
 				title="历史记录",onBack={nav.popBackStack()},
-				end={
-					IconBtn(
-						label="🗑",onClick={cc=true},
-						modifier="fw36 fh36 c8".css().background(c.sv),
-					)
-				}
+				end={IconBtn(label="🗑",onClick={cc=true},modifier="fw36 fh36 c8".css())}
 			)
 		}else{ // 嵌入模式下保留一个轻量工具栏
 			Row(
-				modifier="fw h40 ph12".css().background(c.s),
+				modifier="fw h40 ph12".css(),
 				verticalAlignment=Alignment.CenterVertically,
 				horizontalArrangement=Arrangement.SpaceBetween,
 			){
 				BasicText("历史记录",style=Fyan.TS.copy(color=c.os))
 				IconBtn(
 					label="🗑",onClick={cc=true},
-					modifier="fw32 fh32 c8".css().background(c.sv),
+					modifier="fw32 fh32 c8".css(),
 				)
 			}
 		}
@@ -311,6 +305,8 @@ fun DetailScreen(nav:NavController,id:String){
 // TV 布局
 @Composable private fun TvLayout(d:VideoDetail,episode:Int,onEpisode:(Int)->Unit){
 	val c=Fyan.LC.current
+	var u=d.episodes.getOrNull(episode)?:""
+	if(!u.startsWith("http"))u=fetchVideoSource(u)
 	Row(modifier="fs".css()){
 		// 左列：播放器 2/3 宽
 		Column(modifier="fh".css().weight(2f)){
@@ -319,9 +315,7 @@ fun DetailScreen(nav:NavController,id:String){
 					.background(androidx.compose.ui.graphics.Color.Black),
 				contentAlignment=Alignment.Center,
 			){
-				VideoPlayerPlaceholder(
-					poster=d.poster,src=d.episodes.getOrNull(episode)?:"",
-				)
+				VideoPlayerPlaceholder(poster=d.poster,src=u)
 			}
 			// 集数（水平滚动，单行）
 			LazyRow(

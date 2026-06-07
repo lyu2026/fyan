@@ -35,6 +35,6 @@ private fun X(){
 			composable("filter/{id}"){back->FilterScreen(nav,back.arguments?.getString("id")?:"movie")}
 			composable("detail/{id}"){back->DetailScreen(nav,back.arguments?.getString("id")?:"")}
 		}
-		androidx.compose.foundation.layout.Box(modifier="".css()){Fyan.LogPanel()}
+		androidx.compose.foundation.layout.Box(modifier="abc".css()){Fyan.LogPanel()}
 	}
 }

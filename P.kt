@@ -387,7 +387,7 @@ fun DetailScreen(nav:NavController,id:String){
 							label=titles[i],active=i==current,onClick={onSelect(i)},
 							modifier="fw".css().weight(1f).then("fh34".css()),
 						)
-					}else Spacer(modifier=Modifier.weight(1f))
+					}else Spacer(modifier="".css().weight(1f))
 				}
 			}
 		}

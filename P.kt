@@ -305,8 +305,13 @@ fun DetailScreen(nav:NavController,id:String){
 // TV 布局
 @Composable private fun TvLayout(d:VideoDetail,episode:Int,onEpisode:(Int)->Unit){
 	val c=Fyan.LC.current
-	var u=d.episodes.getOrNull(episode)?:""
-	if(!u.startsWith("http"))u=fetchVideoSource(u)
+	var u by remember(episode){mutableStateOf("")}
+	LaunchedEffect(episode){
+		val ru=d.episodes.getOrNull(episode)?:""
+		if(ru.isNotEmpty()&&!ru.startsWith("http",ignoreCase=true)){
+			u=fetchVideoSource(ru)
+		}else u=""
+	}
 	Row(modifier="fs".css()){
 		// 左列：播放器 2/3 宽
 		Column(modifier="fh".css().weight(2f)){
@@ -315,7 +320,11 @@ fun DetailScreen(nav:NavController,id:String){
 					.background(androidx.compose.ui.graphics.Color.Black),
 				contentAlignment=Alignment.Center,
 			){
-				VideoPlayerPlaceholder(poster=d.poster,src=u)
+				if(u.isNotEmpty()){
+					VideoPlayerPlaceholder(poster=d.poster,src=u)
+				}else{
+					BasicText("加载中...", style=Fyan.TS.copy(color=c.os))
+				}
 			}
 			// 集数（水平滚动，单行）
 			LazyRow(

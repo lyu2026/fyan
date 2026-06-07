@@ -143,7 +143,7 @@ suspend fun fetchVideoSource(id:String):String=
 withContext(Dispatchers.IO){
 	runCatching{
 		val o=JSONObject(URL("$YF/video/getplaydata?mediaKey=$id").readText())
-		val s=o.optJSONObject("data")?.optJSONArray("list")?:return@runCatching null
+		val s=o.optJSONObject("data")?.optJSONArray("list")?:return@runCatching ""
 		var u:String=""
 		for(i in 0 until s.length()){
 			val mu=s.optJSONObject(i)?.optString("mediaUrl","")

@@ -17,6 +17,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.*
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.clickable
@@ -82,7 +83,6 @@ import androidx.compose.animation.animateContentSize
 // ─── 主题色（替代 MaterialTheme colorScheme / typography）───
 
 private object AppTheme {
-	@Composable
 	fun colors(dark: Boolean) = if (dark) DarkColors else LightColors
 
 	val LightColors = AppColors(
@@ -366,9 +366,9 @@ fun Modifier.css(s: String, scope: Any? = null, clicks: Map<String, () -> Unit> 
 			"cc" -> {
 				val onClick = clicks[v] ?: clicks[""] ?: {}
 				if (v == "norip")
-					m.clickable(indication = null, interactionSource = remember { MutableInteractionSource() }, onClick = onClick)
+					m.clickable(indication = null, interactionSource = MutableInteractionSource(), onClick = onClick)
 				else
-					m.clickable(interactionSource = remember { MutableInteractionSource() }, onClick = onClick)
+					m.clickable(interactionSource = MutableInteractionSource(), onClick = onClick)
 			}
 			else -> m
 		}

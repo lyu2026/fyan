@@ -160,7 +160,7 @@ object Fyan{
 							horizontalArrangement=Arrangement.SpaceBetween,
 						){
 							BasicText(
-								"● ${parts.getOrElse(1){""}}",
+								parts.getOrElse(1){""},
 								style=BS.copy(color=ec,lineHeight=1.2.em,fontFamily=FontFamily.Monospace),
 								modifier=Modifier.weight(1f).then("pe4".css()),
 							)
@@ -382,34 +382,25 @@ fun FilterTabRow(
 ){
 	val c=Fyan.LC.current
 	Row(
-		modifier="fw h32".css().background(c.s),
+		modifier="fw h28".css().background(c.s),
 		verticalAlignment=Alignment.CenterVertically,
 	){
-		// 固定列
-		Box(
-			modifier="fh ph10".css().background(c.s).border(0.5.dp,c.ov),
-			contentAlignment=Alignment.Center,
-		){
-			BasicText(fixedLabel,style=Fyan.BS.copy(color=c.os.copy(alpha=0.5f)))
-		}
-		// 滚动列
-		Row(
+		Row( // 滚动列
 			modifier="fh".css().horizontalScroll(rememberScrollState()).weight(1f),
 			verticalAlignment=Alignment.CenterVertically,
 		){
 			tabs.forEach{(id,label)->
 				val active=id==selected
 				Box(
-					modifier="fh ph10".css()
+					modifier="fh ph2".css()
 						.background(if(active)c.p.copy(alpha=0.15f)else Color.Transparent)
 						.clickable{onSelect(id)},
 					contentAlignment=Alignment.Center,
 				){
 					BasicText(
-						label,
-						style=Fyan.BS.copy(
-							color=if(active) c.p else c.os.copy(alpha=0.7f),
-							fontWeight=if(active) FontWeight.W600 else FontWeight.W400,
+						" $label ",style=Fyan.BS.copy(
+							color=if(active)c.p else c.os.copy(alpha=0.7f),
+							fontWeight=if(active)FontWeight.W600 else FontWeight.W400,
 						)
 					)
 				}

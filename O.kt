@@ -1,18 +1,21 @@
 package com.fyan
 
+import android.os.Bundle
 import androidx.compose.runtime.*
 import android.content.res.Configuration
+import androidx.activity.enableEdgeToEdge
+import androidx.activity.compose.setContent
 import androidx.navigation.compose.composable
 
 // ════════════════════════════════════════════════════════════════
 // 入口 Activity
 // ════════════════════════════════════════════════════════════════
 class O:androidx.activity.ComponentActivity(){
-	override fun onCreate(savedInstanceState:android.os.Bundle?){
+	override fun onCreate(savedInstanceState:Bundle?){
 		super.onCreate(savedInstanceState)
-		androidx.activity.enableEdgeToEdge()
+		enableEdgeToEdge()
 		Prefs.init(applicationContext)
-		androidx.activity.compose.setContent{
+		setContent{
 			val dark=(resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK)==Configuration.UI_MODE_NIGHT_YES
 			CompositionLocalProvider(Fyan.LC provides Fyan.color(dark)){X()}
 		}

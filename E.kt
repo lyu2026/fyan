@@ -58,7 +58,8 @@ object Prefs{
 // ════════════════════════════════════════════════════════════════
 private const val YF="https://api.iyf.tv/api"
 // 获取筛选 tag 数据
-suspend fun fetchFilterTags(id:String):List<FilterGroup>=withContext(Dispatchers.IO){
+suspend fun fetchFilterTags(id:String):List<FilterGroup>=
+withContext(Dispatchers.IO){
 	runCatching{
 		var j=JSONObject(URL("$YF/list/getfiltertagsdata?SecondaryCode=$id").readText())
 		j=j.optJSONObject("data")?:return@runCatching emptyList()
@@ -86,9 +87,10 @@ suspend fun fetchFilterTags(id:String):List<FilterGroup>=withContext(Dispatchers
 	}
 }
 // 分页获取筛选视频列表
-suspend fun fetchVideoList(id:String,ids:String,page:Int,size:Int=21):List<VideoListItem>=withContext(Dispatchers.IO){
+suspend fun fetchVideoList(id:String,ids:String,page:Int,size:Int=21):List<VideoListItem>=
+withContext(Dispatchers.IO){
 	runCatching{
-		var j=JSONObject(URL("$YF/list/getconditionfilterdata?titleid=$id&ids=$ids&page=$page&size=$size").readText())
+		var j=JSONObject(URL("$YF/list/getconditionfilterdata?titleid=${id}&ids=${ids}&page=${page}&size=${size}").readText())
 		j=j.optJSONObject("data")?:return@runCatching emptyList()
 		val s=j.optJSONArray("list")?:return@runCatching emptyList()
 		buildList{
@@ -109,7 +111,8 @@ suspend fun fetchVideoList(id:String,ids:String,page:Int,size:Int=21):List<Video
 	}
 }
 // 获取视频详情
-suspend fun fetchVideoDetail(id:String):VideoDetail?=withContext(Dispatchers.IO){
+suspend fun fetchVideoDetail(id:String):VideoDetail?=
+withContext(Dispatchers.IO){
 	runCatching{
 		var o=JSONObject(URL("$YF/video/videodetails?mediaKey=$id").readText())
 		o=o.optJSONObject("data")?:return@runCatching null

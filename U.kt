@@ -186,7 +186,7 @@ object Fyan{
 	val history=mutableStateListOf<VideoItem>()
 	/** 视频基本信息（用于历史记录卡片） */
 	data class VideoItem(
-		val mediaKey:String,
+		val id:String,
 		val title:String,
 		val poster:String,
 		val progress:String="",// 观看到的集数描述

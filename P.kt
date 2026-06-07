@@ -40,7 +40,7 @@ import coil.compose.AsyncImage
 			modifier="fw h48 psb".css().background(c.s).border(0.5.dp,c.ov),
 			verticalAlignment=Alignment.CenterVertically,
 		){
-			Row(modifier="fh e1".css().horizontalScroll(rememberScrollState())){
+			Row(modifier="fh".css().weight(1f).horizontalScroll(rememberScrollState())){
 				NAV_TABS.forEach{o->
 					val x=o.id==tab
 					Box(
@@ -65,7 +65,7 @@ import coil.compose.AsyncImage
 			}
 		}
 		// 子页面内容区
-		Box(modifier="fw e1".css()){
+		Box(modifier="fw".css().weight(1f)){
 			key(tab){
 				when(tab){
 					"history"->HistoryScreen(nav,embedded=true)
@@ -120,7 +120,7 @@ import coil.compose.AsyncImage
 			}
 		}else{
 			LazyVerticalGrid(
-				modifier="fw e1".css(),
+				modifier="fw".css().weight(1f),
 				columns=GridCells.Fixed(cs),
 				contentPadding=PaddingValues(12.dp),
 				verticalArrangement=Arrangement.spacedBy(10.dp),
@@ -232,14 +232,14 @@ import coil.compose.AsyncImage
 			}
 		}
 		// 视频宫格
-		Box(modifier="fw e1".css()){
+		Box(modifier="fw".css().weight(1f)){
 			when{
 				loading->LoadingCenter("加载视频列表…")
 				vs.isEmpty()->Box(modifier="fs".css(),contentAlignment=Alignment.Center){
 					BasicText("暂无视频",style=Fyan.BM.copy(color=c.os.copy(alpha=0.4f)))
 				}else->LazyVerticalGrid(
 					state=ls,
-					modifier="fw e1".css(),
+					modifier="fw".css().weight(1f),
 					columns=GridCells.Fixed(cs),
 					contentPadding=PaddingValues(10.dp),
 					verticalArrangement=Arrangement.spacedBy(8.dp),
@@ -325,7 +325,7 @@ fun DetailScreen(nav:NavController,id:String){
 			}
 			// 集数（水平滚动，单行）
 			LazyRow(
-				modifier="fw e1".css(),
+				modifier="fw".css().weight(1f),
 				horizontalArrangement=Arrangement.spacedBy(8.dp),
 				contentPadding=PaddingValues(horizontal=10.dp,vertical=8.dp),
 			){
@@ -338,7 +338,7 @@ fun DetailScreen(nav:NavController,id:String){
 			}
 		}
 		// 右列：简介
-		Column(modifier="fh ph16 pv12 e1".css().verticalScroll(rememberScrollState())){
+		Column(modifier="fh ph16 pv12".css().weight(1f).verticalScroll(rememberScrollState())){
 			BasicText("简介",style=Fyan.TS.copy(color=c.os.copy(alpha=0.5f)))
 			Spacer(modifier="h6".css())
 			BasicText(d.desc,style=Fyan.BM.copy(color=c.os))
@@ -385,9 +385,9 @@ fun DetailScreen(nav:NavController,id:String){
 					if(i<titles.size){
 						EpisodeBtn(
 							label=titles[i],active=i==current,onClick={onSelect(i)},
-							modifier="fw e1".css().then("fh34".css()),
+							modifier="fw".css().weight(1f).then("fh34".css()),
 						)
-					}else Spacer(modifier="e1".css())
+					}else Spacer(modifier=Modifer.weight(1f))
 				}
 			}
 		}

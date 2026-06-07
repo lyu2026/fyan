@@ -494,10 +494,6 @@ fun String.css():Modifier{
 					}
 				}
 			}
-			'e'->{val v=s.drop(1)
-				val n=v.drop(1).toDoubleOrNull()?.f
-				if(n!=null)m=m.weight(n)
-			}
 			'z'->{val v=s.drop(1)
 				when{
 					v.startsWith("x")->{val n=v.drop(1).toDoubleOrNull()?.dp?:0.dp; m=m.offset(x=n)}

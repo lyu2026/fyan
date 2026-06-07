@@ -310,6 +310,7 @@ fun DetailScreen(nav:NavController,id:String){
 		val ru=d.episodes.getOrNull(episode)?:""
 		if(ru.isNotEmpty()&&!ru.startsWith("http",ignoreCase=true)){
 			u=fetchVideoSource(ru)
+			Fyan.log("fetchVideoSource",u)
 		}else u=""
 	}
 	Row(modifier="fs".css()){

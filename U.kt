@@ -108,24 +108,21 @@ object Fyan{
 	@Composable fun LogPanel(){if(logs_fold)LogHide()else LogShow()}
 	@Composable private fun LogHide(){
 		Box(
-			modifier="fw h5 c2.5".css().background(Color(0x80808080)).clickable{logs_fold=false},
+			modifier="fw pnb abc h5 c2.5".css().background(Color(0x80808080)).clickable{logs_fold=false},
 			contentAlignment=Alignment.Center,
 		){BasicText("· · ·  日志  · · ·",style=BS.copy(color=Color.White.copy(alpha=0.7f)))}
 	}
 	@Composable private fun LogShow(){
 		val lazy=rememberLazyListState()
-		LaunchedEffect(logs.lastOrNull()){if(logs.isNotEmpty()) lazy.animateScrollToItem(logs.size-1)}
+		LaunchedEffect(logs.lastOrNull()){if(logs.isNotEmpty())lazy.animateScrollToItem(logs.size-1)}
 		val maxH=LocalConfiguration.current.screenHeightDp.dp/3
 		val isTv=(LocalConfiguration.current.uiMode and Configuration.UI_MODE_TYPE_MASK)==Configuration.UI_MODE_TYPE_TELEVISION
 		Box(
-			modifier="fw br6,6,0,0".css()
-				.heightIn(max=maxH)
-				.offset(y=logs_y.roundToInt().dp)
-				.background(Color(0xEB1C1C1E))
-				.border(0.5.dp,Color(0x26808080),RoundedCornerShape(topStart=6.dp,topEnd=6.dp))
+			modifier="fw pnb abc b0.5 br6,6,0,0 b808080.70 h>${maxH}".css()
+				.offset(y=logs_y.roundToInt().dp).background(Color(0xEB1C1C1E))
 				.pointerInput(Unit){
 					detectDragGestures(
-						onDragEnd={if(logs_y>150f) logs_fold=true else logs_y=0f},
+						onDragEnd={if(logs_y>100f)logs_fold=true else logs_y=0f},
 						onDrag={ch,d->ch.consume(); if(logs_y+d.y>=0f)logs_y+=d.y}
 					)
 				}

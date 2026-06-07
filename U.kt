@@ -446,7 +446,7 @@ fun FilterTabRow(
 // css() DSL ── 所有 modifier 构建的唯一入口
 // ════════════════════════════════════════════════════════════════
 fun String.css():Modifier{
-	var m=Modifier
+	var m:Modifier=Modifier
 	for(it in split(" ")){
 		val s=it.trim()
 		if(s.isEmpty())continue
@@ -458,7 +458,6 @@ fun String.css():Modifier{
 			}
 			'w'->{val v=s.drop(1)
 				m=when{
-					v=="f"->m.weight(1f)
 					v.toDoubleOrNull()!=null->m.width(v.toDouble().dp)
 					v.startsWith(">")->m.widthIn(min=v.drop(1).toDoubleOrNull()?.dp?:0.dp)
 					v.startsWith("<")->m.widthIn(max=v.drop(1).toDoubleOrNull()?.dp?:Dp.Unspecified)
@@ -494,6 +493,10 @@ fun String.css():Modifier{
 						}
 					}
 				}
+			}
+			'e'->{val v=s.drop(1)
+				val n=v.drop(1).toDoubleOrNull()?.f
+				if(n!=null)m=m.weight(n)
 			}
 			'z'->{val v=s.drop(1)
 				when{
@@ -563,7 +566,6 @@ fun String.css():Modifier{
 					"bs"->Alignment.BottomStart; "bc"->Alignment.BottomCenter; "be"->Alignment.BottomEnd
 					else->null
 				}
-				if(align!=null) m=m.align(align)
 			}
 			'r'->{val v=s.drop(1)
 				if(v.contains("x")){

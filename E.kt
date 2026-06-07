@@ -58,7 +58,7 @@ object Prefs{
 // ════════════════════════════════════════════════════════════════
 private const val YF="https://api.iyf.tv/api"
 // 获取筛选 tag 数据
-suspend fun fetchFilterTags(id:String):List<FilterGroup>=
+suspend fun fetchFilterTags(id:String):List<FilterGroup> =
 withContext(Dispatchers.IO){
 	runCatching{
 		var j=JSONObject(URL("$YF/list/getfiltertagsdata?SecondaryCode=$id").readText())
@@ -87,7 +87,7 @@ withContext(Dispatchers.IO){
 	}
 }
 // 分页获取筛选视频列表
-suspend fun fetchVideoList(id:String,ids:String,page:Int,size:Int=21):List<VideoListItem>=
+suspend fun fetchVideoList(id:String,ids:String,page:Int,size:Int=21):List<VideoListItem> =
 withContext(Dispatchers.IO){
 	runCatching{
 		var j=JSONObject(URL("$YF/list/getconditionfilterdata?titleid=${id}&ids=${ids}&page=${page}&size=${size}").readText())

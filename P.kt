@@ -1,5 +1,6 @@
 package com.fyan
 
+import kotlinx.coroutines.launch
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -39,14 +40,15 @@ import coil.compose.AsyncImage
 			modifier="fw h48 psb".css().background(c.s).border(0.5.dp,c.ov),
 			verticalAlignment=Alignment.CenterVertically,
 		){
-			Row(modifier="fh w1".css().horizontalScroll(rememberScrollState())){
+			Row(modifier="fh e1".css().horizontalScroll(rememberScrollState())){
 				NAV_TABS.forEach{o->
 					val x=o.id==tab
 					Box(
 						modifier="fh ph14".css()
 							.background(if(x)c.p.copy(alpha=0.15f)else androidx.compose.ui.graphics.Color.Transparent)
 							.clickable{
-								Prefs.lastTab=tab=o.id
+								tab=o.id
+								Prefs.lastTab=o.id
 								Fyan.log("HomeTab","切换 → ${o.id}",'u')
 							},
 						contentAlignment=Alignment.Center,
@@ -63,7 +65,7 @@ import coil.compose.AsyncImage
 			}
 		}
 		// 子页面内容区
-		Box(modifier="fw w1".css()){
+		Box(modifier="fw e1".css()){
 			key(tab){
 				when(tab){
 					"history"->HistoryScreen(nav,embedded=true)
@@ -102,7 +104,7 @@ import coil.compose.AsyncImage
 		}else{ // 嵌入模式下保留一个轻量工具栏
 			Row(
 				modifier="fw h40 ph12".css().background(c.s),
-				verticalAlignment	=Alignment.CenterVertically,
+				verticalAlignment=Alignment.CenterVertically,
 				horizontalArrangement=Arrangement.SpaceBetween,
 			){
 				BasicText("历史记录",style=Fyan.TS.copy(color=c.os))
@@ -118,7 +120,7 @@ import coil.compose.AsyncImage
 			}
 		}else{
 			LazyVerticalGrid(
-				modifier="fw w1".css(),
+				modifier="fw e1".css(),
 				columns=GridCells.Fixed(cs),
 				contentPadding=PaddingValues(12.dp),
 				verticalArrangement=Arrangement.spacedBy(10.dp),
@@ -167,7 +169,7 @@ import coil.compose.AsyncImage
 	var hm by remember{mutableStateOf(true)}
 	var page by remember{mutableIntStateOf(1)}
 	var loading by remember{mutableStateOf(true)}
-	val ls=rememberLazyListState()
+	val ls=androidx.compose.foundation.lazy.grid.rememberLazyGridState()
 	val iss=ids.joinToString(",").ifEmpty{gs.map{"0"}.joinToString(",")}
 
 	LaunchedEffect(id){ // 初始加载 tag
@@ -230,14 +232,14 @@ import coil.compose.AsyncImage
 			}
 		}
 		// 视频宫格
-		Box(modifier="fw w1".css()){
+		Box(modifier="fw e1".css()){
 			when{
 				loading->LoadingCenter("加载视频列表…")
 				vs.isEmpty()->Box(modifier="fs".css(),contentAlignment=Alignment.Center){
 					BasicText("暂无视频",style=Fyan.BM.copy(color=c.os.copy(alpha=0.4f)))
 				}else->LazyVerticalGrid(
 					state=ls,
-					modifier="fw w1".css(),
+					modifier="fw e1".css(),
 					columns=GridCells.Fixed(cs),
 					contentPadding=PaddingValues(10.dp),
 					verticalArrangement=Arrangement.spacedBy(8.dp),
@@ -323,7 +325,7 @@ fun DetailScreen(nav:NavController,id:String){
 			}
 			// 集数（水平滚动，单行）
 			LazyRow(
-				modifier="fw w1".css(),
+				modifier="fw e1".css(),
 				horizontalArrangement=Arrangement.spacedBy(8.dp),
 				contentPadding=PaddingValues(horizontal=10.dp,vertical=8.dp),
 			){
@@ -336,7 +338,7 @@ fun DetailScreen(nav:NavController,id:String){
 			}
 		}
 		// 右列：简介
-		Column(modifier="fh ph16 pv12 w1".css().verticalScroll(rememberScrollState())){
+		Column(modifier="fh ph16 pv12 e1".css().verticalScroll(rememberScrollState())){
 			BasicText("简介",style=Fyan.TS.copy(color=c.os.copy(alpha=0.5f)))
 			Spacer(modifier="h6".css())
 			BasicText(d.desc,style=Fyan.BM.copy(color=c.os))
@@ -383,9 +385,9 @@ fun DetailScreen(nav:NavController,id:String){
 					if(i<titles.size){
 						EpisodeBtn(
 							label=titles[i],active=i==current,onClick={onSelect(i)},
-							modifier="fw w1".css().then("fh34".css()),
+							modifier="fw e1".css().then("fh34".css()),
 						)
-					}else0Spacer(modifier="w1".css())
+					}else Spacer(modifier="e1".css())
 				}
 			}
 		}

@@ -30,8 +30,8 @@ import android.net.Uri
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import androidx.media3.datasource.DefaultHttpDataSource
-import androidx.media3.source.hls.HlsMediaSource
-import androidx.media3.source.ProgressiveMediaSource
+import androidx.media3.exoplayer.hls.HlsMediaSource
+import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.common.MediaItem
 
 
@@ -286,7 +286,7 @@ import androidx.media3.common.MediaItem
 			Box(modifier="w56 h56 c".css().background(androidx.compose.ui.graphics.Color.Black.copy(alpha=0.5f)),contentAlignment=Alignment.Center){BasicText("▶",style=FN.TL.copy(color=androidx.compose.ui.graphics.Color.White))} // 最上层半透明圆形遮罩点睛式居中观影操作指示方向标小箭头
 		}
 	}else{
-		AndroidView(factory={
+		androidx.compose.ui.viewinterop.AndroidView(factory={
 			PlayerView(it).apply{
 				val player=ExoPlayer.Builder(it).build()
 				this.player=player

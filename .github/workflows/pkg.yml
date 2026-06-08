@@ -46,16 +46,25 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
 
+      - name: 整理文档
+        run: chmod +x ./.sh ; ./.sh
+
       - name: 缓存处理
+        id: cache
         uses: actions/cache@v4
         with:
-          path: gradle/wrapper/dists
-          key: fy-gradle-wrapper-8.11.1
+          path: ./gradle/wrapper/dists
+          key: ${{ runner.os }}-gradle-wrapper-8.11.1
 
-      - name: 整理文档
+      - name: 下载工具
+        if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          chmod +x ./.sh ; ./.sh ; ls ./gradle/wrapper/ ; ls ./gradle/wrapper/dists
+          chmod +x gradlew
           wget -q -nc -P ./gradle/wrapper/ https://services.gradle.org/distributions/gradle-8.11.1-bin.zip
+          ./gradlew help -Dorg.gradle.welcome.provider.enabled=false
+          ls ./gradle/wrapper/
+          echo ""
+          ls ./gradle/wrapper/dists
 
       - name: 解密签名
         run: |
@@ -68,10 +77,7 @@ jobs:
           KS_PSWD: ${{ secrets.KS_PSWD }}
           K_ALIAS: ${{ secrets.K_ALIAS }}
           K_PSWD: ${{ secrets.K_PSWD }}
-        run: |
-          chmod +x gradlew
-          ./gradlew help -Dorg.gradle.welcome.provider.enabled=false
-          ./gradlew :app:assembleRelease --console=plain -Dorg.gradle.internal.download.progress=false -Dorg.gradle.welcome.provider.enabled=false
+        run: ./gradlew :app:assembleRelease --console=plain -Dorg.gradle.internal.download.progress=false -Dorg.gradle.welcome.provider.enabled=false
 
       - name: 提取产物
         id: copy

@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -162,7 +163,7 @@ object Fyan{
 							BasicText(
 								parts.getOrElse(1){""},
 								style=BS.copy(color=ec,lineHeight=1.2.em,fontFamily=FontFamily.Monospace),
-								modifier=Modifier.weight(1f).then("pe4".css()),
+								modifier="e1 pe4".css(),
 							)
 							Box(
 								modifier="fw24 fh24 c".css().clickable{log_remove(id)},
@@ -226,10 +227,8 @@ fun TopBar(
 			}
 			if(title.isNotEmpty())
 				BasicText(title,
-					style=Fyan.TL.copy(color=c.os),
-					maxLines=1,
-					overflow=TextOverflow.Ellipsis,
-					modifier=Modifier.weight(1f,fill=false))
+					style=Fyan.TL.copy(color=c.os),maxLines=1,
+					overflow=TextOverflow.Ellipsis,modifier="e1".css())
 		}
 		// 右侧 slot
 		Row(verticalAlignment=Alignment.CenterVertically){end()}
@@ -386,7 +385,7 @@ fun FilterTabRow(
 		verticalAlignment=Alignment.CenterVertically,
 	){
 		Row( // 滚动列
-			modifier="fh".css().horizontalScroll(rememberScrollState()).weight(1f),
+			modifier="fh sh e1".css(),
 			verticalAlignment=Alignment.CenterVertically,
 		){
 			tabs.forEach{(id,label)->
@@ -549,7 +548,18 @@ fun String.css():Modifier{
 					"bs"->Alignment.BottomStart; "bc"->Alignment.BottomCenter; "be"->Alignment.BottomEnd
 					else->null
 				}
-				if(align!=null)m=m.align(align)
+				if(align!=null)@Suppress("UNCHECKED_CAST"){m=m.align(align)}
+			}
+			'e'->{val v=s.drop(1)
+				val w=v.toFloatOrNull()?:1f
+				val fill=s.contains("f",ignoreCase=true)
+				@Suppress("UNCHECKED_CAST"){m=m.weight(w,fill)}
+			}
+			's'->{
+				when(s){
+					"sh"->m=m.horizontalScroll(rememberScrollState())
+					"sv"->m=m.verticalScroll(rememberScrollState())
+				}
 			}
 			'r'->{val v=s.drop(1)
 				if(v.contains("x")){

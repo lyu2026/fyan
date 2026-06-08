@@ -14,7 +14,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items as gridItems
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.verticalScroll
@@ -39,7 +38,7 @@ import coil.compose.AsyncImage
 			modifier="fw h56 psb".css().background(c.s).border(0.5.dp,c.ov),
 			verticalAlignment=Alignment.CenterVertically,
 		){
-			Row(modifier="fh".css().weight(1f).horizontalScroll(rememberScrollState())){
+			Row(modifier="fh e1 sh".css()){
 				NAV_TABS.forEach{o->
 					val x=o.id==tab
 					Box(
@@ -64,7 +63,7 @@ import coil.compose.AsyncImage
 			}
 		}
 		// 子页面内容区
-		Box(modifier="fw".css().weight(1f)){
+		Box(modifier="fw e1".css()){
 			key(tab){
 				when(tab){
 					"history"->HistoryScreen(nav,embedded=true)
@@ -114,7 +113,7 @@ import coil.compose.AsyncImage
 			}
 		}else{
 			LazyVerticalGrid(
-				modifier="fw".css().weight(1f),
+				modifier="fw e1".css(),
 				columns=GridCells.Fixed(cs),
 				contentPadding=PaddingValues(12.dp),
 				verticalArrangement=Arrangement.spacedBy(10.dp),
@@ -226,7 +225,7 @@ import coil.compose.AsyncImage
 			}
 		}
 		// 视频宫格
-		Box(modifier="fw".css().weight(1f)){
+		Box(modifier="fw e1".css()){
 			when{
 				loading->LoadingCenter("加载视频列表…")
 				vs.isEmpty()->Box(modifier="fs".css(),contentAlignment=Alignment.Center){
@@ -315,7 +314,7 @@ fun DetailScreen(nav:NavController,id:String){
 	}
 	Row(modifier="fs".css()){
 		// 左列：播放器 2/3 宽
-		Column(modifier="fh".css().weight(2f)){
+		Column(modifier="fh e2".css()){
 			Box( // 播放面板（16:9）
 				modifier="fw".css().aspectRatio(16f/9f)
 					.background(androidx.compose.ui.graphics.Color.Black),
@@ -329,7 +328,7 @@ fun DetailScreen(nav:NavController,id:String){
 			}
 			// 集数（水平滚动，单行）
 			LazyRow(
-				modifier="fw".css().weight(1f),
+				modifier="fw e1".css(),
 				horizontalArrangement=Arrangement.spacedBy(8.dp),
 				contentPadding=PaddingValues(horizontal=10.dp,vertical=8.dp),
 			){
@@ -342,7 +341,7 @@ fun DetailScreen(nav:NavController,id:String){
 			}
 		}
 		// 右列：简介
-		Column(modifier="fh ph16 pv12".css().weight(1f).verticalScroll(rememberScrollState())){
+		Column(modifier="fh ph16 pv12 e1 sv".css()){
 			BasicText("简介",style=Fyan.TS.copy(color=c.os.copy(alpha=0.5f)))
 			Spacer(modifier="h6".css())
 			BasicText(d.desc,style=Fyan.BM.copy(color=c.os))
@@ -353,7 +352,7 @@ fun DetailScreen(nav:NavController,id:String){
 // 手机布局
 @Composable private fun PhoneLayout(d:VideoDetail,episode:Int,onEpisode:(Int)->Unit){
 	val c=Fyan.LC.current
-	Column(modifier="fs".css().verticalScroll(rememberScrollState())){
+	Column(modifier="fs sv".css()){
 		Box( // 播放面板（16:9，贴边）
 			modifier="fw".css().aspectRatio(16f/9f)
 				.background(androidx.compose.ui.graphics.Color.Black),
@@ -389,9 +388,9 @@ fun DetailScreen(nav:NavController,id:String){
 					if(i<titles.size){
 						EpisodeBtn(
 							label=titles[i],active=i==current,onClick={onSelect(i)},
-							modifier="fw".css().weight(1f).then("fh34".css()),
+							modifier="fw e1 fh34".css(),
 						)
-					}else Spacer(modifier="".css().weight(1f))
+					}else Spacer(modifier="e1".css())
 				}
 			}
 		}

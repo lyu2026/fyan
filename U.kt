@@ -108,7 +108,7 @@ fun TB(tt:String="",ob:(()->Unit)?=null,ed:@Composable RowScope.()->Unit={}){ //
 	Row(modifier="fw h60 psb".css().background(cc.s).border(0.5.dp,cc.ov),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.SpaceBetween){ // 顶条水平根布局
 		Row(modifier="ps2".css(),verticalAlignment=Alignment.CenterVertically){ // 左段标题组合行
 			if(ob!=null){ // 若返回事件不为空
-				Box(modifier="fw36 fh36 c8".css().clickable(onClick=ob),contentAlignment=Alignment.Center){androidx.compose.foundation.Image(painter=androidx.compose.ui.res.painterResource(id=R.drawable.arrow_back),modifier="fw20 fh20".css(),colorFilter=androidx.compose.ui.graphics.ColorFilter.tint(cc.os))} // 返回箭头图标按钮
+				Box(modifier="fw36 fh36 c8".css().clickable(onClick=ob),contentAlignment=Alignment.Center){androidx.compose.foundation.Image(painter=androidx.compose.ui.res.painterResource(id=R.drawable.arrow_back),contentDescription=null,modifier="fw20 fh20".css(),colorFilter=androidx.compose.ui.graphics.ColorFilter.tint(cc.os))} // 返回箭头图标按钮
 				if(tt.isNotEmpty())Spacer(modifier="fw12".css()) // 左边距
 			}
 			if(tt.isNotEmpty())BasicText(tt,style=FN.TL.copy(color=cc.os),maxLines=1,overflow=TextOverflow.Ellipsis,modifier="e1".css(this)) // 主标题限单一单行显示

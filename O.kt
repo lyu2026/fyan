@@ -81,7 +81,6 @@ class O:androidx.activity.ComponentActivity(){
 
 @Composable private fun X(){
 	val c=rememberNavController()
-	val h=androidx.compose.ui.platform.LocalConfiguration.current.screenHeightDp/3
 	androidx.compose.foundation.layout.Box(modifier="fs psb pnb".css(),contentAlignment=Alignment.BottomCenter){
 		NavHost(navController=c,startDestination="home"){
 			composable("home"){HS(c)}
@@ -89,6 +88,6 @@ class O:androidx.activity.ComponentActivity(){
 			composable("filter/{id}"){b:NavBackStackEntry->FS(c,id=b.arguments?.getString("id")?:"movie")}
 			composable("detail/{id}"){b:NavBackStackEntry->DS(c,id=b.arguments?.getString("id")?:"")}
 		}
-		FN.LP(modifier="fw h<$h ph0.5".css())
+		FN.LP()
 	}
 }

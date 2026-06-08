@@ -214,7 +214,7 @@ import kotlinx.coroutines.launch
 				if(u.isNotEmpty()){VP(pt=d.pt,sc=u,playing=playing,onPlay={playing=true})}else{BasicText("加载中...",style=FN.TS.copy(color=cc.os))}
 			}
 			LazyRow(modifier="fw".css(),horizontalArrangement=Arrangement.spacedBy(8.dp),contentPadding=PaddingValues(horizontal=10.dp,vertical=8.dp)){
-				items(d.et.indices.toList()){i->EB(lb=d.et[i],ac=i==ep,modifier="w60 h28".css(),oc={oe(i)})}
+				items(d.et.indices.toList()){i->EB(lb=d.et[i],ac=i==ep,modifier="w50 h24".css(),oc={oe(i)})}
 			}
 		}
 		Column(modifier="fh ph16 pv12 e1 sv".css(this)){
@@ -267,7 +267,7 @@ import kotlinx.coroutines.launch
 				repeat(cs){c->
 					val i=r*cs+c
 					if(i<tl.size){
-						EB(lb=tl[i],ac=i==ct,oc={os(i)},modifier="fw e1 h28".css(this))
+						EB(lb=tl[i],ac=i==ct,oc={os(i)},modifier="fw e1 h24".css(this))
 					}else Spacer(modifier="e1".css(this)) // 尾部空位补齐，防止前置按钮拉伸变形
 				}
 			}

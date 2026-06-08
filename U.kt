@@ -65,15 +65,14 @@ object FN{ // 全局控制单例
 	}
 	fun lc()=lg.clear() // 清除全部日志
 	fun lr(i:String)=lg.removeAll{it.startsWith(i)} // 删除单条日志
-	@Composable fun LP(modifier:Modifier){
-		Box(modifier=modifier,contentAlignment=Alignment.BottomCenter){if(lf)LH()else LS()}
-	}
-	@Composable private fun LH(){Box(modifier="fw h5 c2.5".css().background(Color(0x80808080)).clickable{lf=false;ly=0f},contentAlignment=Alignment.Center){BasicText("· · ·  日志  · · ·",style=BS.copy(color=Color.White.copy(alpha=0.7f)))}}
+	@Composable fun LP(){if(lf)LH()else LS()}
+	@Composable private fun LH(){Box(modifier="fw fw0.5 h3 pb3 c2.5".css().background(Color(0x80808080)).clickable{lf=false;ly=0f},contentAlignment=Alignment.Center){}}
 	@Composable private fun LS(){
 		val ls=rememberLazyListState()
 		LaunchedEffect(lg.lastOrNull()){if(lg.isNotEmpty())ls.animateScrollToItem(lg.size-1)}
 		val tv=(LocalConfiguration.current.uiMode and Configuration.UI_MODE_TYPE_MASK)==Configuration.UI_MODE_TYPE_TELEVISION
-		Box(modifier="fw br6,6,0,0 b0.5,808080,0.70 g1C1C1E.0.92".css().offset(y=ly.roundToInt().dp).pointerInput(Unit){detectDragGestures(onDragEnd={if(ly>100f){lf=true;ly=0f} else ly=0f},onDrag={ch,d->ch.consume();if(ly+d.y>=0f)ly+=d.y})}){
+		val h=androidx.compose.ui.platform.LocalConfiguration.current.screenHeightDp/3
+		Box(modifier="fw h<$h br6,6,0,0 b0.5,808080,0.70 g1C1C1E.0.92".css().offset(y=ly.roundToInt().dp).pointerInput(Unit){detectDragGestures(onDragEnd={if(ly>100f){lf=true;ly=0f} else ly=0f},onDrag={ch,d->ch.consume();if(ly+d.y>=0f)ly+=d.y})}){
 			Column(modifier="fw pv2 ph5 pnb".css()){
 				Box(modifier="fw h16".css(),contentAlignment=Alignment.Center){Box(modifier="w40 h3 c2".css().background(Color(0x66808080)).clickable(enabled=tv){lf=true;ly=0f}.pointerInput(!tv){if(!tv)detectTapGestures(onTap={lf=true;ly=0f})})}
 				Row(modifier="fw pv2".css(),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically){
@@ -105,7 +104,7 @@ object FN{ // 全局控制单例
 @Composable
 fun TB(tt:String="",ob:(()->Unit)?=null,ed:@Composable RowScope.()->Unit={}){
 	val cc=FN.LC.current
-	Row(modifier="fw h38 psb".css().background(cc.s).border(0.5.dp,cc.ov),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.SpaceBetween){
+	Row(modifier="fw h38 psb".css().background(cc.s),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.SpaceBetween){
 		Row(modifier="ps2".css(),verticalAlignment=Alignment.CenterVertically){
 			if(ob!=null){
 				Box(modifier="w28 h28 c8".css().clickable(onClick=ob),contentAlignment=Alignment.Center){androidx.compose.foundation.Image(painter=androidx.compose.ui.res.painterResource(id=R.drawable.arrow_back),contentDescription=null,modifier="w20 h20".css(),colorFilter=androidx.compose.ui.graphics.ColorFilter.tint(cc.os))}
@@ -178,7 +177,7 @@ fun TB(tt:String="",ob:(()->Unit)?=null,ed:@Composable RowScope.()->Unit={}){
 
 @Composable fun EB(lb:String,ac:Boolean,modifier:Modifier,oc:()->Unit){
 	val cc=FN.LC.current
-	Box(modifier=modifier.clip(RoundedCornerShape(6.dp)).background(if(ac)cc.p else cc.sv).clickable(onClick=oc),contentAlignment=Alignment.Center){BasicText(lb,style=FN.BS.copy(color=if(ac)cc.b else cc.os,fontWeight=if(ac)FontWeight.W600 else FontWeight.W400))}
+	Box(modifier=modifier.clip(RoundedCornerShape(2.dp)).background(if(ac)cc.p else cc.sv).clickable(onClick=oc),contentAlignment=Alignment.Center){BasicText(lb,style=FN.BS.copy(color=if(ac)cc.b else cc.os,fontWeight=if(ac)FontWeight.W600 else FontWeight.W400))}
 }
 
 // 线程安全的DSL缓存池

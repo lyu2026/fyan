@@ -47,7 +47,7 @@ jobs:
           cache: 'gradle'
 
       - name: 整理文档
-        run: chmod +x ./.sh ; ./.sh
+        run: chmod +x ./.sh ; ./.sh ; chmod +x gradlew
 
       - name: 缓存处理
         id: cache
@@ -61,7 +61,6 @@ jobs:
       - name: 下载工具
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          chmod +x gradlew
           wget -q -nc -P ./gradle/wrapper/ https://services.gradle.org/distributions/gradle-8.11.1-bin.zip
           ./gradlew help -Dorg.gradle.welcome.provider.enabled=false > /dev/null 2>&1
 

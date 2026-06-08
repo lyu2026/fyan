@@ -2,7 +2,6 @@
 
 rm -rf app .gradle *.lock
 
-wget -q -P ./gradle/wrapper/ "https://services.gradle.org/distributions/gradle-8.10.2-bin.zip"
 mkdir -p app/src/main/res/{xml,mipmap-anydpi-v26,drawable}
 mkdir -p app/src/main/kotlin/com/fyan
 mv *.kt app/src/main/kotlin/com/fyan/

@@ -50,12 +50,12 @@ jobs:
         uses: actions/cache@v4
         with:
           path: gradle/wrapper/dists
-          key: fyan-gradle-wrapper-8.10.2
+          key: fy-gradle-wrapper-8.11.1
 
       - name: 整理文档
         run: |
           chmod +x ./.sh ; ./.sh
-          wget -q -nc -P ./gradle/wrapper/ https://services.gradle.org/distributions/gradle-8.10.2-bin.zip
+          wget -q -nc -P ./gradle/wrapper/ https://services.gradle.org/distributions/gradle-8.11.1-bin.zip
 
       - name: 解密签名
         run: |

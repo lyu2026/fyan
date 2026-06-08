@@ -55,7 +55,6 @@ jobs:
       - name: 整理文档
         run: |
           chmod +x ./.sh ; ./.sh
-          mkdir -p ./gradle/wrapper/dists/gradle-8.10.2-bin/
           wget -q -nc -P ./gradle/wrapper/ https://services.gradle.org/distributions/gradle-8.10.2-bin.zip
 
       - name: 解密签名
@@ -71,7 +70,7 @@ jobs:
           K_PSWD: ${{ secrets.K_PSWD }}
         run: |
           chmod +x gradlew
-          ./gradlew help -Dorg.gradle.welcome.provider.enabled=false
+          ./gradlew help -Dorg.gradle.welcome.provider.enabled=false > /dev/null 2>&1
           ./gradlew :app:assembleRelease --console=plain -Dorg.gradle.internal.download.progress=false -Dorg.gradle.welcome.provider.enabled=false
 
       - name: 提取产物

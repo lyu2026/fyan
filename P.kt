@@ -29,12 +29,12 @@ import coil.compose.AsyncImage
 @Composable fun HS(nv:NavController){ // HS (HomeScreen) 应用首页主架组件
 	val cc=FN.LC.current // 注入全局色彩配置
 	var tb by remember{mutableStateOf(PR.lt)} // 维持首页主导页面分类游标
-	Column(modifier="fs".css(this).background(cc.b)){ // 贯穿全屏的竖向主页列布局
-		Row(modifier="fw h56 psb".css(this).background(cc.s).border(0.5.dp,cc.ov),verticalAlignment=Alignment.CenterVertically){ // 顶部横向滚动主分类频道栏
+	Column(modifier="fs".css().background(cc.b)){ // 贯穿全屏的竖向主页列布局
+		Row(modifier="fw h56 psb".css().background(cc.s).border(0.5.dp,cc.ov),verticalAlignment=Alignment.CenterVertically){ // 顶部横向滚动主分类频道栏
 			Row(modifier="fh e1 sh".css(this)){ // 赋予横向滚动属性的包裹容器
 				NAV_TABS.forEach{o-> // 迭代配置预设的各个频道标签
 					val ac=o.id==tb // 结算当下选中状态
-					Box(modifier="fh ph10".css(this).background(if(ac)cc.p.copy(alpha=0.15f) else androidx.compose.ui.graphics.Color.Transparent).clickable{tb=o.id;PR.lt=o.id;FN.lg("HomeTab","切换 → ${o.id}",'u')},contentAlignment=Alignment.Center){ // 触发分类重洗刷新的点击响应盒
+					Box(modifier="fh ph10".css().background(if(ac)cc.p.copy(alpha=0.15f) else androidx.compose.ui.graphics.Color.Transparent).clickable{tb=o.id;PR.lt=o.id;FN.lg("HomeTab","切换 → ${o.id}",'u')},contentAlignment=Alignment.Center){ // 触发分类重洗刷新的点击响应盒
 						BasicText(o.lb,style=FN.TM.copy(color=if(ac)cc.p else cc.os.copy(alpha=0.7f),fontWeight=if(ac)androidx.compose.ui.text.font.FontWeight.W600 else androidx.compose.ui.text.font.FontWeight.W400)) // 各频道的文字显示
 					}
 				}
@@ -61,17 +61,17 @@ import coil.compose.AsyncImage
 		cf.screenWidthDp>=600->4 // 折叠开屏常规平板开四列
 		else->3 // 普通竖持小屏智能手机开三列
 	}
-	Column(modifier="fs".css(this).background(cc.b)){ // 足迹页面纵向排布根盒
+	Column(modifier="fs".css().background(cc.b)){ // 足迹页面纵向排布根盒
 		if(!eb){ // 若非嵌入模式（即独立路由大页）
 			TB(tt="历史记录",ob={nv.popBackStack()},ed={IB(lb="🗑",oc={cl=true},modifier="fw36 fh36 c8".css())}) // 绘制配备标准清空功能把手的独立大顶部Bar
 		}else{ // 归属于首页主屏之下的嵌入子页
-			Row(modifier="fw h40 ph12".css(this),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.SpaceBetween){ // 绘制一个极简轻盈的标题行
+			Row(modifier="fw h40 ph12".css(),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.SpaceBetween){ // 绘制一个极简轻盈的标题行
 				BasicText("历史记录",style=FN.TS.copy(color=cc.os)) // 足迹小标文案
 				IB(lb="🗑",oc={cl=true},modifier="fw32 fh32 c8".css()) // 清空按钮
 			}
 		}
 		if(FN.hi.isEmpty()){ // 全局记录为空的缺省判定
-			Box(modifier="fs".css(this),contentAlignment=Alignment.Center){BasicText("暂无观看记录",style=FN.BM.copy(color=cc.os.copy(alpha=0.4f)))} // 居中输出空视窗信息
+			Box(modifier="fs".css(),contentAlignment=Alignment.Center){BasicText("暂无观看记录",style=FN.BM.copy(color=cc.os.copy(alpha=0.4f)))} // 居中输出空视窗信息
 		}else{ // 包含有效足迹历史记录
 			LazyVerticalGrid(modifier="fw".css(),columns=GridCells.Fixed(cs),contentPadding=PaddingValues(12.dp),verticalArrangement=Arrangement.spacedBy(10.dp),horizontalArrangement=Arrangement.spacedBy(10.dp)){ // 惰性栅格流式网格
 				gridItems(FN.hi,key={it.id}){o-> // 遍历足迹条目绑定唯一主键

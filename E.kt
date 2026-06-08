@@ -54,7 +54,7 @@ suspend fun fL(id:String,isStr:String,pg:Int,sz:Int=21):List<VI> = withContext(D
 		buildList{ // 安全生成可变队列
 			for(i in 0 until s.length()){ // 迭代打包卡片模型
 				val x=s.getJSONObject(i) // 从索引点提出媒体基本字典
-				add(VI(title=x.optString("title",""),score=x.optString("score",""),id=x.optString("mediaKey",""),poster=x.optString("coverImgUrl",""),update=x.optString("updateStatus",""))) // 组合VI视频项入库
+				add(VI(id=x.optString("mediaKey",""),tt=x.optString("title",""),pt=x.optString("coverImgUrl",""),sc=x.optString("score",""),ut=x.optString("updateStatus",""))) // 组合VI视频项入库
 			}
 		}
 	}.getOrElse{e->FN.lg("List",e.message?:"err",'e');emptyList()} // 捕获错误并归档

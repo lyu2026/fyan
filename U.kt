@@ -66,19 +66,19 @@ object FN{ // 全局控制单例
 	fun lr(i:String)=lg.removeAll{it.startsWith(i)} // 定向抹除单条对应的历史日志
 	@Composable fun LP(){if(lf)LH()else LS()} // 总控调度日志承载看板组件
 	@Composable private fun LH(){ // 简易窄条折叠指示组件
-		Box(modifier="fw pnb h5 c2.5".css(this).background(Color(0x80808080)).clickable{lf=false},contentAlignment=Alignment.Center){BasicText("· · ·  日志  · · ·",style=BS.copy(color=Color.White.copy(alpha=0.7f)))} // 呼唤还原的狭窄长盒
+		Box(modifier="fw pnb h5 c2.5".css().background(Color(0x80808080)).clickable{lf=false},contentAlignment=Alignment.Center){BasicText("· · ·  日志  · · ·",style=BS.copy(color=Color.White.copy(alpha=0.7f)))} // 呼唤还原的狭窄长盒
 	}
 	@Composable private fun LS(){ // 宽幅展开日志详情组件
 		val ls=rememberLazyListState() // 日志惰性栏目的状态游标
 		LaunchedEffect(lg.lastOrNull()){if(lg.isNotEmpty())ls.animateScrollToItem(lg.size-1)} // 当有新日志产生时平滑触底
 		val mh=LocalConfiguration.current.screenHeightDp.dp/3 // 动态划分设备屏幕视口的三分之一高度
 		val tv=(LocalConfiguration.current.uiMode and Configuration.UI_MODE_TYPE_MASK)==Configuration.UI_MODE_TYPE_TELEVISION // 检测是否运行于TV端
-		Box(modifier="fw pnb br6,6,0,0 b0.5,808080,0.70 h>${mh}".css(this).offset(y=ly.roundToInt().dp).background(Color(0xEB1C1C1E)).pointerInput(Unit){detectDragGestures(onDragEnd={if(ly>100f)lf=true else ly=0f},onDrag={ch,d->ch.consume();if(ly+d.y>=0f)ly+=d.y})}){ // 核心手势拖拽外罩盒子
-			Column(modifier="fw pv2 ph5".css(this)){ // 纵向排布容器
-				Box(modifier="fw h16".css(this),contentAlignment=Alignment.Center){Box(modifier="fw40 fh3 c2".css(this).background(Color(0x66808080)).clickable(enabled=tv){lf=true}.pointerInput(!tv){if(!tv)detectTapGestures(onTap={lf=true})})} // 顶部居中的拖曳手柄横条
-				Row(modifier="fw ph4 pv2".css(this),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically){ // 工具条横列布局
+		Box(modifier="fw pnb br6,6,0,0 b0.5,808080,0.70 h>${mh}".css().offset(y=ly.roundToInt().dp).background(Color(0xEB1C1C1E)).pointerInput(Unit){detectDragGestures(onDragEnd={if(ly>100f)lf=true else ly=0f},onDrag={ch,d->ch.consume();if(ly+d.y>=0f)ly+=d.y})}){ // 核心手势拖拽外罩盒子
+			Column(modifier="fw pv2 ph5".css()){ // 纵向排布容器
+				Box(modifier="fw h16".css(),contentAlignment=Alignment.Center){Box(modifier="fw40 fh3 c2".css().background(Color(0x66808080)).clickable(enabled=tv){lf=true}.pointerInput(!tv){if(!tv)detectTapGestures(onTap={lf=true})})} // 顶部居中的拖曳手柄横条
+				Row(modifier="fw ph4 pv2".css(),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically){ // 工具条横列布局
 					BasicText("日志 · ${lg.size}条",style=BS.copy(color=Color(0xFF9E9E9E),fontFamily=FontFamily.Monospace)) // 指示当前条数
-					Box(modifier="ph8 pv2 c4".css(this).background(Color(0x33F44336)).clickable{lc()}){BasicText("清空",style=BS.copy(color=Color(0xFFF44336)))} // 触发擦除日志按钮
+					Box(modifier="ph8 pv2 c4".css().background(Color(0x33F44336)).clickable{lc()}){BasicText("清空",style=BS.copy(color=Color(0xFFF44336)))} // 触发擦除日志按钮
 				}
 				LazyColumn(state=ls,modifier="fw pt4".css()){ // 日志条目流滚动组件
 					items(lg){ey-> // 单条日志渲染循环
@@ -87,11 +87,11 @@ object FN{ // 全局控制单例
 						val id=if(dt>0)pt[0].substring(0,dt) else pt[0] // 提取出事件原始ID
 						val hx=if(dt>0)pt[0].substring(dt+1) else "#9E9E9E" // 拿到十六进制色彩
 						val ec=try{Color(AC.parseColor(hx))}catch(_:Exception){Color(0xFF9E9E9E)} // 转换输出原生显色
-						Row(modifier="fw pt1".css(this),verticalAlignment=Alignment.Top,horizontalArrangement=Arrangement.SpaceBetween){ // 单条横向显示行
+						Row(modifier="fw pt1".css(),verticalAlignment=Alignment.Top,horizontalArrangement=Arrangement.SpaceBetween){ // 单条横向显示行
 							BasicText(pt.getOrElse(1){""},modifier="e1 pe4".css(this),style=BS.copy(color=ec,lineHeight=1.2.em,fontFamily=FontFamily.Monospace)) // 内容核心块
-							Box(modifier="fw24 fh24 c".css(this).clickable{lr(id)},contentAlignment=Alignment.Center){BasicText("✕",style=BS.copy(color=Color(0xFF9E9E9E)))} // 单一删除把手按钮
+							Box(modifier="fw24 fh24 c".css().clickable{lr(id)},contentAlignment=Alignment.Center){BasicText("✕",style=BS.copy(color=Color(0xFF9E9E9E)))} // 单一删除把手按钮
 						}
-						Box(modifier="fw h0.5".css(this).background(Color(0x1A808080))) // 行底浅色微缝线
+						Box(modifier="fw h0.5".css().background(Color(0x1A808080))) // 行底浅色微缝线
 					}
 				}
 			}
@@ -105,7 +105,7 @@ object FN{ // 全局控制单例
 @Composable
 fun TB(tt:String="",ob:(()->Unit)?=null,ed:@Composable RowScope.()->Unit={}){ // TB (TopBar) 标题工具栏组件
 	val cc=FN.LC.current // 取出当前环境主题色
-	Row(modifier="fw h56 ph12 psb".css(this).background(cc.s).border(0.5.dp,cc.ov),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.SpaceBetween){ // 顶条水平根布局
+	Row(modifier="fw h56 ph12 psb".css().background(cc.s).border(0.5.dp,cc.ov),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.SpaceBetween){ // 顶条水平根布局
 		Row(verticalAlignment=Alignment.CenterVertically){ // 左段标题组合行
 			if(ob!=null){ // 若返回事件不为空
 				IB(lb="←",modifier="fw36 fh36 c8".css().background(cc.sv),oc=ob) // 绘制通用返回按钮组件
@@ -126,7 +126,7 @@ fun IB(lb:String,modifier:Modifier,oc:()->Unit){ // IB (IconBtn) 图标轻量按
 @Composable
 fun CL(tt:String="加载中…"){ // CL (LoadingCenter) 全屏居中数据等待缓冲组件
 	val cc=FN.LC.current // 绑定全局色彩
-	Box(modifier="fs".css(this),contentAlignment=Alignment.Center){ // 外层绝对居中对齐箱盒子
+	Box(modifier="fs".css(),contentAlignment=Alignment.Center){ // 外层绝对居中对齐箱盒子
 		Column(horizontalAlignment=Alignment.CenterHorizontally){ // 纵向排列组件
 			BasicText("◌",style=TextStyle(fontSize=32.sp,color=cc.p)) // 转圈文本占位符
 			Spacer(modifier="h8".css()) // 小垂直空白
@@ -140,8 +140,8 @@ fun VC(pt:String,tt:String,sb:String,modifier:Modifier,oc:()->Unit,lp:(()->Unit)
 	val cc=FN.LC.current // 引入主题配色
 	Box(modifier=modifier.clip(RoundedCornerShape(10.dp)).background(cc.sv).then(if(lp!=null)Modifier.pointerInput(Unit){detectTapGestures(onTap={oc()},onLongPress={lp()})} else Modifier.clickable(onClick=oc))){ // 响应单击和长按的高级触碰外包装框
 		Column{ // 主卡片纵向排版流
-			Box(modifier="fw r3x4".css(this).background(cc.s)){AsyncImage(modifier="fs".css(),model=pt,contentDescription=tt,contentScale=ContentScale.Crop)} // 锁定3比4规格的海报大画布
-			Column(modifier="fw ph8 pv6".css(this)){ // 文字辅助信息容器
+			Box(modifier="fw r3x4".css().background(cc.s)){AsyncImage(modifier="fs".css(),model=pt,contentDescription=tt,contentScale=ContentScale.Crop)} // 锁定3比4规格的海报大画布
+			Column(modifier="fw ph8 pv6".css()){ // 文字辅助信息容器
 				BasicText(tt,style=FN.BS.copy(color=cc.os),maxLines=2,overflow=TextOverflow.Ellipsis) // 双行标题截断文本
 				if(sb.isNotEmpty()){ // 若更新提示不为空
 					Spacer(modifier="h2".css()) // 顶距微调
@@ -155,13 +155,13 @@ fun VC(pt:String,tt:String,sb:String,modifier:Modifier,oc:()->Unit,lp:(()->Unit)
 @Composable
 fun CD(tt:String,ct:String="确认",at:String="取消",oc:()->Unit,od:()->Unit){ // CD (ConfirmDialog) 强交互二次确认悬浮弹窗组件
 	val cc=FN.LC.current // 引入当下主题
-	Box(modifier="fs".css(this).background(Color(0x80000000)),contentAlignment=Alignment.Center){ // 半透明黑色纯底大蒙层
-		Column(modifier="fw300 ph20 pv20 c12".css(this).background(cc.s).border(0.5.dp,cc.ov,RoundedCornerShape(12.dp)),horizontalAlignment=Alignment.CenterHorizontally){ // 圆角容器主体大框
+	Box(modifier="fs".css().background(Color(0x80000000)),contentAlignment=Alignment.Center){ // 半透明黑色纯底大蒙层
+		Column(modifier="fw300 ph20 pv20 c12".css().background(cc.s).border(0.5.dp,cc.ov,RoundedCornerShape(12.dp)),horizontalAlignment=Alignment.CenterHorizontally){ // 圆角容器主体大框
 			BasicText(tt,style=FN.BM.copy(color=cc.os,textAlign=TextAlign.Center)) // 提示警示内容
 			Spacer(modifier="h16".css()) // 高度间距
 			Row(horizontalArrangement=Arrangement.spacedBy(12.dp)){ // 下部横列双向按钮控制行
-				Box(modifier="fw ph20 pv10 c8".css(this).background(cc.sv).clickable(onClick=od),contentAlignment=Alignment.Center){BasicText(at,style=FN.BM.copy(color=cc.os))} // 取消退出按钮
-				Box(modifier="fw ph20 pv10 c8".css(this).background(cc.p.copy(alpha=0.15f)).clickable(onClick=oc),contentAlignment=Alignment.Center){BasicText(ct,style=FN.BM.copy(color=cc.p))} // 接受确认按钮
+				Box(modifier="fw ph20 pv10 c8".css().background(cc.sv).clickable(onClick=od),contentAlignment=Alignment.Center){BasicText(at,style=FN.BM.copy(color=cc.os))} // 取消退出按钮
+				Box(modifier="fw ph20 pv10 c8".css().background(cc.p.copy(alpha=0.15f)).clickable(onClick=oc),contentAlignment=Alignment.Center){BasicText(ct,style=FN.BM.copy(color=cc.p))} // 接受确认按钮
 			}
 		}
 	}
@@ -170,11 +170,11 @@ fun CD(tt:String,ct:String="确认",at:String="取消",oc:()->Unit,od:()->Unit){
 @Composable
 fun TR(fl:String,tb:List<Pair<String,String>>,sl:String,on:(String)->Unit){ // TR (FilterTabRow) 单行横向可滚动标签属性过滤轴组件
 	val cc=FN.LC.current // 上下文取色
-	Row(modifier="fw h28".css(this).background(cc.s),verticalAlignment=Alignment.CenterVertically){ // 外套主横行框架
+	Row(modifier="fw h28".css().background(cc.s),verticalAlignment=Alignment.CenterVertically){ // 外套主横行框架
 		Row(modifier="fh sh e1".css(this),verticalAlignment=Alignment.CenterVertically){ // 支持横滚的内联横向列
 			tb.forEach{(id,lb)-> // 拆包迭代各子细分项对
 				val ac=id==sl // 测算激活标志
-				Box(modifier="fh ph2".css(this).clickable{on(id)}.background(if(ac)cc.p.copy(alpha=0.15f) else Color.Transparent),contentAlignment=Alignment.Center){BasicText(" $lb ",style=FN.BS.copy(color=if(ac)cc.p else cc.os.copy(alpha=0.7f),fontWeight=if(ac)FontWeight.W600 else FontWeight.W400))} // 变色微型单片过滤块
+				Box(modifier="fh ph2".css().clickable{on(id)}.background(if(ac)cc.p.copy(alpha=0.15f) else Color.Transparent),contentAlignment=Alignment.Center){BasicText(" $lb ",style=FN.BS.copy(color=if(ac)cc.p else cc.os.copy(alpha=0.7f),fontWeight=if(ac)FontWeight.W600 else FontWeight.W400))} // 变色微型单片过滤块
 			}
 		}
 	}
@@ -186,6 +186,7 @@ fun TR(fl:String,tb:List<Pair<String,String>>,sl:String,on:(String)->Unit){ // T
 }
 
 class CW(val m:Modifier,val w:Float?=null,val a:Alignment?=null,val f:Boolean=true) // CW DSL修饰符样式编译中间打包实体类
+
 @Composable fun pcss(s:String):CW{ // 高度精简CSS流式多属性解析翻译引擎方法
 	var m:Modifier=Modifier;var w:Float?=null;var f=true;var a:Alignment?=null // 状态配置临时初始化
 	for(it in s.split(" ")){ // 依照单一空格切片迭代
@@ -283,7 +284,7 @@ class CW(val m:Modifier,val w:Float?=null,val a:Alignment?=null,val f:Boolean=tr
 				}
 			}
 			'a'->{a=when(t.drop(1)){"c"->Alignment.Center;"cs"->Alignment.CenterStart;"ce"->Alignment.CenterEnd;"ts"->Alignment.TopStart;"tc"->Alignment.TopCenter;"te"->Alignment.TopEnd;"bs"->Alignment.BottomStart;"bc"->Alignment.BottomCenter;"be"->Alignment.BottomEnd;else->null}} // 特殊视口布局对齐锚点极速映射
-			'e'->{val v=t.drop(1);w=v.filter{it!='f'}.toFloatOrNull()?:1f;f='f'!in v} // 视口容器内权重分配
+			'e'->{val v=t.drop(1);w=v.filter{it!='f'}.toFloatOrNull()?:1f;f=!v.contains('f')} // 视口容器内权重分配
 			's'->{when(t){"sh"->m=m.horizontalScroll(rememberScrollState());"sv"->m=m.verticalScroll(rememberScrollState())}} // 容器快速附赠物理滑滚能力
 			'r'->{val v=t.drop(1) // 锁定画面纵横画幅比例大项
 				if(v.contains("x")){ // 捕捉乘数分割键
@@ -298,6 +299,6 @@ class CW(val m:Modifier,val w:Float?=null,val a:Alignment?=null,val f:Boolean=tr
 	return CW(m,w,a,f) // 打包返回翻译出来的逻辑结果
 }
 @Composable fun String.css()=remember(this){pcss(this).m} // 纯粹泛用单体扩展属性方法
-@Composable fun String.css(s:ColumnScope)=remember(this,s){pcss(this).let{var m=it.m;it.w?.let{w->m=m.weight(w,it.f)};m}} // 垂直主轴专精样式注入方法
-@Composable fun String.css(s:RowScope)=remember(this,s){pcss(this).let{var m=it.m;it.w?.let{w->m=m.weight(w,it.f)};it.a?.let{a->m=m.align(a)};m}} // 水平横轴专精样式注入方法
-@Composable fun String.css(s:BoxScope)=remember(this,s){pcss(this).let{var m=it.m;it.a?.let{a->m=m.align(a)};m}} // 多层叠压箱层专精样式注入方法
+@Composable fun String.css(s:ColumnScope)=remember(this,s){with(s){pcss(this@css).let{var m=it.m;it.w?.let{w->m=m.weight(w,it.f)};m}}} // 垂直主轴专精样式注入方法
+@Composable fun String.css(s:RowScope)=remember(this,s){with(s){pcss(this@css).let{var m=it.m;it.w?.let{w->m=m.weight(w,it.f)};it.a?.let{a->m=m.align(a)};m}}} // 水平横轴专精样式注入方法
+@Composable fun String.css(s:BoxScope)=remember(this,s){with(s){pcss(this@css).let{var m=it.m;it.a?.let{a->m=m.align(a)};m}}} // 多层叠压箱层专精样式注入方法

@@ -7,7 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.compose.setContent
 import androidx.navigation.compose.composable
 
-class OA:androidx.activity.ComponentActivity(){ // OA (O-Activity) 应用主窗体唯一运行物理容器Activity入口类
+class O:androidx.activity.ComponentActivity(){ // O 应用主窗体唯一运行物理容器Activity入口类
 	override fun onCreate(savedInstanceState:Bundle?){ // 核心生命周期窗体构建起点
 		super.onCreate(savedInstanceState) // 执行基类默认创建
 		enableEdgeToEdge() // 开启系统级别的边缘无缝隙沉浸式全屏渲染支持

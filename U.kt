@@ -198,8 +198,8 @@ class CW(val m:Modifier,val w:Float?=null,val a:Alignment?=null,val f:Boolean=tr
 		when(t[0]){ // 按照核心标识首字母划分分支
 			'f'->when{ // fill填充流大组
 				t=="fs"->m=m.fillMaxSize() // 填充全屏视口
-				t.startsWith("fw")->{val v=t.drop(2);m=if(v.isEmpty())m.fillMaxWidth()else m.fillMaxWidth(v.toFloatOrNull()?:1.f)} // 铺满宽或赋予特定宽
-				t.startsWith("fh")->{val v=t.drop(2);m=if(v.isEmpty())m.fillMaxHeight()else m.fillMaxHeight(v.toFloatOrNull()?:1.f)} // 铺满高或赋予特定高
+				t.startsWith("fw")->{val v=t.drop(2);m=if(v.isEmpty())m.fillMaxWidth()else m.fillMaxWidth(v.toFloatOrNull()?:1f)} // 铺满宽或赋予特定宽
+				t.startsWith("fh")->{val v=t.drop(2);m=if(v.isEmpty())m.fillMaxHeight()else m.fillMaxHeight(v.toFloatOrNull()?:1f)} // 铺满高或赋予特定高
 			}
 			'w'->{val v=t.drop(1) // 宽度特定修饰流
 				m=when{ // 深度测算区间边界值

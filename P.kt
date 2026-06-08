@@ -293,26 +293,28 @@ import androidx.media3.common.MediaItem
 	}
 }
 
-@Composable private fun VP(pt:String,sc:String,playing:Boolean,onPlay:()->Unit){ // VP 播放核心画幅前端高真界面模拟卡位占位组件
-	val cc=FN.LC.current // 上下文取配色
-	var fc by remember{mutableStateOf(false)} // 记忆焦点状态
+@Composable
+private fun VP(pt:String,sc:String,playing:Boolean,onPlay:()->Unit){
+	val cc=FN.LC.current
+	var fc by remember{mutableStateOf(false)}
 	if(!playing){
-		Box(modifier="fs".css().onFocusChanged{fc=it.isFocused}.border(if(fc)2.dp else 0.dp,cc.p).clickable{onPlay()},contentAlignment=Alignment.Center){ // 多层压栈覆盖盒子根底
-			AsyncImage(model=pt,contentDescription="封面",contentScale=ContentScale.Fit,modifier="fs".css()) // 最底层完全平铺且保持比例不坏的视频大海报原图画布
-			Box(modifier="w56 h56 c".css().background(androidx.compose.ui.graphics.Color.Black.copy(alpha=0.5f)),contentAlignment=Alignment.Center){BasicText("▶",style=FN.TL.copy(color=androidx.compose.ui.graphics.Color.White))} // 最上层半透明圆形遮罩点睛式居中观影操作指示方向标小箭头
+		Box(modifier="fs".css().onFocusChanged{fc=it.isFocused}.border(if(fc)2.dp else 0.dp,cc.p).clickable{onPlay()},contentAlignment=Alignment.Center){
+			AsyncImage(model=pt,contentDescription="封面",contentScale=ContentScale.Fit,modifier="fs".css())
+			Box(modifier="w56 h56 c".css().background(androidx.compose.ui.graphics.Color.Black.copy(alpha=0.5f)),contentAlignment=Alignment.Center){BasicText("▶",style=FN.TL.copy(color=androidx.compose.ui.graphics.Color.White))}
 		}
 	}else{
-		val player=remember{ExoPlayer.Builder(it).build()}
-		DisposableEffect(player){onDispose{player.release()}}
-		androidx.compose.ui.viewinterop.AndroidView(factory={
-			PlayerView(it).apply{
-				this.player=player
-				val ms=if(sc.endsWith(".m3u8"))HlsMediaSource.Factory(DefaultHttpDataSource.Factory()).createMediaSource(MediaItem.fromUri(Uri.parse(sc)))
-				else ProgressiveMediaSource.Factory(DefaultHttpDataSource.Factory()).createMediaSource(MediaItem.fromUri(Uri.parse(sc)))
-				player.setMediaSource(ms)
-				player.prepare()
-				player.playWhenReady=true
-			}
-		},modifier="fs".css().onFocusChanged{fc=it.isFocused}.border(if(fc)2.dp else 0.dp,cc.p))
+		val c=androidx.compose.ui.platform.LocalContext.current
+		val player=remember{ExoPlayer.Builder(c).build().apply{playWhenReady=true}}
+		DisposableEffect(Unit){onDispose{player.release()}}
+		LaunchedEffect(sc){
+			val factory=if(sc.endsWith(".m3u8"))HlsMediaSource.Factory(DefaultHttpDataSource.Factory())
+			else ProgressiveMediaSource.Factory(DefaultHttpDataSource.Factory())
+			player.setMediaSource(factory.createMediaSource(MediaItem.fromUri(Uri.parse(sc))))
+			player.prepare()
+		}
+		androidx.compose.ui.viewinterop.AndroidView(
+			factory={PlayerView(c).apply{this.player=player}},
+			modifier="fs".css().onFocusChanged{fc=it.isFocused}.border(if(fc)2.dp else 0.dp,cc.p)
+		)
 	}
 }

@@ -106,7 +106,7 @@ object FN{ // 全局控制单例
 fun TB(tt:String="",ob:(()->Unit)?=null,ed:@Composable RowScope.()->Unit={}){ // TB (TopBar) 标题工具栏组件
 	val cc=FN.LC.current // 取出当前环境主题色
 	Row(modifier="fw h56 psb".css().background(cc.s).border(0.5.dp,cc.ov),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.SpaceBetween){ // 顶条水平根布局
-		Row(modifier="ph12".css().verticalAlignment=Alignment.CenterVertically){ // 左段标题组合行
+		Row(modifier="ph12".css(),verticalAlignment=Alignment.CenterVertically){ // 左段标题组合行
 			if(ob!=null){ // 若返回事件不为空
 				IB(lb="←",modifier="fw36 fh36 c8".css().background(cc.sv),oc=ob) // 绘制通用返回按钮组件
 				if(tt.isNotEmpty())Spacer(modifier="fw12".css()) // 左边距

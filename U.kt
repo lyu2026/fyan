@@ -118,7 +118,7 @@ object Fyan{
 		val maxH=LocalConfiguration.current.screenHeightDp.dp/3
 		val isTv=(LocalConfiguration.current.uiMode and Configuration.UI_MODE_TYPE_MASK)==Configuration.UI_MODE_TYPE_TELEVISION
 		Box(
-			modifier="fw pnb abc br6,6,0,0 b0.5,808080,0.70 h>${maxH}".css().border(0.5.d,)
+			modifier="fw pnb abc br6,6,0,0 b0.5,808080,0.70 h>${maxH}".css()
 				.offset(y=logs_y.roundToInt().dp).background(Color(0xEB1C1C1E))
 				.pointerInput(Unit){
 					detectDragGestures(
@@ -549,7 +549,7 @@ fun String.css():Modifier{
 					"bs"->Alignment.BottomStart; "bc"->Alignment.BottomCenter; "be"->Alignment.BottomEnd
 					else->null
 				}
-				m=m.align(align)
+				if(align!=null)m=m.align(align)
 			}
 			'r'->{val v=s.drop(1)
 				if(v.contains("x")){

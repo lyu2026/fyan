@@ -2,8 +2,8 @@
 plugins {
 	id("com.android.library") version "8.9.1" apply false
 	id("com.android.application") version "8.9.1" apply false
-	id("org.jetbrains.kotlin.android") version "2.3.10" apply false
-	id("org.jetbrains.kotlin.plugin.compose") version "2.3.10" apply false
+	id("org.jetbrains.kotlin.android") version "2.1.20" apply false
+	id("org.jetbrains.kotlin.plugin.compose") version "2.1.20" apply false
 }
 
 @app/build.gradle.kts
@@ -28,7 +28,7 @@ android {
 		applicationId = "com.fyan"
 		minSdk = 23
 		targetSdk = 36
-		versionCode = 202669
+		versionCode = 20260609
 		versionName = "2026.6.9"
 		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 		vectorDrawables { useSupportLibrary = true }

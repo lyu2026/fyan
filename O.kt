@@ -29,9 +29,9 @@ class O:androidx.activity.ComponentActivity(){
 		PR.init(applicationContext);lH() // 初始化SP并反序列化历史记录
 		setContent{
 			var se by remember{mutableStateOf(false)}
-			BackHandler{se=true}
-			if(se)CD(tt="确定杀死应用并退出吗？",od={se=false},oc={finishAffinity()})
-			X();LaunchedEffect(Unit){cu()}
+			BackHandler{if(se)se=false else se=true}
+			X();if(se)CD(tt="确定杀死应用并退出吗？",od={se=false},oc={finishAffinity()})
+			LaunchedEffect(Unit){cu()}
 		}
 	}
 	override fun onDestroy(){super.onDestroy();dr?.let{unregisterReceiver(it)}} // 防泄漏注销广播

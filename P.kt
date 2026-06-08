@@ -11,7 +11,6 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.*
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -31,16 +30,13 @@ import kotlinx.coroutines.launch
 	val cc=FN.LC.current
 	var tb by remember{mutableStateOf(PR.lt)} // 主Tab游标
 	Column(modifier="fs".css().background(cc.b)){
-		Row(modifier="fw h60 psb".css().background(cc.s),verticalAlignment=Alignment.CenterVertically){
+		Row(modifier="fw h60".css().background(cc.s),verticalAlignment=Alignment.CenterVertically){
 			Row(modifier=Modifier.fillMaxWidth().fillMaxHeight().horizontalScroll(rememberScrollState())){
 				NAV_TABS.forEach{o->
 					val ac=o.id==tb
-					var fc by remember{mutableStateOf(false)}
 					Box(
 						modifier="fh".css()
-							.onFocusChanged{fc=it.isFocused}
-							.border(if(fc)2.dp else 0.dp,cc.p)
-							.background(if(ac||fc)cc.p.copy(alpha=0.15f)else androidx.compose.ui.graphics.Color.Transparent)
+							.background(if(ac)cc.p.copy(alpha=0.15f)else androidx.compose.ui.graphics.Color.Transparent)
 							.clickable{tb=o.id;PR.lt=o.id;FN.lg("HomeTab","切换 → ${o.id}",'u')},contentAlignment=Alignment.Center
 					){
 						BasicText("  ${o.lb}  ",style=FN.TM.copy(color=if(ac)cc.p else cc.os.copy(alpha=0.7f),fontWeight=if(ac)androidx.compose.ui.text.font.FontWeight.W600 else androidx.compose.ui.text.font.FontWeight.W400))
@@ -79,8 +75,7 @@ import kotlinx.coroutines.launch
 		}else{
 			LazyVerticalGrid(modifier="fw".css(),columns=GridCells.Fixed(cs),contentPadding=PaddingValues(2.dp),verticalArrangement=Arrangement.spacedBy(2.dp),horizontalArrangement=Arrangement.spacedBy(2.dp)){
 				gridItems(FN.hi,key={it.id}){o->
-					var fc by remember{mutableStateOf(false)}
-					VC(tt=o.tt,pt=o.pt,sb=o.pg,modifier="fw".css().onFocusChanged{fc=it.isFocused}.border(if(fc)2.dp else 0.dp,cc.p),oc={FN.lg("History","点击 ${o.id}",'u');nv.navigate("detail/${o.id}")},lp={rk=o.id})
+					VC(tt=o.tt,pt=o.pt,sb=o.pg,modifier="fw".css(),oc={FN.lg("History","点击 ${o.id}",'u');nv.navigate("detail/${o.id}")},lp={rk=o.id})
 				}
 			}
 		}
@@ -154,8 +149,7 @@ import kotlinx.coroutines.launch
 				vs.isEmpty()->Box(modifier="fs".css(),contentAlignment=Alignment.Center){BasicText("暂无视频",style=FN.BM.copy(color=cc.os.copy(alpha=0.4f)))}
 				else->LazyVerticalGrid(state=ls,modifier="fw".css(),columns=GridCells.Fixed(cs),contentPadding=PaddingValues(2.dp),verticalArrangement=Arrangement.spacedBy(2.dp),horizontalArrangement=Arrangement.spacedBy(2.dp)){
 					gridItems(vs,key={it.id}){o->
-						var fc by remember{mutableStateOf(false)}
-						VC(pt=o.pt,tt=o.tt,modifier="fw".css().onFocusChanged{fc=it.isFocused}.border(if(fc)2.dp else 0.dp,cc.p),oc={
+						VC(pt=o.pt,tt=o.tt,modifier="fw".css(),oc={
 							aH(FN.VT(o.id,o.tt,o.pt))
 							nv.navigate("detail/${o.id}")
 						},sb=listOfNotNull(o.sc.takeIf{it.isNotEmpty()},o.ut.takeIf{it.isNotEmpty()}).joinToString(" · "))
@@ -219,10 +213,7 @@ import kotlinx.coroutines.launch
 				if(u.isNotEmpty()){VP(pt=d.pt,sc=u,playing=playing,onPlay={playing=true})}else{BasicText("加载中...",style=FN.TS.copy(color=cc.os))}
 			}
 			LazyRow(modifier="fw".css(),horizontalArrangement=Arrangement.spacedBy(8.dp),contentPadding=PaddingValues(horizontal=10.dp,vertical=8.dp)){
-				items(d.et.indices.toList()){i->
-					var fc by remember{mutableStateOf(false)}
-					EB(lb=d.et[i],ac=i==ep,modifier="w60 h28".css().onFocusChanged{fc=it.isFocused}.border(if(fc)2.dp else 0.dp,cc.p),oc={oe(i)})
-				}
+				items(d.et.indices.toList()){i->EB(lb=d.et[i],ac=i==ep,modifier="w60 h28".css(),oc={oe(i)})}
 			}
 		}
 		Column(modifier="fh ph16 pv12 e1 sv".css(this)){
@@ -274,8 +265,7 @@ import kotlinx.coroutines.launch
 				repeat(cs){c->
 					val i=r*cs+c
 					if(i<tl.size){
-						var fc by remember{mutableStateOf(false)}
-						EB(lb=tl[i],ac=i==ct,oc={os(i)},modifier="fw e1 h28".css(this).onFocusChanged{fc=it.isFocused}.border(if(fc)2.dp else 0.dp,cc.p))
+						EB(lb=tl[i],ac=i==ct,oc={os(i)},modifier="fw e1 h28".css(this))
 					}else Spacer(modifier="e1".css(this)) // 尾部空位补齐，防止前置按钮拉伸变形
 				}
 			}
@@ -285,9 +275,8 @@ import kotlinx.coroutines.launch
 
 @Composable private fun VP(pt:String,sc:String,playing:Boolean,onPlay:()->Unit){ // VP 播放器核心组件
 	val cc=FN.LC.current
-	var fc by remember{mutableStateOf(false)}
 	if(!playing){
-		Box(modifier="fs".css().onFocusChanged{fc=it.isFocused}.border(if(fc)2.dp else 0.dp,cc.p).clickable{onPlay()},contentAlignment=Alignment.Center){
+		Box(modifier="fs".css().clickable{onPlay()},contentAlignment=Alignment.Center){
 			AsyncImage(model=pt,contentDescription="封面",contentScale=ContentScale.Fit,modifier="fs".css())
 			Box(modifier="w56 h56 c".css().background(androidx.compose.ui.graphics.Color.Black.copy(alpha=0.5f)),contentAlignment=Alignment.Center){BasicText("▶",style=FN.TL.copy(color=androidx.compose.ui.graphics.Color.White))}
 		}
@@ -301,9 +290,6 @@ import kotlinx.coroutines.launch
 			player.setMediaSource(factory.createMediaSource(MediaItem.fromUri(Uri.parse(sc))))
 			player.prepare()
 		}
-		AndroidView(
-			factory={PlayerView(c).apply{this.player=player}},
-			modifier="fs".css().onFocusChanged{fc=it.isFocused}.border(if(fc)2.dp else 0.dp,cc.p)
-		)
+		AndroidView(factory={PlayerView(c).apply{this.player=player}},modifier="fs".css())
 	}
 }

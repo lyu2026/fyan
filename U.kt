@@ -155,9 +155,9 @@ fun TB(tt:String="",ob:(()->Unit)?=null,ed:@Composable RowScope.()->Unit={}){
 		Column(modifier="w300 p20 c6".css().background(cc.s).border(0.1.dp,cc.ov,RoundedCornerShape(6.dp)),horizontalAlignment=Alignment.CenterHorizontally){
 			BasicText(tt,style=FN.BM.copy(color=cc.os,textAlign=TextAlign.Center))
 			Spacer(modifier="h16".css())
-			Row(horizontalArrangement=Arrangement.spacedBy(12.dp)){
-				Box(modifier="fw0.5 ph20 pv10 c8".css().background(cc.sv).clickable(onClick=od),contentAlignment=Alignment.Center){BasicText(at,style=FN.BM.copy(color=cc.os))}
-				Box(modifier="fw ph20 pv10 c8".css().background(cc.p.copy(alpha=0.15f)).clickable(onClick=oc),contentAlignment=Alignment.Center){BasicText(ct,style=FN.BM.copy(color=cc.p))}
+			Row(horizontalArrangement=Arrangement.spacedBy(10.dp)){
+				Box(modifier="fw0.5 ph20 pv10 c2".css().background(cc.sv).clickable(onClick=od),contentAlignment=Alignment.Center){BasicText(at,style=FN.BM.copy(color=cc.os))}
+				Box(modifier="fw ph20 pv10 c2".css().background(cc.p.copy(alpha=0.15f)).clickable(onClick=oc),contentAlignment=Alignment.Center){BasicText(ct,style=FN.BM.copy(color=cc.p))}
 			}
 		}
 	}
@@ -252,7 +252,7 @@ class CW(val m:Modifier,val w:Float?=null,val a:Alignment?=null,val f:Boolean=tr
 				val rt=v.drop(hx.length)
 				val ap=if(rt.startsWith("."))rt.drop(1).toDoubleOrNull()?.toFloat()?:1f else 1f
 				val bs=try{Color(AC.parseColor("#$hx"))}catch(_:Exception){Color.Transparent}
-				val fc=if(ap!=1f)bs.copy(alpha=ap) else bs
+				val fc=if(ap!=1f)bs.copy(alpha=ap)else bs
 				m=when{
 					rt.endsWith("c")->m.clip(CircleShape).background(fc)
 					rt.contains("r")->{val r=rt.dropWhile{!it.isDigit()}.toDoubleOrNull()?.dp?:0.dp;m.clip(RoundedCornerShape(r)).background(fc)}
@@ -272,7 +272,7 @@ class CW(val m:Modifier,val w:Float?=null,val a:Alignment?=null,val f:Boolean=tr
 						val hx=pt.getOrNull(1)?:""
 						val ap=pt.getOrNull(2)?.toFloatOrNull()?:1f
 						val fc=if(hx.isNotEmpty()){try{Color(AC.parseColor("#$hx"))}catch(_:Exception){Color.Black}}else Color.Black
-						val c2=if(ap!=1f)fc.copy(alpha=ap) else fc
+						val c2=if(ap!=1f)fc.copy(alpha=ap)else fc
 						m=m.border(wd,c2)
 					}
 				}

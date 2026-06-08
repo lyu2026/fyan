@@ -46,3 +46,8 @@ for f in .xml .zml;do
 done
 
 rm -r .xml .zml .sh
+
+vc=$(date +%Y%m%d)
+vn=$(date +%Y.%-m.%-d)
+sed -i "s/versionCode = .*/versionCode = $vc/" app/build.gradle.kts
+sed -i "s/versionName = \".*\"/versionName = \"$vn\"/" app/build.gradle.kts

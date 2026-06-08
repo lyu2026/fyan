@@ -152,12 +152,11 @@ fun TB(tt:String="",ob:(()->Unit)?=null,ed:@Composable RowScope.()->Unit={}){
 @Composable fun CD(tt:String,ct:String="确认",at:String="取消",oc:()->Unit,od:()->Unit){
 	val cc=FN.LC.current
 	Box(modifier="fs".css().background(Color(0x80000000)),contentAlignment=Alignment.Center){
-		Column(modifier="w300 p20 c6".css().background(cc.s).border(0.1.dp,cc.ov,RoundedCornerShape(6.dp)),horizontalAlignment=Alignment.CenterHorizontally){
-			BasicText(tt,style=FN.BM.copy(color=cc.os,textAlign=TextAlign.Center))
-			Spacer(modifier="h16".css())
+		Column(modifier="w300 p20 c4".css().background(cc.s).border(0.1.dp,cc.ov,RoundedCornerShape(4.dp)),horizontalAlignment=Alignment.CenterHorizontally){
+			BasicText(tt,modifier="ph6 pb14".css(this),style=FN.BM.copy(color=cc.os,textAlign=TextAlign.Center))
 			Row(horizontalArrangement=Arrangement.spacedBy(10.dp)){
-				Box(modifier="fw0.5 ph20 pv10 c2".css().background(cc.sv).clickable(onClick=od),contentAlignment=Alignment.Center){BasicText(at,style=FN.BM.copy(color=cc.os))}
-				Box(modifier="fw ph20 pv10 c2".css().background(cc.p.copy(alpha=0.15f)).clickable(onClick=oc),contentAlignment=Alignment.Center){BasicText(ct,style=FN.BM.copy(color=cc.p))}
+				Box(modifier="fw0.5 h16 ph20 pv10 c4".css().background(cc.sv).clickable(onClick=od),contentAlignment=Alignment.Center){BasicText(at,style=FN.BM.copy(color=cc.os))}
+				Box(modifier="fw h16 ph20 pv10 c4".css().background(cc.p.copy(alpha=0.15f)).clickable(onClick=oc),contentAlignment=Alignment.Center){BasicText(ct,style=FN.BM.copy(color=cc.p))}
 			}
 		}
 	}

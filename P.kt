@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
 	val cc=FN.LC.current
 	var tb by remember{mutableStateOf(PR.lt)} // 主Tab游标
 	Column(modifier="fs".css().background(cc.b)){
-		Row(modifier="fw h60".css().background(cc.s),verticalAlignment=Alignment.CenterVertically){
+		Row(modifier="fw h52".css().background(cc.s),verticalAlignment=Alignment.CenterVertically){
 			Row(modifier=Modifier.fillMaxWidth().fillMaxHeight().horizontalScroll(rememberScrollState())){
 				NAV_TABS.forEach{o->
 					val ac=o.id==tb
@@ -66,9 +66,9 @@ import kotlinx.coroutines.launch
 		else->3
 	}
 	Column(modifier="fs".css().background(cc.b)){
-		Row(modifier="fw h40 ph2".css(),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.SpaceBetween){
+		Row(modifier="fw h30 ph8".css(),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.SpaceBetween){
 			BasicText("记录清单",style=FN.TS.copy(color=cc.os))
-			IB(lb="🗑",oc={cl=true},modifier="fw28 fh28 c8".css())
+			IB(lb="🗑",oc={cl=true},modifier="w28 h28".css())
 		}
 		if(FN.hi.isEmpty()){
 			Box(modifier="fs".css(),contentAlignment=Alignment.Center){BasicText("暂无观看记录",style=FN.BM.copy(color=cc.os.copy(alpha=0.4f)))}
@@ -206,6 +206,7 @@ import kotlinx.coroutines.launch
 		if(ru.isNotEmpty()&&!ru.startsWith("http",ignoreCase=true)){
 			u=fS(id,ru)
 		}else u=""
+		FN.lg("VideoSource","${ep}: $ru -> $u",'u');
 	}
 	Row(modifier="fs".css()){
 		Column(modifier="fh e2".css(this)){
@@ -234,6 +235,7 @@ import kotlinx.coroutines.launch
 		if(ru.isNotEmpty()&&!ru.startsWith("http",ignoreCase=true)){
 			u=fS(id,ru)
 		}else u=""
+		FN.lg("VideoSource","${ep}: $ru -> $u",'u');
 	}
 	Column(modifier="fs sv".css()){
 		Box(modifier="fw".css().aspectRatio(16f/9f).background(androidx.compose.ui.graphics.Color.Black),contentAlignment=Alignment.Center){
@@ -285,6 +287,7 @@ import kotlinx.coroutines.launch
 		val player=remember{ExoPlayer.Builder(c).build().apply{playWhenReady=true}}
 		DisposableEffect(player){onDispose{player.release()}}
 		LaunchedEffect(sc){
+			FN.lg("VideoPlay",sc,'u');
 			val factory=if(sc.endsWith(".m3u8"))HlsMediaSource.Factory(DefaultHttpDataSource.Factory())
 			else ProgressiveMediaSource.Factory(DefaultHttpDataSource.Factory())
 			player.setMediaSource(factory.createMediaSource(MediaItem.fromUri(Uri.parse(sc))))

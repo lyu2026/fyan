@@ -548,12 +548,16 @@ fun FilterTabRow(
 					"bs"->Alignment.BottomStart; "bc"->Alignment.BottomCenter; "be"->Alignment.BottomEnd
 					else->null
 				}
-				if(align!=null)@Suppress("UNCHECKED_CAST"){m=(m as Modifier).align(align)}
+				if(align!=null){
+					val xx=Modifier::class.java.getMethod("align",Alignment::class.java)
+					m=xx.invoke(m,align) as Modifier
+				}
 			}
 			'e'->{val v=s.drop(1)
 				val fill='f' in v
 				val w=v.filter{it!='f'}.toFloatOrNull()?:1f
-				@Suppress("UNCHECKED_CAST"){m=(m as Modifier).weight(w,fill)}
+				val xx=Modifier::class.java.getMethod("weight",Float::class.javaPrimitiveType,Boolean::class.javaPrimitiveType)
+				m=xx.invoke(m,w,fill) as Modifier
 			}
 			's'->{
 				when(s){

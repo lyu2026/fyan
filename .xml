@@ -9,6 +9,13 @@
 		android:label="仏琰"
 		android:theme="@style/Theme.Fyan" android:allowBackup="true"
 		android:icon="@mipmap/icon" android:banner="@drawable/banner">
+		<provider
+			android:name="androidx.core.content.FileProvider"
+			android:authorities="com.fyan.fileprovider"
+			android:exported="false"
+			android:grantUriPermissions="true">
+			<meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/paths" />
+		</provider>
 		<activity
 			android:name="com.fyan.O" android:exported="true"
 			android:theme="@style/Theme.Fyan" android:windowSoftInputMode="adjustResize">
@@ -23,6 +30,12 @@
 		</activity>
 	</application>
 </manifest>
+
+@app/src/main/res/xml/paths.xml
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+	<external-files-path name="downloads" path="Download/" />
+</paths>
 
 @app/src/main/res/values/themes.xml
 <resources>

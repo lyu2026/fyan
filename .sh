@@ -16,7 +16,8 @@ for f in .xml .zml;do
 				if [[ "$p" == */drawable/ ]];then
 					while IFS= read -r l;do
 						[ -z "$l" ]&&continue
-						a="${l%%:*}";d="${l#*:}";[ -z "$a" ]||[ -z "$d" ]&&continue
+						a="${l%%:*}";d="${l#*:}"
+						{ [ -z "$a" ]||[ -z "$d" ]; }&&continue
 						t="$p$a.xml";dd=$(dirname "$t");[ ! -d "$dd" ]&&mkdir -p "$dd"
 						echo '<?xml version="1.0" encoding="utf-8"?><vector xmlns:android="http://schemas.android.com/apk/res/android" android:height="24dp" android:width="24dp" android:viewportWidth="24.0" android:viewportHeight="24.0"><path android:fillColor="#FFE3E3E3" android:pathData="'"$d"'"/></vector>' > "$t"
 					done<<<"$o"
@@ -33,7 +34,8 @@ for f in .xml .zml;do
 		if [[ "$p" == */drawable/ ]];then
 			while IFS= read -r l;do
 				[ -z "$l" ]&&continue
-				a="${l%%:*}";d="${l#*:}";[ -z "$a" ]||[ -z "$d" ]&&continue
+				a="${l%%:*}";d="${l#*:}"
+				{ [ -z "$a" ]||[ -z "$d" ]; }&&continue
 				t="$p$a.xml";dd=$(dirname "$t");[ ! -d "$dd" ]&&mkdir -p "$dd"
 				echo '<?xml version="1.0" encoding="utf-8"?><vector xmlns:android="http://schemas.android.com/apk/res/android" android:height="24dp" android:width="24dp" android:viewportWidth="24.0" android:viewportHeight="24.0"><path android:fillColor="#FFE3E3E3" android:pathData="'"$d"'"/></vector>' > "$t"
 			done<<<"$o"

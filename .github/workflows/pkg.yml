@@ -56,7 +56,7 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper/dists
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('~/.gradle/caches/modules-2/modules-2.lock', '**/gradle-wrapper.properties') }}
 
       - name: 下载工具
         if: steps.cache.outputs.cache-hit != 'true'
@@ -92,10 +92,10 @@ jobs:
               break
             fi
           done)
-          if [ -z "$m" ]; then
-            m="暂未补充"
+          if [ -z "$cm" ]; then
+            cm="暂未补充"
           fi
-          echo "message=$m" >> $GITHUB_OUTPUT
+          echo "message=$cm" >> $GITHUB_OUTPUT
 
       - name: 正式发布
         uses: softprops/action-gh-release@v2

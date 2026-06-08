@@ -64,18 +64,16 @@ object FN{ // 全局控制单例
 	}
 	fun lc()=lg.clear() // 彻底擦除当前运行时日志
 	fun lr(i:String)=lg.removeAll{it.startsWith(i)} // 定向抹除单条对应的历史日志
-	@Composable fun LP(){if(lf)LH()else LS()} // 总控调度日志承载看板组件
-	@Composable private fun LH(){ // 简易窄条折叠指示组件
-		Box(modifier="fw pnb h5 c2.5".css().background(Color(0x80808080)).clickable{lf=false},contentAlignment=Alignment.Center){BasicText("· · ·  日志  · · ·",style=BS.copy(color=Color.White.copy(alpha=0.7f)))} // 呼唤还原的狭窄长盒
-	}
+	@Composable fun LP(){Column(modifier="fw".css(),verticalArrangement=Arrangement.Bottom){if(lf)LH()else LS()}} // 总控调度日志承载看板组件
+	@Composable private fun LH(){Box(modifier="fw h5 pnb c2.5".css().background(Color(0x80808080)).clickable{lf=false;ly=0f},contentAlignment=Alignment.Center){BasicText("· · ·  日志  · · ·",style=BS.copy(color=Color.White.copy(alpha=0.7f)))}} // 简易窄条折叠指示组件
 	@Composable private fun LS(){ // 宽幅展开日志详情组件
 		val ls=rememberLazyListState() // 日志惰性栏目的状态游标
 		LaunchedEffect(lg.lastOrNull()){if(lg.isNotEmpty())ls.animateScrollToItem(lg.size-1)} // 当有新日志产生时平滑触底
 		val mh=LocalConfiguration.current.screenHeightDp.dp/3 // 动态划分设备屏幕视口的三分之一高度
 		val tv=(LocalConfiguration.current.uiMode and Configuration.UI_MODE_TYPE_MASK)==Configuration.UI_MODE_TYPE_TELEVISION // 检测是否运行于TV端
-		Box(modifier="fw pnb br6,6,0,0 b0.5,808080,0.70 h>${mh}".css().offset(y=ly.roundToInt().dp).background(Color(0xEB1C1C1E)).pointerInput(Unit){detectDragGestures(onDragEnd={if(ly>100f)lf=true else ly=0f},onDrag={ch,d->ch.consume();if(ly+d.y>=0f)ly+=d.y})}){ // 核心手势拖拽外罩盒子
-			Column(modifier="fw pv2 ph5".css()){ // 纵向排布容器
-				Box(modifier="fw h16".css(),contentAlignment=Alignment.Center){Box(modifier="fw40 fh3 c2".css().background(Color(0x66808080)).clickable(enabled=tv){lf=true}.pointerInput(!tv){if(!tv)detectTapGestures(onTap={lf=true})})} // 顶部居中的拖曳手柄横条
+		Box(modifier="fw br6,6,0,0 b0.5,808080,0.70 h>${mh}".css().offset(y=ly.roundToInt().dp).background(Color(0xEB1C1C1E)).pointerInput(Unit){detectDragGestures(onDragEnd={if(ly>100f){lf=true;ly=0f} else ly=0f},onDrag={ch,d->ch.consume();if(ly+d.y>=0f)ly+=d.y})}){ // 核心手势拖拽外罩盒子，pnb移至LH统一处理
+			Column(modifier="fw pv2 ph5 pnb".css()){ // 纵向排布容器，底部导航内边距移至此处
+				Box(modifier="fw h16".css(),contentAlignment=Alignment.Center){Box(modifier="fw40 fh3 c2".css().background(Color(0x66808080)).clickable(enabled=tv){lf=true;ly=0f}.pointerInput(!tv){if(!tv)detectTapGestures(onTap={lf=true;ly=0f})})} // 顶部居中的拖曳手柄横条
 				Row(modifier="fw ph4 pv2".css(),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically){ // 工具条横列布局
 					BasicText("日志 · ${lg.size}条",style=BS.copy(color=Color(0xFF9E9E9E),fontFamily=FontFamily.Monospace)) // 指示当前条数
 					Box(modifier="ph8 pv2 c4".css().background(Color(0x33F44336)).clickable{lc()}){BasicText("清空",style=BS.copy(color=Color(0xFFF44336)))} // 触发擦除日志按钮
@@ -124,9 +122,9 @@ fun IB(lb:String,modifier:Modifier,oc:()->Unit){ // IB (IconBtn) 图标轻量按
 }
 
 @Composable
-fun CL(tt:String="加载中…"){ // CL (LoadingCenter) 全屏居中数据等待缓冲组件
+fun CL(pt:String="0",tt:String="加载中…"){ // CL (LoadingCenter) 全屏居中数据等待缓冲组件
 	val cc=FN.LC.current // 绑定全局色彩
-	Box(modifier="fw".css(),contentAlignment=Alignment.Center){ // 铺满宽度并居中对齐的外层箱盒子
+	Box(modifier="fw pt$pt".css(),contentAlignment=Alignment.Center){ // 铺满宽度并居中对齐的外层箱盒子
 		Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(8.dp)){ // 图标与文字横向同行排列
 			BasicText("◌",style=TextStyle(fontSize=20.sp,color=cc.p)) // 转圈图标占位符
 			BasicText(tt,style=FN.BS.copy(color=cc.os.copy(alpha=0.6f))) // 加载状态文字

@@ -146,7 +146,7 @@ import coil.compose.AsyncImage
 		}
 		Box(modifier="fw e1".css(this)){ // 核心流媒体瀑布网格画布盒子
 			when{ // 选择分支显示不同形态中间态组件
-				ld->CL("加载视频列表…") // 首加载状态展示CL缓冲组件
+				ld->CL("100","加载视频列表…") // 首加载状态展示CL缓冲组件
 				vs.isEmpty()->Box(modifier="fs".css(),contentAlignment=Alignment.Center){BasicText("暂无视频",style=FN.BM.copy(color=cc.os.copy(alpha=0.4f)))} // 无结果提示空视图
 				else->LazyVerticalGrid(state=ls,modifier="fw".css(),columns=GridCells.Fixed(cs),contentPadding=PaddingValues(10.dp),verticalArrangement=Arrangement.spacedBy(8.dp),horizontalArrangement=Arrangement.spacedBy(8.dp)){ // 流式自适应多列视频卡片网格
 					gridItems(vs,key={it.id}){o-> // 绑定卡片并指明媒体主键
@@ -180,7 +180,7 @@ import coil.compose.AsyncImage
 	Column(modifier="fs".css().background(cc.b)){ // 详情主垂直排布根框
 		TB(tt=o?.tt?:"视频详情",ob={nv.popBackStack()}) // 组装详情页定制的顶栏
 		when{ // 网络拉取逻辑多态判定切换
-			ld->CL("加载视频详情…") // 骨架锁住则常驻加载状态组件
+			ld->CL("200","加载视频详情…") // 骨架锁住则常驻加载状态组件
 			o==null->Box(modifier="fs".css(),contentAlignment=Alignment.Center){BasicText("加载失败",style=FN.BM.copy(color=cc.os.copy(alpha=0.5f)))} // 解析失败输出损坏文案
 			else->{ // 提取解包非空正片详情数据流
 				val d=o!! // 解开强制绑定

@@ -47,14 +47,14 @@ class O:androidx.activity.ComponentActivity(){
 					@Suppress("DEPRECATION")packageManager.getPackageInfo(packageName,0).versionName
 				val cv="v"+vn
 				if(ver.startsWith("v")&&ver!=cv){
-					withContext(Dispatchers.Main){ni("https://github.com/lyu2026/fyan/releases/download/$ver/fyan.apk")}
+					withContext(Dispatchers.Main){ni(ver,"https://github.com/lyu2026/fyan/releases/download/$ver/fyan.apk")}
 				}
 			}
 		}
 	}
-	private fun ni(url:String){
-		val req=android.app.DownloadManager.Request(Uri.parse(url)).apply{
-			setTitle("Fyan 更新");setDescription("后台下载中...");setNotificationVisibility(1)
+	private fun ni(v:String,u:String){
+		val req=android.app.DownloadManager.Request(Uri.parse(u)).apply{
+			setTitle("Fyan → $v");setDescription("后台下载中...");setNotificationVisibility(1)
 			setMimeType("application/vnd.android.package-archive")
 			setDestinationInExternalFilesDir(this@O,android.os.Environment.DIRECTORY_DOWNLOADS,"fyan.apk")
 		}
@@ -81,13 +81,13 @@ class O:androidx.activity.ComponentActivity(){
 @Composable private fun X(){
 	val c=rememberNavController()
 	val h=androidx.compose.ui.platform.LocalConfiguration.current.screenHeightDp/3
-	androidx.compose.foundation.layout.Box(modifier="fs".css()){
+	androidx.compose.foundation.layout.Box(modifier="fs psb pnb".css(),contentAlignment=Alignment.BottomCenter){
 		NavHost(navController=c,startDestination="home"){
 			composable("home"){HS(c)}
 			composable("history"){HI(c)}
 			composable("filter/{id}"){b:NavBackStackEntry->FS(c,id=b.arguments?.getString("id")?:"movie")}
 			composable("detail/{id}"){b:NavBackStackEntry->DS(c,id=b.arguments?.getString("id")?:"")}
 		}
-		FN.LP(modifier="fw h<$h ph0.5 pnb".css())
+		FN.LP(modifier="fw h<$h ph0.5".css())
 	}
 }

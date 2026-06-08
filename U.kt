@@ -105,7 +105,7 @@ object FN{ // 全局控制单例
 @Composable
 fun TB(tt:String="",ob:(()->Unit)?=null,ed:@Composable RowScope.()->Unit={}){
 	val cc=FN.LC.current
-	Row(modifier="fw h60 psb".css().background(cc.s).border(0.5.dp,cc.ov),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.SpaceBetween){
+	Row(modifier="fw h38 psb".css().background(cc.s).border(0.5.dp,cc.ov),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.SpaceBetween){
 		Row(modifier="ps2".css(),verticalAlignment=Alignment.CenterVertically){
 			if(ob!=null){
 				Box(modifier="w28 h28 c8".css().clickable(onClick=ob),contentAlignment=Alignment.Center){androidx.compose.foundation.Image(painter=androidx.compose.ui.res.painterResource(id=R.drawable.arrow_back),contentDescription=null,modifier="w20 h20".css(),colorFilter=androidx.compose.ui.graphics.ColorFilter.tint(cc.os))}
@@ -153,7 +153,9 @@ fun TB(tt:String="",ob:(()->Unit)?=null,ed:@Composable RowScope.()->Unit={}){
 	val cc=FN.LC.current
 	Box(modifier="fs".css().background(Color(0x80000000)),contentAlignment=Alignment.Center){
 		Column(modifier="w300 p20 c4".css().background(cc.s).border(0.1.dp,cc.ov,RoundedCornerShape(4.dp)),horizontalAlignment=Alignment.CenterHorizontally){
+			Spacer(modifier="h6".css())
 			BasicText(tt,modifier="ph6 pb14".css(this),style=FN.BM.copy(color=cc.os,textAlign=TextAlign.Center))
+			Spacer(modifier="h10".css())
 			Row(horizontalArrangement=Arrangement.spacedBy(10.dp)){
 				Box(modifier="fw0.5 h16 ph20 pv10 c4".css().background(cc.sv).clickable(onClick=od),contentAlignment=Alignment.Center){BasicText(at,style=FN.BM.copy(color=cc.os))}
 				Box(modifier="fw h16 ph20 pv10 c4".css().background(cc.p.copy(alpha=0.15f)).clickable(onClick=oc),contentAlignment=Alignment.Center){BasicText(ct,style=FN.BM.copy(color=cc.p))}

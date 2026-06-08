@@ -93,6 +93,11 @@ dependencies {
 @settings.gradle.kts
 pluginManagement {
 	buildscript {
+		repositories {
+			google()
+			mavenCentral()
+			gradlePluginPortal()
+		}
 		dependencies {
 			classpath("com.android.tools:r8:8.8.14")
 		}

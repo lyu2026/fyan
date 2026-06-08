@@ -74,7 +74,7 @@ jobs:
           KS_PSWD: ${{ secrets.KS_PSWD }}
           K_ALIAS: ${{ secrets.K_ALIAS }}
           K_PSWD: ${{ secrets.K_PSWD }}
-        run: ./gradlew :app:assembleRelease --console=plain -Dorg.gradle.internal.download.progress=false -Dorg.gradle.welcome.provider.enabled=false
+        run: ./gradlew :app:assembleRelease --refresh-dependencies --console=plain -Dorg.gradle.internal.download.progress=false -Dorg.gradle.welcome.provider.enabled=false
 
       - name: 提取产物
         id: copy

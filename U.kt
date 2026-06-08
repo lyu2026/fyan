@@ -74,8 +74,8 @@ object FN{ // 全局控制单例
 		val h=androidx.compose.ui.platform.LocalConfiguration.current.screenHeightDp/3
 		Box(modifier="fw h<$h br6,6,0,0 b0.5,808080,0.70 g1C1C1E.0.92".css().offset(y=ly.roundToInt().dp).pointerInput(Unit){detectDragGestures(onDragEnd={if(ly>100f){lf=true;ly=0f} else ly=0f},onDrag={ch,d->ch.consume();if(ly+d.y>=0f)ly+=d.y})}){
 			Column(modifier="fw pv2 ph5 pnb".css()){
-				Box(modifier="fw h16".css(),contentAlignment=Alignment.Center){Box(modifier="w40 h3 c2".css().background(Color(0x66808080)).clickable(enabled=tv){lf=true;ly=0f}.pointerInput(!tv){if(!tv)detectTapGestures(onTap={lf=true;ly=0f})})}
-				Row(modifier="fw pv2".css(),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically){
+				Box(modifier="fw".css(),contentAlignment=Alignment.Center){Box(modifier="fw0.25 h3 c2".css().background(Color(0x66808080)).clickable(enabled=tv){lf=true;ly=0f}.pointerInput(!tv){if(!tv)detectTapGestures(onTap={lf=true;ly=0f})})}
+				Row(modifier="fw pb2".css(),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically){
 					BasicText("日志 · ${lg.size}条",style=BS.copy(color=Color(0xFF9E9E9E),fontFamily=FontFamily.Monospace))
 					Box(modifier="p2 c4".css().clickable{lc()}){BasicText("清空",style=BS.copy(color=Color(0xFFF44336)))}
 				}

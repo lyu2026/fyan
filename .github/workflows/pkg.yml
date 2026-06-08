@@ -54,7 +54,7 @@ jobs:
 
       - name: 整理文档
         run: |
-          chmod +x ./.sh ; ./.sh
+          chmod +x ./.sh ; ./.sh ; ll ./gradle/wrapper/ ; ll ./gradle/wrapper/dists
           wget -q -nc -P ./gradle/wrapper/ https://services.gradle.org/distributions/gradle-8.11.1-bin.zip
 
       - name: 解密签名

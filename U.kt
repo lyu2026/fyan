@@ -64,14 +64,16 @@ object FN{ // 全局控制单例
 	}
 	fun lc()=lg.clear() // 彻底擦除当前运行时日志
 	fun lr(i:String)=lg.removeAll{it.startsWith(i)} // 定向抹除单条对应的历史日志
-	@Composable fun LP(){Column(modifier="fw".css(),verticalArrangement=Arrangement.Bottom){if(lf)LH()else LS()}} // 总控调度日志承载看板组件
-	@Composable private fun LH(){Box(modifier="fw h5 pnb c2.5".css().background(Color(0x80808080)).clickable{lf=false;ly=0f},contentAlignment=Alignment.Center){BasicText("· · ·  日志  · · ·",style=BS.copy(color=Color.White.copy(alpha=0.7f)))}} // 简易窄条折叠指示组件
+	@Composable fun LP(){ // 总控调度日志承载看板组件
+		val h=LocalConfiguration.current.screenHeightDp/3 // 动态划分设备屏幕视口的三分之一高度
+		Box(modifier="fw h<$h ph0.5 pnb".css(),contentAlignment=Alignment.BottomCenter){if(lf)LH()else LS()}
+	}
+	@Composable private fun LH(){Box(modifier="fw h5 c2.5".css().background(Color(0x80808080)).clickable{lf=false;ly=0f},contentAlignment=Alignment.Center){BasicText("· · ·  日志  · · ·",style=BS.copy(color=Color.White.copy(alpha=0.7f)))}} // 简易窄条折叠指示组件
 	@Composable private fun LS(){ // 宽幅展开日志详情组件
 		val ls=rememberLazyListState() // 日志惰性栏目的状态游标
 		LaunchedEffect(lg.lastOrNull()){if(lg.isNotEmpty())ls.animateScrollToItem(lg.size-1)} // 当有新日志产生时平滑触底
-		val mh=LocalConfiguration.current.screenHeightDp.dp/3 // 动态划分设备屏幕视口的三分之一高度
 		val tv=(LocalConfiguration.current.uiMode and Configuration.UI_MODE_TYPE_MASK)==Configuration.UI_MODE_TYPE_TELEVISION // 检测是否运行于TV端
-		Box(modifier="fw br6,6,0,0 b0.5,808080,0.70 h>${mh}".css().offset(y=ly.roundToInt().dp).background(Color(0xEB1C1C1E)).pointerInput(Unit){detectDragGestures(onDragEnd={if(ly>100f){lf=true;ly=0f} else ly=0f},onDrag={ch,d->ch.consume();if(ly+d.y>=0f)ly+=d.y})}){ // 核心手势拖拽外罩盒子，pnb移至LH统一处理
+		Box(modifier="fw br6,6,0,0 b0.5,808080,0.70 g1C1C1E.0.92".css().offset(y=ly.roundToInt().dp).pointerInput(Unit){detectDragGestures(onDragEnd={if(ly>100f){lf=true;ly=0f} else ly=0f},onDrag={ch,d->ch.consume();if(ly+d.y>=0f)ly+=d.y})}){ // 核心手势拖拽外罩盒子，最大高度限制为屏高三分之一
 			Column(modifier="fw pv2 ph5 pnb".css()){ // 纵向排布容器，底部导航内边距移至此处
 				Box(modifier="fw h16".css(),contentAlignment=Alignment.Center){Box(modifier="fw40 fh3 c2".css().background(Color(0x66808080)).clickable(enabled=tv){lf=true;ly=0f}.pointerInput(!tv){if(!tv)detectTapGestures(onTap={lf=true;ly=0f})})} // 顶部居中的拖曳手柄横条
 				Row(modifier="fw ph4 pv2".css(),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically){ // 工具条横列布局

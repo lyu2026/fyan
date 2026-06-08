@@ -10,7 +10,7 @@ import kotlinx.coroutines.withContext
 data class NT(val id:String,val lb:String) // NT (NavTab) 首页顶部频道常量结构
 val NAV_TABS=listOf(NT("history","历史记录"),NT("movie","电影"),NT("drama","电视剧"),NT("anime","动漫"),NT("variety","综艺"),NT("documentary","纪录片"),NT("news","新闻"),NT("yule","娱乐")) // 分类常量全局配置序列
 data class FO(val id:String,val lb:String) // FO (FilterOption) 细分检索小标签节点
-data class FG(val nm:String,val op:List<FO>) // FG (FilterGroup) 多属性标签组结构
+data class FG(val op:List<FO>) // FG (FilterGroup) 多属性标签组结构
 data class VI(val id:String,val tt:String,val pt:String,val sc:String,val ut:String) // VI (VideoListItem) 视频流展示简略项结构
 data class VD(val id:String,val tt:String,val ds:String,val pt:String,val ep:List<String>,val et:List<String>) // VD (VideoDetail) 全量详情数据模型
 
@@ -32,7 +32,6 @@ suspend fun fG(id:String):List<FG> = withContext(Dispatchers.IO){ // fG (fetchGr
 		buildList{ // 组装列表
 			for(i in 0 until s.length()){ // 层级迭代条件组
 				val x=s.getJSONObject(i) // 拿到当前的过滤大项
-				val nm=x.optString("name","") // 标签大组冠名
 				val z=x.optJSONArray("list")?:continue // 割取内部包含的细分项
 				val op=buildList{ // 迭代解包细分属性小分支
 					for(r in 0 until z.length()){ // 小项大迭代
@@ -40,7 +39,7 @@ suspend fun fG(id:String):List<FG> = withContext(Dispatchers.IO){ // fG (fetchGr
 						add(FO(id=o.optString("classifyId","0"),lb=o.optString("classifyName",""))) // 挂接FO配置节点
 					}
 				}
-				add(FG(nm=nm,op=op)) // 归档大FG配置树
+				add(FG(op=op)) // 归档大FG配置树
 			}
 		}
 	}.getOrElse{e->FN.lg("Tags",e.message?:"err",'e');emptyList()} // 发生异常熔断返回零长度空集并打入错误日志

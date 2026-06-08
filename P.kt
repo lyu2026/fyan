@@ -136,7 +136,7 @@ import coil.compose.AsyncImage
 		if(gs.isNotEmpty()){ // 若包含行数不为零的条件组
 			Column(modifier="fw".css().background(cc.s).border(0.5.dp,cc.ov)){ // 多属性栏目垂直聚集大盒子
 				gs.forEachIndexed{i,g-> // 迭代各条独立大检索属性行
-					TR(fl=g.nm,tb=g.op.map{it.id to it.lb},sl=ds.getOrElse(i){"0"},on={ii-> // 挂载单条标签滑轨TR
+					TR(tb=g.op.map{it.id to it.lb},sl=ds.getOrElse(i){"0"},on={ii-> // 挂载单条标签滑轨TR
 						ds=ds.toMutableList().also{it[i]=ii} // 高速就地克隆更新对应行的细化属性选中代码
 						kotlinx.coroutines.MainScope().launch{rl()} // 在就近主域调起清洗函数更新网络数据网格
 					})

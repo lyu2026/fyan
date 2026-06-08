@@ -299,6 +299,6 @@ class CW(val m:Modifier,val w:Float?=null,val a:Alignment?=null,val f:Boolean=tr
 	return CW(m,w,a,f) // 打包返回翻译出来的逻辑结果
 }
 @Composable fun String.css()=remember(this){pcss(this).m} // 纯粹泛用单体扩展属性方法
-@Composable fun String.css(s:ColumnScope)=remember(this,s){with(s){pcss(this@css).let{var m=it.m;it.w?.let{w->m=m.weight(w,it.f)};m}}} // 垂直主轴专精样式注入方法
-@Composable fun String.css(s:RowScope)=remember(this,s){with(s){pcss(this@css).let{var m=it.m;it.w?.let{w->m=m.weight(w,it.f)};it.a?.let{a->m=m.align(a)};m}}} // 水平横轴专精样式注入方法
-@Composable fun String.css(s:BoxScope)=remember(this,s){with(s){pcss(this@css).let{var m=it.m;it.a?.let{a->m=m.align(a)};m}}} // 多层叠压箱层专精样式注入方法
+@Composable fun String.css(s:ColumnScope)=remember(this){with(s){pcss(this@css).let{var m=it.m;it.w?.let{w->m=m.weight(w,it.f)};m}}} // 垂直主轴专精样式注入方法
+@Composable fun String.css(s:RowScope)=remember(this){with(s){pcss(this@css).let{var m=it.m;it.w?.let{w->m=m.weight(w,it.f)};it.a?.let{a->(a as? Alignment.Vertical)?.let{v->m=m.align(v)}};m}}} // 水平横轴专精样式注入方法
+@Composable fun String.css(s:BoxScope)=remember(this){with(s){pcss(this@css).let{var m=it.m;it.a?.let{a->m=m.align(a)};m}}} // 多层叠压箱层专精样式注入方法

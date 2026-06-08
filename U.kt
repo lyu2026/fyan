@@ -105,13 +105,13 @@ object FN{ // 全局控制单例
 @Composable
 fun TB(tt:String="",ob:(()->Unit)?=null,ed:@Composable RowScope.()->Unit={}){ // TB (TopBar) 标题工具栏组件
 	val cc=FN.LC.current // 取出当前环境主题色
-	Row(modifier="fw h56 psb".css().background(cc.s).border(0.5.dp,cc.ov),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.SpaceBetween){ // 顶条水平根布局
+	Row(modifier="fw h60 psb".css().background(cc.s).border(0.5.dp,cc.ov),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.SpaceBetween){ // 顶条水平根布局
 		Row(modifier="ph12".css(),verticalAlignment=Alignment.CenterVertically){ // 左段标题组合行
 			if(ob!=null){ // 若返回事件不为空
-				IB(lb="←",modifier="fw36 fh36 c8".css().background(cc.sv),oc=ob) // 绘制通用返回按钮组件
+				Box(modifier="fw36 fh36 c8".css().clickable(onClick=ob),contentAlignment=Alignment.Center){androidx.compose.foundation.Image(painter=androidx.compose.ui.res.painterResource(id=R.drawable.arrow_back),modifier="fw20 fh20".css(),colorFilter=androidx.compose.ui.graphics.ColorFilter.tint(cc.os))} // 返回箭头图标按钮
 				if(tt.isNotEmpty())Spacer(modifier="fw12".css()) // 左边距
 			}
-			if(tt.isNotEmpty())BasicText("  ${tt.trim()}  ",style=FN.TL.copy(color=cc.os),maxLines=1,overflow=TextOverflow.Ellipsis,modifier="e1".css(this)) // 主标题限单一单行显示
+			if(tt.isNotEmpty())BasicText(tt,style=FN.TL.copy(color=cc.os),maxLines=1,overflow=TextOverflow.Ellipsis,modifier="e1".css(this)) // 主标题限单一单行显示
 		}
 		Row(verticalAlignment=Alignment.CenterVertically){ed()} // 右段自定义按钮行
 	}
@@ -170,11 +170,11 @@ fun CD(tt:String,ct:String="确认",at:String="取消",oc:()->Unit,od:()->Unit){
 @Composable
 fun TR(tb:List<Pair<String,String>>,tc:String,on:(String)->Unit){ // TR (FilterTabRow) 单行横向可滚动标签属性过滤轴组件
 	val cc=FN.LC.current // 上下文取色
-	Row(modifier="fw h28".css().background(cc.s),verticalAlignment=Alignment.CenterVertically){ // 外套主横行框架
+	Row(modifier="fw h24".css().background(cc.s),verticalAlignment=Alignment.CenterVertically){ // 外套主横行框架
 		Row(modifier="fh sh e1".css(this),verticalAlignment=Alignment.CenterVertically){ // 支持横滚的内联横向列
 			tb.forEach{(id,o)-> // 拆包迭代各子细分项对
 				val ac=id==tc // 测算激活标志
-				Box(modifier="fh ph2".css().clickable{on(id)}.background(if(ac)cc.p.copy(alpha=0.15f)else Color.Transparent),contentAlignment=Alignment.Center){BasicText("  ${o.trim()}  ",style=FN.BS.copy(color=if(ac)cc.p else cc.os.copy(alpha=0.7f),fontWeight=if(ac)FontWeight.W600 else FontWeight.W400))} // 变色微型单片过滤块
+				Box(modifier="fh".css().clickable{on(id)}.background(if(ac)cc.p.copy(alpha=0.15f)else Color.Transparent),contentAlignment=Alignment.Center){BasicText("  ${o.trim()}  ",style=FN.BS.copy(color=if(ac)cc.p else cc.os.copy(alpha=0.7f),fontWeight=if(ac)FontWeight.W600 else FontWeight.W400))} // 变色微型单片过滤块
 			}
 		}
 	}

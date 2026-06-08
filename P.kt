@@ -1,40 +1,31 @@
 package com.fyan
 
-import kotlinx.coroutines.launch
 import android.content.res.Configuration
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
+import android.net.Uri
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.lazy.grid.items as gridItems
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.ui.*
+import androidx.compose.ui.draw.*
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
-import coil3.compose.AsyncImage
-
-import android.net.Uri
-import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.ui.PlayerView
+import androidx.media3.common.MediaItem
 import androidx.media3.datasource.DefaultHttpDataSource
+import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.hls.HlsMediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
-import androidx.media3.common.MediaItem
-
+import androidx.media3.ui.PlayerView
+import coil3.compose.AsyncImage
+import kotlinx.coroutines.launch
 
 @Composable fun HS(nv:NavController){ // HS (HomeScreen) 应用首页主架组件
 	val cc=FN.LC.current // 注入全局色彩配置
@@ -100,7 +91,6 @@ import androidx.media3.common.MediaItem
 
 @Composable fun FS(nv:NavController,id:String){ // FS (FilterScreen) 视频高级检索筛选大页面组件
 	val cc=FN.LC.current // 绑定全局取色
-	val tb=NAV_TABS.find{it.id==id} // 精准捕获所关联的分类常数字段
 	var gs by remember{mutableStateOf<List<FG>>(emptyList())} // 本检索分类持有的筛选多属性组定义
 	var ds by remember{mutableStateOf<List<String>>(emptyList())} // 对应各过滤属性组的具体选中项映射键数组
 	var vs by remember{mutableStateOf<List<VI>>(emptyList())} // 流式无限加载追加的多媒体视频数据集合
@@ -108,7 +98,7 @@ import androidx.media3.common.MediaItem
 	var hm by remember{mutableStateOf(true)} // 标志远端服务器后台是否仍存在残余待拉取的后置页面
 	var pg by remember{mutableIntStateOf(1)} // 本地维护的分页游标深度计数值
 	var ld by remember{mutableStateOf(true)} // 首次进场初始化拉取网格白屏骨架锁状态
-	val ls=androidx.compose.foundation.lazy.grid.rememberLazyGridState() // 掌控惰性多列网格底层滚动逻辑的独立游标状态
+	val ls=rememberLazyGridState() // 掌控惰性多列网格底层滚动逻辑的独立游标状态
 
 	LaunchedEffect(id){ // 进场触发首次多重属性条件初始化的协程副作用
 		ld=true // 封锁大视窗
@@ -131,7 +121,7 @@ import androidx.media3.common.MediaItem
 		ld=false // 打开封面
 	}
 
-	val nr by remember{derivedStateOf{val lt=ls.layoutInfo;val lx=lt.visibleItemsInfo.lastOrNull()?.index?:-1;lx>=lt.totalItemsCount-3&&lt.totalItemsCount>0}} // 派生触底状态：最后可见项接近末尾则为true
+	val nr by remember{derivedStateOf{val lt=ls.layoutInfo;val lx=lt.visibleItemsInfo.lastOrNull()?.index?:-1;lx>=lt.totalItemsCount-3&&lt.totalItemsCount>0}} // 派生触底状态
 	LaunchedEffect(nr){ // 监听派生触底状态变化触发增量分页副作用
 		if(nr&&hm&&!lm&&!ld){ // 确认触底且有更多数据且无重入
 			lm=true // 夯死触发防抖锁
@@ -201,8 +191,8 @@ import androidx.media3.common.MediaItem
 			o==null->Box(modifier="fs".css(),contentAlignment=Alignment.Center){BasicText("加载失败",style=FN.BM.copy(color=cc.os.copy(alpha=0.5f)))} // 解析失败输出损坏文案
 			else->{ // 提取解包非空正片详情数据流
 				val d=o!! // 解开强制绑定
-				if(tv||(tt&&lp)){TV(id,d,pg){i->pg=i;aH(FN.VT(d.id,d.tt,d.pt,"第${i+1}集"))}} // 在大屏智能终端横幅下调用横向定制版TV大组件
-				else{PL(id,d,pg){i->pg=i;aH(FN.VT(d.id,d.tt,d.pt,"第${i+1}集"))}} // 针对竖屏普通移动手机用户调用专属黄金竖列PL组件
+				if(tv||(tt&&lp))TV(id,d,pg){i->pg=i;aH(FN.VT(d.id,d.tt,d.pt,"第${i+1}集"))} // 在大屏智能终端横幅下调用横向定制版TV大组件
+				else PL(id,d,pg){i->pg=i;aH(FN.VT(d.id,d.tt,d.pt,"第${i+1}集"))} // 针对竖屏普通移动手机用户调用专属黄金竖列PL组件
 			}
 		}
 	}
@@ -215,10 +205,8 @@ import androidx.media3.common.MediaItem
 	LaunchedEffect(ep){ // 集数换集触发的切片直连流重解析副作用
 		playing=false // 换集重置播放
 		val ru=d.ep.getOrNull(ep)?:"" // 剥离出当前集数锁死持有的流口令密匙
-		FN.lg("fetchVideoSource 1",ru,'u') // 日志记录下放的大切片流媒体直连物理地址
 		if(ru.isNotEmpty()&&!ru.startsWith("http",ignoreCase=true)){ // 鉴别是否属于需要二次转换的短哈希密匙口令
 			u=fS(id,ru) // 网络功能模块解码返回真实的真实大网络公网流直连地址
-			FN.lg("fetchVideoSource 2",u,'u') // 日志记录下放的大切片流媒体直连物理地址
 		}else u="" // 清空脏态
 	}
 	Row(modifier="fs".css()){ // 横向平分全屏的左右两段左右大双列布局
@@ -248,10 +236,8 @@ import androidx.media3.common.MediaItem
 	LaunchedEffect(ep){ // 集数换集触发的切片直连流重解析副作用
 		playing=false // 换集重置播放
 		val ru=d.ep.getOrNull(ep)?:"" // 剥离出当前集数锁死持有的流口令密匙
-		FN.lg("fetchVideoSource 1",ru,'u') // 日志记录下放的大切片流媒体直连物理地址
 		if(ru.isNotEmpty()&&!ru.startsWith("http",ignoreCase=true)){ // 鉴别是否属于需要二次转换的短哈希密匙口令
 			u=fS(id,ru) // 网络功能模块解码返回真实的真实大网络公网流直连地址
-			FN.lg("fetchVideoSource 2",u,'u') // 日志记录下放的大切片流媒体直连物理地址
 		}else u="" // 清空脏态
 	}
 	Column(modifier="fs sv".css()){ // 贯穿全高支持自如顺滑向下纵滚的页面大长垂直基座Column
@@ -293,8 +279,7 @@ import androidx.media3.common.MediaItem
 	}
 }
 
-@Composable
-private fun VP(pt:String,sc:String,playing:Boolean,onPlay:()->Unit){
+@Composable private fun VP(pt:String,sc:String,playing:Boolean,onPlay:()->Unit){ // VP 播放核心画幅前端高真界面模拟卡位占位组件
 	val cc=FN.LC.current
 	var fc by remember{mutableStateOf(false)}
 	if(!playing){
@@ -303,16 +288,16 @@ private fun VP(pt:String,sc:String,playing:Boolean,onPlay:()->Unit){
 			Box(modifier="w56 h56 c".css().background(androidx.compose.ui.graphics.Color.Black.copy(alpha=0.5f)),contentAlignment=Alignment.Center){BasicText("▶",style=FN.TL.copy(color=androidx.compose.ui.graphics.Color.White))}
 		}
 	}else{
-		val c=androidx.compose.ui.platform.LocalContext.current
+		val c=LocalContext.current
 		val player=remember{ExoPlayer.Builder(c).build().apply{playWhenReady=true}}
-		DisposableEffect(Unit){onDispose{player.release()}}
+		DisposableEffect(player){onDispose{player.release()}}
 		LaunchedEffect(sc){
 			val factory=if(sc.endsWith(".m3u8"))HlsMediaSource.Factory(DefaultHttpDataSource.Factory())
 			else ProgressiveMediaSource.Factory(DefaultHttpDataSource.Factory())
 			player.setMediaSource(factory.createMediaSource(MediaItem.fromUri(Uri.parse(sc))))
 			player.prepare()
 		}
-		androidx.compose.ui.viewinterop.AndroidView(
+		AndroidView(
 			factory={PlayerView(c).apply{this.player=player}},
 			modifier="fs".css().onFocusChanged{fc=it.isFocused}.border(if(fc)2.dp else 0.dp,cc.p)
 		)

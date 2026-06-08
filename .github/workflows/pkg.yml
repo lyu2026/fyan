@@ -49,13 +49,13 @@ jobs:
       - name: 缓存处理
         uses: actions/cache@v4
         with:
-          path: ~/.gradle/wrapper/dists
+          path: gradle/wrapper/dists
           key: ${{ runner.os }}-gradle-wrapper-8.10.2
 
       - name: 检查缓存
         run: |
-          mkdir -p ~/.gradle/wrapper/dists/gradle-8.10.2-bin/
-          wget -q -nc -P ~/.gradle/wrapper/dists/gradle-8.10.2-bin/ https://services.gradle.org/distributions/gradle-8.10.2-bin.zip
+          mkdir -p gradle/wrapper/dists/gradle-8.10.2-bin/
+          wget -q -nc -P gradle/wrapper/dists/gradle-8.10.2-bin/ https://services.gradle.org/distributions/gradle-8.10.2-bin.zip
 
       - name: 整理配置
         run: chmod +x ./.sh;./.sh

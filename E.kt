@@ -15,7 +15,7 @@ private val HC=okhttp3.OkHttpClient.Builder()
 private fun SF(url:String):String{
 	val r=okhttp3.Request.Builder().url(url).build()
 	HC.newCall(r).execute().use{o->
-		if(!o.isSuccessful)throw java.io.IOException("网络请求失败: $response")
+		if(!o.isSuccessful)throw java.io.IOException("网络请求失败: $o")
 		return o.body?.string()?:""
 	}
 }

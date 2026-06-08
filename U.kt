@@ -429,7 +429,7 @@ fun FilterTabRow(
 // ════════════════════════════════════════════════════════════════
 // css() DSL ── 所有 modifier 构建的唯一入口
 // ════════════════════════════════════════════════════════════════
-fun String.css():Modifier{
+@Composable fun String.css():Modifier{
 	var m:Modifier=Modifier
 	for(it in split(" ")){
 		val s=it.trim()

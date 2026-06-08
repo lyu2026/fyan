@@ -122,11 +122,13 @@ fun IB(lb:String,modifier:Modifier,oc:()->Unit){ // IB (IconBtn) 图标轻量按
 }
 
 @Composable
-fun CL(pt:String="0",tt:String="加载中…"){ // CL (LoadingCenter) 全屏居中数据等待缓冲组件
+fun CL(vc:Boolean=false,tt:String="加载中…",cs:ColumnScope?=null){ // CL (LoadingCenter) 全屏居中数据等待缓冲组件
 	val cc=FN.LC.current // 绑定全局色彩
-	Box(modifier="fw pt$pt".css(),contentAlignment=Alignment.Center){ // 铺满宽度并居中对齐的外层箱盒子
-		Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(8.dp)){ // 图标与文字横向同行排列
+	val bm=if(vc&&cs!=null)"fw e1".css(cs)else"fw".css() // vc且有父列作用域时撑满剩余高度，否则高度自适应
+	Box(modifier=bm,contentAlignment=Alignment.Center){ // 内容始终居中对齐
+		Row(modifier="fw".css(),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.Center){ // 图标与文字横向同行整体居中排列
 			BasicText("◌",style=TextStyle(fontSize=20.sp,color=cc.p)) // 转圈图标占位符
+			Spacer(modifier="w8".css()) // 图标与文字间距
 			BasicText(tt,style=FN.BS.copy(color=cc.os.copy(alpha=0.6f))) // 加载状态文字
 		}
 	}

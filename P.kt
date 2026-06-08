@@ -23,6 +23,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 
@@ -291,6 +292,21 @@ import androidx.media3.common.MediaItem
 	}
 }
 
+@Composable fun VP(pt:String,sc:String,playing:Boolean,onPlay:()->Unit){
+	var fc by remember{mutableStateOf(false)}
+	if(!playing){
+		Box(modifier="fs".css().onFocusChanged{fc=it.isFocused}.border(if(fc)2.dp else 0.dp,cc.p).clickable{onPlay()},contentAlignment=Alignment.Center){
+			AsyncImage(model=pt,contentDescription="封面",contentScale=ContentScale.Fit,modifier="fs".css())
+			Box(modifier="w56 h56 c".css().background(androidx.compose.ui.graphics.Color.Black.copy(alpha=0.5f)),contentAlignment=Alignment.Center){BasicText("▶",style=FN.TL.copy(color=androidx.compose.ui.graphics.Color.White))}
+		}
+	}else{
+		val ctx=androidx.compose.ui.platform.LocalContext.current
+		val player=remember{ExoPlayer.Builder(ctx).build()}
+		DisposableEffect(player){onDispose{player.release()}}
+		AndroidView(factory={PlayerView(it).apply{setPlayer(player)}},modifier="fs".css())
+	}
+}
+
 @Composable private fun VP(pt:String,sc:String,playing:Boolean,onPlay:()->Unit){ // VP 播放核心画幅前端高真界面模拟卡位占位组件
 	var fc by remember{mutableStateOf(false)} // 记忆焦点状态
 	if(!playing){
@@ -299,14 +315,10 @@ import androidx.media3.common.MediaItem
 			Box(modifier="w56 h56 c".css().background(androidx.compose.ui.graphics.Color.Black.copy(alpha=0.5f)),contentAlignment=Alignment.Center){BasicText("▶",style=FN.TL.copy(color=androidx.compose.ui.graphics.Color.White))} // 最上层半透明圆形遮罩点睛式居中观影操作指示方向标小箭头
 		}
 	}else{
+		val player=remember{ExoPlayer.Builder(it).build()}
+		DisposableEffect(player){onDispose{player.release()}}
 		androidx.compose.ui.viewinterop.AndroidView(factory={
 			PlayerView(it).apply{
-				val player=remember{ExoPlayer.Builder(it).build()}
-				DisposableEffect(player){ // 绑定声明式生命周期副作用
-					onDispose{
-						player.release() // 当用户退出详情页、返回首页时，强制当场释放硬件解码器和 Surface 纹理
-					}
-				}
 				this.player=player
 				val ms=if(sc.endsWith(".m3u8"))HlsMediaSource.Factory(DefaultHttpDataSource.Factory()).createMediaSource(MediaItem.fromUri(Uri.parse(sc)))
 				else ProgressiveMediaSource.Factory(DefaultHttpDataSource.Factory()).createMediaSource(MediaItem.fromUri(Uri.parse(sc)))

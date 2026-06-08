@@ -1,18 +1,55 @@
 package com.fyan
 
+import android.app.AlertDialog
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import androidx.compose.runtime.*
-import android.content.res.Configuration
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
-import androidx.navigation.compose.composable
+import androidx.compose.runtime.*
+import kotlinx.coroutines.*
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import java.io.File
 
-class O:androidx.activity.ComponentActivity(){ // O 应用主窗体唯一运行物理容器Activity入口类
-	override fun onCreate(savedInstanceState:Bundle?){ // 核心生命周期窗体构建起点
-		super.onCreate(savedInstanceState) // 执行基类默认创建
-		PR.init(applicationContext) // 挂载注入就地启动本地轻量SharedPreference薄存储封装单例
-		setContent{ // 进入Compose声明式UI画布大根节点
-			val dk=(resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK)==Configuration.UI_MODE_NIGHT_YES // 实时捕获当前系统的深色/夜间/极夜环境主题标志
-			CompositionLocalProvider(FN.LC provides FN.cl(dk)){X()} // 注入供给主题局部变量，并拉起中央路由引擎大组件
+class O:androidx.activity.ComponentActivity(){
+	override fun onCreate(savedInstanceState:Bundle?){
+		super.onCreate(savedInstanceState)
+		setContent{
+			var se by remember{mutableStateOf(false)}
+			BackHandler{se=true}
+			if(se)AlertDialog(onDismissRequest={se=false},title={BasicText("退出")},text={BasicText("确定杀死应用并退出吗？")},confirmButton={androidx.compose.material3.TextButton(onClick={finishAffinity()}){BasicText("确定")}},dismissButton={androidx.compose.material3.TextButton(onClick={se=false}){BasicText("取消")}})
+			X();LaunchedEffect(Unit){cu()}
+		}
+	}
+	private fun cu(){
+		CoroutineScope(Dispatchers.IO).launch{
+			runCatching{
+				val client=OkHttpClient.Builder().followRedirects(true).build()
+				val res=client.newCall(Request.Builder().url("https://github.com/lyu2026/fyan/releases/latest").build()).execute()
+				val url=res.request.url.toString()
+				val ver=url.substringAfterLast("/")
+				if(ver!="v2026.6.8"){
+					withContext(Dispatchers.Main){
+						// 弹窗提示，点击后下载
+						ni("https://github.com/lyu2026/fyan/releases/download/$ver/fyan.apk")
+					}
+				}
+			}
+		}
+	}
+	private fun ni(url:String){
+		CoroutineScope(Dispatchers.IO).launch{
+			val file=File(cacheDir,"fyan.apk")
+			val client=OkHttpClient()
+			val res=client.newCall(Request.Builder().url(url).build()).execute()
+			file.outputStream().use{it.write(res.body!!.bytes())}
+			withContext(Dispatchers.Main){
+				val intent=Intent(Intent.ACTION_VIEW)
+				intent.setDataAndType(Uri.fromFile(file),"application/vnd.android.package-archive")
+				intent.flags=Intent.FLAG_ACTIVITY_NEW_TASK
+				startActivity(intent)
+			}
 		}
 	}
 }

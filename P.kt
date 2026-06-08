@@ -30,12 +30,12 @@ import coil.compose.AsyncImage
 	val cc=FN.LC.current // 注入全局色彩配置
 	var tb by remember{mutableStateOf(PR.lt)} // 维持首页主导页面分类游标
 	Column(modifier="fs".css().background(cc.b)){ // 贯穿全屏的竖向主页列布局
-		Row(modifier="fw h56 psb".css().background(cc.s).border(0.5.dp,cc.ov),verticalAlignment=Alignment.CenterVertically){ // 顶部横向滚动主分类频道栏
+		Row(modifier="fw h60 psb".css().background(cc.s),verticalAlignment=Alignment.CenterVertically){ // 顶部横向滚动主分类频道栏
 			Row(modifier="fh e1 sh".css(this)){ // 赋予横向滚动属性的包裹容器
 				NAV_TABS.forEach{o-> // 迭代配置预设的各个频道标签
 					val ac=o.id==tb // 结算当下选中状态
-					Box(modifier="fh ph10".css().background(if(ac)cc.p.copy(alpha=0.15f) else androidx.compose.ui.graphics.Color.Transparent).clickable{tb=o.id;PR.lt=o.id;FN.lg("HomeTab","切换 → ${o.id}",'u')},contentAlignment=Alignment.Center){ // 触发分类重洗刷新的点击响应盒
-						BasicText(o.lb,style=FN.TM.copy(color=if(ac)cc.p else cc.os.copy(alpha=0.7f),fontWeight=if(ac)androidx.compose.ui.text.font.FontWeight.W600 else androidx.compose.ui.text.font.FontWeight.W400)) // 各频道的文字显示
+					Box(modifier="fh".css().background(if(ac)cc.p.copy(alpha=0.15f)else androidx.compose.ui.graphics.Color.Transparent).clickable{tb=o.id;PR.lt=o.id;FN.lg("HomeTab","切换 → ${o.id}",'u')},contentAlignment=Alignment.Center){ // 触发分类重洗刷新的点击响应盒
+						BasicText("  ${o.lb}  ",style=FN.TM.copy(color=if(ac)cc.p else cc.os.copy(alpha=0.7f),fontWeight=if(ac)androidx.compose.ui.text.font.FontWeight.W600 else androidx.compose.ui.text.font.FontWeight.W400)) // 各频道的文字显示
 					}
 				}
 			}
@@ -148,7 +148,7 @@ import coil.compose.AsyncImage
 			when{ // 选择分支显示不同形态中间态组件
 				ld->CL(vc=true,tt="加载视频列表…") // 首加载状态展示CL缓冲组件
 				vs.isEmpty()->Box(modifier="fs".css(),contentAlignment=Alignment.Center){BasicText("暂无视频",style=FN.BM.copy(color=cc.os.copy(alpha=0.4f)))} // 无结果提示空视图
-				else->LazyVerticalGrid(state=ls,modifier="fw".css(),columns=GridCells.Fixed(cs),contentPadding=PaddingValues(10.dp),verticalArrangement=Arrangement.spacedBy(8.dp),horizontalArrangement=Arrangement.spacedBy(8.dp)){ // 流式自适应多列视频卡片网格
+				else->LazyVerticalGrid(state=ls,modifier="fw".css(),columns=GridCells.Fixed(cs),contentPadding=PaddingValues(4.dp),verticalArrangement=Arrangement.spacedBy(4.dp),horizontalArrangement=Arrangement.spacedBy(4.dp)){ // 流式自适应多列视频卡片网格
 					gridItems(vs,key={it.id}){o-> // 绑定卡片并指明媒体主键
 						VC(pt=o.pt,tt=o.tt,modifier="fw".css(),oc={aH(FN.VT(o.id,o.tt,o.pt));nv.navigate("detail/${o.id}")},sb=listOfNotNull(o.sc.takeIf{it.isNotEmpty()},o.ut.takeIf{it.isNotEmpty()}).joinToString(" · ")) // 单张高保真视频展现卡片
 					}
@@ -196,9 +196,10 @@ import coil.compose.AsyncImage
 	var u by remember(ep){mutableStateOf("")} // 独立声明托管当前具体解析得到的直连切片流媒体物理大链接URL
 	LaunchedEffect(ep){ // 集数换集触发的切片直连流重解析副作用
 		val ru=d.ep.getOrNull(ep)?:"" // 剥离出当前集数锁死持有的流口令密匙
+		FN.lg("fetchVideoSource 1",ru,'u') // 日志记录下放的大切片流媒体直连物理地址
 		if(ru.isNotEmpty()&&!ru.startsWith("http",ignoreCase=true)){ // 鉴别是否属于需要二次转换的短哈希密匙口令
 			u=fS(ru) // 网络功能模块解码返回真实的真实大网络公网流直连地址
-			FN.lg("fetchVideoSource",u) // 日志记录下放的大切片流媒体直连物理地址
+			FN.lg("fetchVideoSource 2",u,'u') // 日志记录下放的大切片流媒体直连物理地址
 		}else u="" // 清空脏态
 	}
 	Row(modifier="fs".css()){ // 横向平分全屏的左右两段左右大双列布局
@@ -220,8 +221,19 @@ import coil.compose.AsyncImage
 
 @Composable private fun PL(d:VD,ep:Int,oe:(Int)->Unit){ // PL 智能移动普通小手机垂直窄视口常规排版流组件
 	val cc=FN.LC.current // 主题全局配色
+	var u by remember(ep){mutableStateOf("")} // 独立声明托管当前具体解析得到的直连切片流媒体物理大链接URL
+	LaunchedEffect(ep){ // 集数换集触发的切片直连流重解析副作用
+		val ru=d.ep.getOrNull(ep)?:"" // 剥离出当前集数锁死持有的流口令密匙
+		FN.lg("fetchVideoSource 1",ru,'u') // 日志记录下放的大切片流媒体直连物理地址
+		if(ru.isNotEmpty()&&!ru.startsWith("http",ignoreCase=true)){ // 鉴别是否属于需要二次转换的短哈希密匙口令
+			u=fS(ru) // 网络功能模块解码返回真实的真实大网络公网流直连地址
+			FN.lg("fetchVideoSource 2",u,'u') // 日志记录下放的大切片流媒体直连物理地址
+		}else u="" // 清空脏态
+	}
 	Column(modifier="fs sv".css()){ // 贯穿全高支持自如顺滑向下纵滚的页面大长垂直基座Column
-		Box(modifier="fw".css().aspectRatio(16f/9f).background(androidx.compose.ui.graphics.Color.Black),contentAlignment=Alignment.Center){VP(pt=d.pt,sc=d.ep.getOrNull(ep)?:"")} // 贴紧两侧物理屏幕边缘的标准视界16比9大观影面视窗
+		Box(modifier="fw".css().aspectRatio(16f/9f).background(androidx.compose.ui.graphics.Color.Black),contentAlignment=Alignment.Center){
+			if(u.isNotEmpty()){VP(pt=d.pt,sc=u)}else{BasicText("加载中...",style=FN.TS.copy(color=cc.os))} // 若直连链接非空则降落VP模拟播放器卡位画幅，否则原地挂起小字提示符
+		}
 		Column(modifier="fw ph14 pv12".css()){ // 介绍文案内容外框
 			BasicText("简介",style=FN.TS.copy(color=cc.os.copy(alpha=0.5f))) // 提示分类暗字
 			Spacer(modifier="h4".css()) // 缝隙留白

@@ -109,9 +109,9 @@ fun TB(tt:String="",ob:(()->Unit)?=null,ed:@Composable RowScope.()->Unit={}){ //
 		Row(modifier="ps2".css(),verticalAlignment=Alignment.CenterVertically){ // 左段标题组合行
 			if(ob!=null){ // 若返回事件不为空
 				Box(modifier="fw36 fh36 c8".css().clickable(onClick=ob),contentAlignment=Alignment.Center){androidx.compose.foundation.Image(painter=androidx.compose.ui.res.painterResource(id=R.drawable.arrow_back),contentDescription=null,modifier="fw20 fh20".css(),colorFilter=androidx.compose.ui.graphics.ColorFilter.tint(cc.os))} // 返回箭头图标按钮
-				if(tt.isNotEmpty())Spacer(modifier="fw12".css()) // 左边距
+				if(tt.isNotEmpty())Spacer(modifier="w6".css()) // 左边距
 			}
-			if(tt.isNotEmpty())BasicText(tt,style=FN.TL.copy(color=cc.os),maxLines=1,overflow=TextOverflow.Ellipsis,modifier="e1".css(this)) // 主标题限单一单行显示
+			if(tt.isNotEmpty())BasicText(tt,style=FN.TM.copy(color=cc.os),maxLines=1,overflow=TextOverflow.Ellipsis,modifier="e1".css(this)) // 主标题限单一单行显示
 		}
 		Row(verticalAlignment=Alignment.CenterVertically){ed()} // 右段自定义按钮行
 	}
@@ -127,7 +127,7 @@ fun IB(lb:String,modifier:Modifier,oc:()->Unit){ // IB (IconBtn) 图标轻量按
 fun CL(vc:Boolean=false,tt:String="加载中…"){ // CL (LoadingCenter) 全屏居中数据等待缓冲组件
 	val cc=FN.LC.current // 绑定全局色彩
 	Box(modifier=if(vc)"fs".css()else"fw".css(),contentAlignment=Alignment.Center){ // vc时铺满父容器剩余空间否则高度自适应，内容始终居中
-		Row(modifier="fw".css(),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.Center){ // 图标与文字横向同行整体居中排列
+		Row(modifier=if(vc)"fw".css()else"fw h30".css(),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.Center){ // 图标与文字横向同行整体居中排列
 			BasicText("◌",style=TextStyle(fontSize=20.sp,color=cc.p)) // 转圈图标占位符
 			Spacer(modifier="w8".css()) // 图标与文字间距
 			BasicText(tt,style=FN.BS.copy(color=cc.os.copy(alpha=0.6f))) // 加载状态文字

@@ -53,22 +53,20 @@ jobs:
         id: cache
         uses: actions/cache@v4
         with:
-          path: ./gradle/wrapper/dists
-          key: ${{ runner.os }}-gradle-wrapper-8.11.1
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper/dists
+          key: key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
 
       - name: 下载工具
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           chmod +x gradlew
           wget -q -nc -P ./gradle/wrapper/ https://services.gradle.org/distributions/gradle-8.11.1-bin.zip
-          ./gradlew help -Dorg.gradle.welcome.provider.enabled=false
-          ls ./gradle/wrapper/
-          echo ""
-          ls ./gradle/wrapper/dists
+          ./gradlew help -Dorg.gradle.welcome.provider.enabled=false > /dev/null 2>&1
 
       - name: 解密签名
-        run: |
-          echo "${{ secrets.KS_B64 }}" | base64 --decode > "$GITHUB_WORKSPACE/fyan.keystore"
+        run: echo "${{ secrets.KS_B64 }}" | base64 --decode > "$GITHUB_WORKSPACE/fyan.keystore"
 
       - name: 执行构建
         env:

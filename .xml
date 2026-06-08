@@ -5,12 +5,12 @@
 	<uses-feature android:name="android.software.leanback" android:required="false" />
 	<uses-permission android:name="android.permission.INTERNET" />
 	<application
-		android:label="仏琰" android:allowBackup="true"
-		android:theme="@android:style/Theme.Material.NoActionBar"
+		android:label="仏琰"
+		android:theme="@style/Theme.Fyan" android:allowBackup="true"
 		android:icon="@mipmap/icon" android:banner="@drawable/banner">
 		<activity
 			android:name="com.fyan.O" android:exported="true"
-			android:windowSoftInputMode="adjustResize">
+			android:theme="@style/Theme.Fyan" android:windowSoftInputMode="adjustResize">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 				<category android:name="android.intent.category.LAUNCHER" />

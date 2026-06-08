@@ -3,14 +3,12 @@ package com.fyan
 import android.os.Bundle
 import androidx.compose.runtime.*
 import android.content.res.Configuration
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.compose.setContent
 import androidx.navigation.compose.composable
 
 class O:androidx.activity.ComponentActivity(){ // O 应用主窗体唯一运行物理容器Activity入口类
 	override fun onCreate(savedInstanceState:Bundle?){ // 核心生命周期窗体构建起点
 		super.onCreate(savedInstanceState) // 执行基类默认创建
-		enableEdgeToEdge() // 开启系统级别的边缘无缝隙沉浸式全屏渲染支持
 		PR.init(applicationContext) // 挂载注入就地启动本地轻量SharedPreference薄存储封装单例
 		setContent{ // 进入Compose声明式UI画布大根节点
 			val dk=(resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK)==Configuration.UI_MODE_NIGHT_YES // 实时捕获当前系统的深色/夜间/极夜环境主题标志

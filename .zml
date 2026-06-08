@@ -32,7 +32,6 @@ android {
 		versionName = "1.0"
 		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 		vectorDrawables { useSupportLibrary = true }
-		multiDexEnabled = true
 	}
 	sourceSets {
 		getByName("main") {
@@ -67,21 +66,27 @@ android {
 	}
 }
 dependencies {
-	implementation(platform("androidx.compose:compose-bom:2026.05.00"))
-	implementation("androidx.core:core-ktx:1.15.0")
-	implementation("androidx.activity:activity-compose:1.10.1")
-	implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
-	implementation("androidx.navigation:navigation-compose:2.8.8")
+	// 基础 Compose BOM (2026.05.00 最稳定)
+	val composeBom = platform("androidx.compose:compose-bom:2026.05.00")
+	implementation(composeBom)
+	// AndroidX 核心与生命周期
+	implementation("androidx.core:core-ktx:1.19.0")
+	implementation("androidx.activity:activity-compose:1.13.0")
+	implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.10.0")
+	implementation("androidx.navigation:navigation-compose:2.8.8") // 这个版本目前依然适用
+	// Compose UI 与基础组件 (由 BOM 管理)
 	implementation("androidx.compose.ui:ui")
 	implementation("androidx.compose.ui:ui-graphics")
 	implementation("androidx.compose.foundation:foundation")
-
-	implementation("androidx.media3:media3-exoplayer:1.3.1")
-	implementation("androidx.media3:media3-exoplayer-hls:1.3.1")
-	implementation("androidx.media3:media3-ui:1.3.1")
-
-	implementation("io.coil-kt:coil-compose:2.6.0")
-
+	// Media3 流媒体库
+	implementation("androidx.media3:media3-exoplayer:1.10.1")
+	implementation("androidx.media3:media3-exoplayer-hls:1.10.1")
+	implementation("androidx.media3:media3-ui:1.10.1")
+	// Coil 3 图片加载库核心与 Compose 扩展模块
+	implementation("io.coil-kt.coil3:coil-compose:3.4.0")
+	// 网络引擎模块，否则无法加载 URL 图片
+	implementation("io.coil-kt.coil3:coil-network-okhttp:3.4.0")
+	// 开发工具
 	debugImplementation("androidx.compose.ui:ui-tooling")
 }
 
@@ -112,3 +117,4 @@ org.gradle.caching=true
 org.gradle.configuration-cache=true
 kotlin.incremental=true
 kotlin.parallel.tasks.in.project=true
+kotlin.compiler.execution.strategy=in-process

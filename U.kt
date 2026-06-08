@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import java.util.UUID
 import kotlin.math.roundToInt
 
@@ -58,9 +58,10 @@ object FN{ // 全局控制单例
 	var lh by mutableStateOf(false) // 控制台是否全面隐藏状态
 	var ly by mutableStateOf(0f) // 触屏拖拽实时位移量
 	fun lg(m:String,o:String,c:Char='i'){ // 打印应用运行事件方法
-		val t=java.time.LocalTime.now().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss")) // 获取当下格式化时钟
+		val t=java.text.SimpleDateFormat("HH:mm:ss",java.util.Locale.getDefault()).format(java.util.Date()) // 获取当下格式化时钟
 		val x=when(c){'i'->"#2196F3";'u'->"#9C27B0";'e'->"#F44336";'s'->"#00BCD4";'n'->"#4CAF50";'w'->"#FF9800";else->"#9E9E9E"} // 分配日志级别的显色
-		lg.add("${UUID.randomUUID().toString().replace("-","")}.$x●$t $m ➜ $o") // 压入带有独立键值的日志序列
+		val v="${UUID.randomUUID().toString().replace("-","")}.$x●$t $m ➜ $o"
+		android.os.Handler(android.os.Looper.getMainLooper()).post{lg.add(v)} // 压入带有独立键值的日志序列
 	}
 	fun lc()=lg.clear() // 彻底擦除当前运行时日志
 	fun lr(i:String)=lg.removeAll{it.startsWith(i)} // 定向抹除单条对应的历史日志
@@ -184,11 +185,15 @@ fun TR(tb:List<Pair<String,String>>,tc:String,on:(String)->Unit){ // TR (FilterT
 	Box(modifier=modifier.clip(RoundedCornerShape(6.dp)).background(if(ac)cc.p else cc.sv).clickable(onClick=oc),contentAlignment=Alignment.Center){BasicText(lb,style=FN.BS.copy(color=if(ac)cc.b else cc.os,fontWeight=if(ac)FontWeight.W600 else FontWeight.W400))} // 分集交互背景圆角按钮盒子
 }
 
-class CW(val m:Modifier,val w:Float?=null,val a:Alignment?=null,val f:Boolean=true) // CW DSL修饰符样式编译中间打包实体类
-
-@Composable fun pcss(s:String):CW{ // 高度精简CSS流式多属性解析翻译引擎方法
+// 线程安全的缓存池
+private val CC=java.util.concurrent.ConcurrentHashMap<String,List<String>>()
+// CW DSL修饰符样式编译中间打包实体类
+class CW(val m:Modifier,val w:Float?=null,val a:Alignment?=null,val f:Boolean=true)
+// 高度精简CSS流式多属性解析翻译引擎方法
+@Composable fun pcss(s:String):CW{
 	var m:Modifier=Modifier;var w:Float?=null;var f=true;var a:Alignment?=null // 状态配置临时初始化
-	for(it in s.split(" ")){ // 依照单一空格切片迭代
+	val ss=CC.getOrPut(s){s.split(" ")}
+	for(it in ss){ // 依照单一空格切片迭代
 		val t=it.trim();if(t.isEmpty())continue // 滤过非法空格
 		when(t[0]){ // 按照核心标识首字母划分分支
 			'f'->when{ // fill填充流大组

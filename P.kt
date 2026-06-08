@@ -24,7 +24,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 
 import android.net.Uri
 import androidx.media3.exoplayer.ExoPlayer
@@ -43,7 +43,14 @@ import androidx.media3.common.MediaItem
 			Row(modifier="fh e1 sh".css(this)){ // 赋予横向滚动属性的包裹容器
 				NAV_TABS.forEach{o-> // 迭代配置预设的各个频道标签
 					val ac=o.id==tb // 结算当下选中状态
-					Box(modifier="fh".css().background(if(ac)cc.p.copy(alpha=0.15f)else androidx.compose.ui.graphics.Color.Transparent).clickable{tb=o.id;PR.lt=o.id;FN.lg("HomeTab","切换 → ${o.id}",'u')},contentAlignment=Alignment.Center){ // 触发分类重洗刷新的点击响应盒
+					var fc by remember{mutableStateOf(false)} // 记忆焦点状态
+					Box(
+						modifier="fh".css()
+							.onFocusChanged{fc=it.isFocused} // 监听遥控器光标是否停留在当前 item
+							.border(if(fc)2.dp else 0.dp,cc.p)
+							.background(if(ac||fc)cc.p.copy(alpha=0.15f)else androidx.compose.ui.graphics.Color.Transparent)
+							.clickable{tb=o.id;PR.lt=o.id;FN.lg("HomeTab","切换 → ${o.id}",'u')},contentAlignment=Alignment.Center
+					){ // 触发分类重洗刷新的点击响应盒
 						BasicText("  ${o.lb}  ",style=FN.TM.copy(color=if(ac)cc.p else cc.os.copy(alpha=0.7f),fontWeight=if(ac)androidx.compose.ui.text.font.FontWeight.W600 else androidx.compose.ui.text.font.FontWeight.W400)) // 各频道的文字显示
 					}
 				}
@@ -52,15 +59,15 @@ import androidx.media3.common.MediaItem
 		Box(modifier="fw e1".css(this)){ // 核心视图容器内容动态更换区
 			key(tb){ // 运用Tab唯一键强制重新计算渲染
 				when(tb){ // 判断特定路由分类
-					"history"->HI(nv,eb=true) // 调起首层嵌入版足迹记录大屏组件
-					else->FS(nv,id=tb,eb=true) // 调起首层嵌入版特定视频列表分类大屏组件
+					"history"->HI(nv) // 调起首层嵌入版足迹记录大屏组件
+					else->FS(nv,id=tb) // 调起首层嵌入版特定视频列表分类大屏组件
 				}
 			}
 		}
 	}
 }
 
-@Composable fun HI(nv:NavController,eb:Boolean=false){ // HI (HistoryScreen) 历史浏览记录页面组件
+@Composable fun HI(nv:NavController){ // HI (HistoryScreen) 历史浏览记录页面组件
 	val cc=FN.LC.current // 取出环境配置色
 	var cl by remember{mutableStateOf(false)} // 抹除足迹二次提示面板触发器
 	var rk by remember{mutableStateOf<String?>(null)} // 选中准备废除的单体足迹记录主键
@@ -71,20 +78,17 @@ import androidx.media3.common.MediaItem
 		else->3 // 普通竖持小屏智能手机开三列
 	}
 	Column(modifier="fs".css().background(cc.b)){ // 足迹页面纵向排布根盒
-		if(!eb){ // 若非嵌入模式（即独立路由大页）
-			TB(tt="记录清单",ob={nv.popBackStack()},ed={IB(lb="🗑",oc={cl=true},modifier="fw36 fh36 c8".css())}) // 绘制配备标准清空功能把手的独立大顶部Bar
-		}else{ // 归属于首页主屏之下的嵌入子页
-			Row(modifier="fw h40 ph2".css(),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.SpaceBetween){ // 绘制一个极简轻盈的标题行
-				BasicText("记录清单",style=FN.TS.copy(color=cc.os)) // 足迹小标文案
-				IB(lb="🗑",oc={cl=true},modifier="fw28 fh28 c8".css()) // 清空按钮
-			}
+		Row(modifier="fw h40 ph2".css(),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.SpaceBetween){ // 绘制一个极简轻盈的标题行
+			BasicText("记录清单",style=FN.TS.copy(color=cc.os)) // 足迹小标文案
+			IB(lb="🗑",oc={cl=true},modifier="fw28 fh28 c8".css()) // 清空按钮
 		}
 		if(FN.hi.isEmpty()){ // 全局记录为空的缺省判定
 			Box(modifier="fs".css(),contentAlignment=Alignment.Center){BasicText("暂无观看记录",style=FN.BM.copy(color=cc.os.copy(alpha=0.4f)))} // 居中输出空视窗信息
 		}else{ // 包含有效足迹历史记录
 			LazyVerticalGrid(modifier="fw".css(),columns=GridCells.Fixed(cs),contentPadding=PaddingValues(2.dp),verticalArrangement=Arrangement.spacedBy(2.dp),horizontalArrangement=Arrangement.spacedBy(2.dp)){ // 惰性栅格流式网格
 				gridItems(FN.hi,key={it.id}){o-> // 遍历足迹条目绑定唯一主键
-					VC(tt=o.tt,pt=o.pt,sb=o.pg,modifier="fw".css(),oc={FN.lg("History","点击 ${o.id}",'u');nv.navigate("detail/${o.id}")},lp={rk=o.id}) // 挂载瀑布视频历史记录大卡片
+					var fc by remember{mutableStateOf(false)} // 记忆焦点状态
+					VC(tt=o.tt,pt=o.pt,sb=o.pg,modifier="fw".css().onFocusChanged{fc=it.isFocused}.border(if(fc)2.dp else 0.dp,cc.p),oc={FN.lg("History","点击 ${o.id}",'u');nv.navigate("detail/${o.id}")},lp={rk=o.id}) // 挂载瀑布视频历史记录大卡片
 				}
 			}
 		}
@@ -93,7 +97,7 @@ import androidx.media3.common.MediaItem
 	rk?.let{ky->CD(tt="确认删除该条历史记录？",od={rk=null},oc={rH(ky);rk=null})} // 划走移除单条历史记录提示窗
 }
 
-@Composable fun FS(nv:NavController,id:String,eb:Boolean=false){ // FS (FilterScreen) 视频高级检索筛选大页面组件
+@Composable fun FS(nv:NavController,id:String){ // FS (FilterScreen) 视频高级检索筛选大页面组件
 	val cc=FN.LC.current // 绑定全局取色
 	val tb=NAV_TABS.find{it.id==id} // 精准捕获所关联的分类常数字段
 	var gs by remember{mutableStateOf<List<FG>>(emptyList())} // 本检索分类持有的筛选多属性组定义
@@ -141,7 +145,6 @@ import androidx.media3.common.MediaItem
 	val cf=LocalConfiguration.current // 设备状态抓取
 	val cs=when{cf.screenWidthDp>=840->6;cf.screenWidthDp>=600->4;else->3} // 自适应大中小型设备列分摊排布
 	Column(modifier="fs".css().background(cc.b)){ // 检索列表页纵向主布局
-		if(!eb)TB(tt=tb?.lb?:"",ob={nv.popBackStack()}) // 在独立大页面模式之下绘制专属标准TBBar顶栏
 		if(gs.isNotEmpty()){ // 若包含行数不为零的条件组
 			Column(modifier="fw".css().background(cc.s).border(0.5.dp,cc.ov)){ // 多属性栏目垂直聚集大盒子
 				gs.forEachIndexed{i,g-> // 迭代各条独立大检索属性行
@@ -159,7 +162,11 @@ import androidx.media3.common.MediaItem
 				vs.isEmpty()->Box(modifier="fs".css(),contentAlignment=Alignment.Center){BasicText("暂无视频",style=FN.BM.copy(color=cc.os.copy(alpha=0.4f)))} // 无结果提示空视图
 				else->LazyVerticalGrid(state=ls,modifier="fw".css(),columns=GridCells.Fixed(cs),contentPadding=PaddingValues(2.dp),verticalArrangement=Arrangement.spacedBy(2.dp),horizontalArrangement=Arrangement.spacedBy(2.dp)){ // 流式自适应多列视频卡片网格
 					gridItems(vs,key={it.id}){o-> // 绑定卡片并指明媒体主键
-						VC(pt=o.pt,tt=o.tt,modifier="fw".css(),oc={aH(FN.VT(o.id,o.tt,o.pt));nv.navigate("detail/${o.id}")},sb=listOfNotNull(o.sc.takeIf{it.isNotEmpty()},o.ut.takeIf{it.isNotEmpty()}).joinToString(" · ")) // 单张高保真视频展现卡片
+						var fc by remember{mutableStateOf(false)} // 记忆焦点状态
+						VC(pt=o.pt,tt=o.tt,modifier="fw".css().onFocusChanged{fc=it.isFocused}.border(if(fc)2.dp else 0.dp,cc.p),oc={
+							aH(FN.VT(o.id,o.tt,o.pt))
+							nv.navigate("detail/${o.id}")
+						},sb=listOfNotNull(o.sc.takeIf{it.isNotEmpty()},o.ut.takeIf{it.isNotEmpty()}).joinToString(" · ")) // 单张高保真视频展现卡片
 					}
 					if(lm)item{CL(tt="加载更多…")} // 正在滑滚增量中在最后行外置一个微型数据解析缓冲圈
 				}
@@ -219,7 +226,10 @@ import androidx.media3.common.MediaItem
 				if(u.isNotEmpty()){VP(pt=d.pt,sc=u,playing=playing,onPlay={playing=true})}else{BasicText("加载中...",style=FN.TS.copy(color=cc.os))} // 若直连链接非空则降落VP模拟播放器卡位画幅，否则原地挂起小字提示符
 			}
 			LazyRow(modifier="fw".css(),horizontalArrangement=Arrangement.spacedBy(8.dp),contentPadding=PaddingValues(horizontal=10.dp,vertical=8.dp)){ // 下属横行自由水平滑滚的分选按钮单行导轨
-				items(d.et.indices.toList()){i->EB(lb=d.et[i],ac=i==ep,modifier="w60 h28".css(),oc={oe(i)})} // 循环输出分集圆角选择切片钮
+				items(d.et.indices.toList()){i->
+					var fc by remember{mutableStateOf(false)} // 记忆焦点状态
+					EB(lb=d.et[i],ac=i==ep,modifier="w60 h28".css().onFocusChanged{fc=it.isFocused}.border(if(fc)2.dp else 0.dp,cc.p),oc={oe(i)})
+				} // 循环输出分集圆角选择切片钮
 			}
 		}
 		Column(modifier="fh ph16 pv12 e1 sv".css(this)){ // 右方副位：分配单倍宽幅权重支持纵向自由翻滚的视频详细介绍长文本纸盒
@@ -271,8 +281,10 @@ import androidx.media3.common.MediaItem
 			Row(horizontalArrangement=Arrangement.spacedBy(6.dp)){ // 每行内部的按钮按水平横向间隙间隔排开
 				repeat(cs){c-> // 顺应列数因子单行内部循环平铺
 					val i=r*cs+c // 换算映射还原出一维长数组内真实的数据元素指针
-					if(i<tl.size){EB(lb=tl[i],ac=i==ct,oc={os(i)},modifier="fw e1 h28".css(this))} // 绘制单枚权重对半分发的块集数选区小组件
-					else Spacer(modifier="e1".css(this)) // 一行内尾部残缺格子补齐同等空置视口物理权重，避免前置按钮因空位而产生大范围拉伸变形
+					if(i<tl.size){ // 绘制单枚权重对半分发的块集数选区小组件
+						var fc by remember{mutableStateOf(false)} // 记忆焦点状态
+						EB(lb=tl[i],ac=i==ct,oc={os(i)},modifier="fw e1 h28".css(this).onFocusChanged{fc=it.isFocused}.border(if(fc)2.dp else 0.dp,cc.p))
+					}else Spacer(modifier="e1".css(this)) // 一行内尾部残缺格子补齐同等空置视口物理权重，避免前置按钮因空位而产生大范围拉伸变形
 				}
 			}
 		}
@@ -280,15 +292,21 @@ import androidx.media3.common.MediaItem
 }
 
 @Composable private fun VP(pt:String,sc:String,playing:Boolean,onPlay:()->Unit){ // VP 播放核心画幅前端高真界面模拟卡位占位组件
+	var fc by remember{mutableStateOf(false)} // 记忆焦点状态
 	if(!playing){
-		Box(modifier="fs".css().clickable{onPlay()},contentAlignment=Alignment.Center){ // 多层压栈覆盖盒子根底
+		Box(modifier="fs".css().onFocusChanged{fc=it.isFocused}.border(if(fc)2.dp else 0.dp,cc.p).clickable{onPlay()},contentAlignment=Alignment.Center){ // 多层压栈覆盖盒子根底
 			AsyncImage(model=pt,contentDescription="封面",contentScale=ContentScale.Fit,modifier="fs".css()) // 最底层完全平铺且保持比例不坏的视频大海报原图画布
 			Box(modifier="w56 h56 c".css().background(androidx.compose.ui.graphics.Color.Black.copy(alpha=0.5f)),contentAlignment=Alignment.Center){BasicText("▶",style=FN.TL.copy(color=androidx.compose.ui.graphics.Color.White))} // 最上层半透明圆形遮罩点睛式居中观影操作指示方向标小箭头
 		}
 	}else{
 		androidx.compose.ui.viewinterop.AndroidView(factory={
 			PlayerView(it).apply{
-				val player=ExoPlayer.Builder(it).build()
+				val player=remember{ExoPlayer.Builder(it).build()}
+				DisposableEffect(player){ // 绑定声明式生命周期副作用
+					onDispose{
+						player.release() // 当用户退出详情页、返回首页时，强制当场释放硬件解码器和 Surface 纹理
+					}
+				}
 				this.player=player
 				val ms=if(sc.endsWith(".m3u8"))HlsMediaSource.Factory(DefaultHttpDataSource.Factory()).createMediaSource(MediaItem.fromUri(Uri.parse(sc)))
 				else ProgressiveMediaSource.Factory(DefaultHttpDataSource.Factory()).createMediaSource(MediaItem.fromUri(Uri.parse(sc)))
@@ -296,6 +314,6 @@ import androidx.media3.common.MediaItem
 				player.prepare()
 				player.playWhenReady=true
 			}
-		},modifier="fs".css())
+		},modifier="fs".css().onFocusChanged{fc=it.isFocused}.border(if(fc)2.dp else 0.dp,cc.p))
 	}
 }

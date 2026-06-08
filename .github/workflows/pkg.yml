@@ -70,7 +70,7 @@ jobs:
           K_PSWD: ${{ secrets.K_PSWD }}
         run: |
           chmod +x gradlew
-          ./gradlew help -Dorg.gradle.welcome.provider.enabled=false > /dev/null 2>&1
+          ./gradlew help -Dorg.gradle.welcome.provider.enabled=false
           ./gradlew :app:assembleRelease --console=plain -Dorg.gradle.internal.download.progress=false -Dorg.gradle.welcome.provider.enabled=false
 
       - name: 提取产物

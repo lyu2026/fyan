@@ -70,7 +70,7 @@ suspend fun fD(id:String):VD?= withContext(Dispatchers.IO){ // fD (fetchDetail) 
 		if(s!=null){ // 判定剧集有效性
 			for(i in 0 until s.length()){ // 迭代切分集数数据
 				val v=s.getJSONObject(i) // 摸出当前分集
-				us.add(v.optString("episodeKey","")) // 注入Key
+				us.add(v.optString("episodeId","")) // 注入Key
 				ts.add(v.optString("episodeTitle","${i+1}")) // 填充标题名
 			}
 		}
@@ -78,9 +78,9 @@ suspend fun fD(id:String):VD?= withContext(Dispatchers.IO){ // fD (fetchDetail) 
 	}.getOrElse{e->FN.lg("Detail",e.message?:"err",'e');null} // 崩溃降级丢回空壳引用并记日志
 }
 
-suspend fun fS(id:String):String= withContext(Dispatchers.IO){ // fS (fetchSource) 高级解密正片特定单集哈希密钥转换回公网可播放物理直连URL大地址
+suspend fun fS(id:String,vid:String):String= withContext(Dispatchers.IO){ // fS (fetchSource) 高级解密正片特定单集哈希密钥转换回公网可播放物理直连URL大地址
 	runCatching{ // 异常防护层
-		val o=JSONObject(URL("$YF/video/getplaydata?mediaKey=$id").readText()) // 网络拉回播放元源字典数据
+		val o=JSONObject(URL("$YF/video/getplaydata?mediaKey=$id&videoId=$vid").readText()) // 网络拉回播放元源字典数据
 		val s=o.optJSONObject("data")?.optJSONArray("list")?:return@runCatching "" // 斩获核心排布通道数据链
 		var u:String="" // 直连视频大长URL承载暂存器
 		for(i in 0 until s.length()){ // 条件大搜索

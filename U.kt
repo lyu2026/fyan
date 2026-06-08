@@ -64,9 +64,8 @@ object FN{ // 全局控制单例
 	}
 	fun lc()=lg.clear() // 彻底擦除当前运行时日志
 	fun lr(i:String)=lg.removeAll{it.startsWith(i)} // 定向抹除单条对应的历史日志
-	@Composable fun LP(){ // 总控调度日志承载看板组件
-		val h=LocalConfiguration.current.screenHeightDp/3 // 动态划分设备屏幕视口的三分之一高度
-		Box(modifier="fw h<$h ph0.5 pnb".css(),contentAlignment=Alignment.BottomCenter){if(lf)LH()else LS()}
+	@Composable fun LP(modifier:Modifier){ // 总控调度日志承载看板组件
+		Box(modifier=modifier,contentAlignment=Alignment.BottomCenter){if(lf)LH()else LS()}
 	}
 	@Composable private fun LH(){Box(modifier="fw h5 c2.5".css().background(Color(0x80808080)).clickable{lf=false;ly=0f},contentAlignment=Alignment.Center){BasicText("· · ·  日志  · · ·",style=BS.copy(color=Color.White.copy(alpha=0.7f)))}} // 简易窄条折叠指示组件
 	@Composable private fun LS(){ // 宽幅展开日志详情组件
@@ -76,9 +75,9 @@ object FN{ // 全局控制单例
 		Box(modifier="fw br6,6,0,0 b0.5,808080,0.70 g1C1C1E.0.92".css().offset(y=ly.roundToInt().dp).pointerInput(Unit){detectDragGestures(onDragEnd={if(ly>100f){lf=true;ly=0f} else ly=0f},onDrag={ch,d->ch.consume();if(ly+d.y>=0f)ly+=d.y})}){ // 核心手势拖拽外罩盒子，最大高度限制为屏高三分之一
 			Column(modifier="fw pv2 ph5 pnb".css()){ // 纵向排布容器，底部导航内边距移至此处
 				Box(modifier="fw h16".css(),contentAlignment=Alignment.Center){Box(modifier="fw40 fh3 c2".css().background(Color(0x66808080)).clickable(enabled=tv){lf=true;ly=0f}.pointerInput(!tv){if(!tv)detectTapGestures(onTap={lf=true;ly=0f})})} // 顶部居中的拖曳手柄横条
-				Row(modifier="fw ph4 pv2".css(),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically){ // 工具条横列布局
+				Row(modifier="fw pv2".css(),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically){ // 工具条横列布局
 					BasicText("日志 · ${lg.size}条",style=BS.copy(color=Color(0xFF9E9E9E),fontFamily=FontFamily.Monospace)) // 指示当前条数
-					Box(modifier="ph8 pv2 c4".css().background(Color(0x33F44336)).clickable{lc()}){BasicText("清空",style=BS.copy(color=Color(0xFFF44336)))} // 触发擦除日志按钮
+					Box(modifier="p2 c4".css().clickable{lc()}){BasicText("清空",style=BS.copy(color=Color(0xFFF44336)))} // 触发擦除日志按钮
 				}
 				LazyColumn(state=ls,modifier="fw pt4".css()){ // 日志条目流滚动组件
 					items(lg){ey-> // 单条日志渲染循环
@@ -87,9 +86,9 @@ object FN{ // 全局控制单例
 						val id=if(dt>0)pt[0].substring(0,dt) else pt[0] // 提取出事件原始ID
 						val hx=if(dt>0)pt[0].substring(dt+1) else "#9E9E9E" // 拿到十六进制色彩
 						val ec=try{Color(AC.parseColor(hx))}catch(_:Exception){Color(0xFF9E9E9E)} // 转换输出原生显色
-						Row(modifier="fw pt1".css(),verticalAlignment=Alignment.Top,horizontalArrangement=Arrangement.SpaceBetween){ // 单条横向显示行
+						Row(modifier="fw".css(),verticalAlignment=Alignment.Top,horizontalArrangement=Arrangement.SpaceBetween){ // 单条横向显示行
 							BasicText(pt.getOrElse(1){""},modifier="e1 pe4".css(this),style=BS.copy(color=ec,lineHeight=1.2.em,fontFamily=FontFamily.Monospace)) // 内容核心块
-							Box(modifier="fw24 fh24 c".css().clickable{lr(id)},contentAlignment=Alignment.Center){BasicText("✕",style=BS.copy(color=Color(0xFF9E9E9E)))} // 单一删除把手按钮
+							Box(modifier="fw20 fh20 c".css().clickable{lr(id)},contentAlignment=Alignment.Center){BasicText("✕",style=BS.copy(color=Color(0xFF9E9E9E)))} // 单一删除把手按钮
 						}
 						Box(modifier="fw h0.5".css().background(Color(0x1A808080))) // 行底浅色微缝线
 					}
@@ -109,7 +108,7 @@ fun TB(tt:String="",ob:(()->Unit)?=null,ed:@Composable RowScope.()->Unit={}){ //
 		Row(modifier="ps2".css(),verticalAlignment=Alignment.CenterVertically){ // 左段标题组合行
 			if(ob!=null){ // 若返回事件不为空
 				Box(modifier="fw36 fh36 c8".css().clickable(onClick=ob),contentAlignment=Alignment.Center){androidx.compose.foundation.Image(painter=androidx.compose.ui.res.painterResource(id=R.drawable.arrow_back),contentDescription=null,modifier="fw20 fh20".css(),colorFilter=androidx.compose.ui.graphics.ColorFilter.tint(cc.os))} // 返回箭头图标按钮
-				if(tt.isNotEmpty())Spacer(modifier="w6".css()) // 左边距
+				if(tt.isNotEmpty())Spacer(modifier="fw6".css()) // 左边距
 			}
 			if(tt.isNotEmpty())BasicText(tt,style=FN.TM.copy(color=cc.os),maxLines=1,overflow=TextOverflow.Ellipsis,modifier="e1".css(this)) // 主标题限单一单行显示
 		}

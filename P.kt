@@ -184,21 +184,21 @@ import coil.compose.AsyncImage
 			o==null->Box(modifier="fs".css(),contentAlignment=Alignment.Center){BasicText("加载失败",style=FN.BM.copy(color=cc.os.copy(alpha=0.5f)))} // 解析失败输出损坏文案
 			else->{ // 提取解包非空正片详情数据流
 				val d=o!! // 解开强制绑定
-				if(tv||(tt&&lp)){TV(d,pg){i->pg=i;aH(FN.VT(d.id,d.tt,d.pt,"第${i+1}集"))}} // 在大屏智能终端横幅下调用横向定制版TV大组件
-				else{PL(d,pg){i->pg=i;aH(FN.VT(d.id,d.tt,d.pt,"第${i+1}集"))}} // 针对竖屏普通移动手机用户调用专属黄金竖列PL组件
+				if(tv||(tt&&lp)){TV(id,d,pg){i->pg=i;aH(FN.VT(d.id,d.tt,d.pt,"第${i+1}集"))}} // 在大屏智能终端横幅下调用横向定制版TV大组件
+				else{PL(id,d,pg){i->pg=i;aH(FN.VT(d.id,d.tt,d.pt,"第${i+1}集"))}} // 针对竖屏普通移动手机用户调用专属黄金竖列PL组件
 			}
 		}
 	}
 }
 
-@Composable private fun TV(d:VD,ep:Int,oe:(Int)->Unit){ // TV 大视口终端或高横宽屏特定专属自适应双列播放框架组件
+@Composable private fun TV(id:String,d:VD,ep:Int,oe:(Int)->Unit){ // TV 大视口终端或高横宽屏特定专属自适应双列播放框架组件
 	val cc=FN.LC.current // 上下文取配色
 	var u by remember(ep){mutableStateOf("")} // 独立声明托管当前具体解析得到的直连切片流媒体物理大链接URL
 	LaunchedEffect(ep){ // 集数换集触发的切片直连流重解析副作用
 		val ru=d.ep.getOrNull(ep)?:"" // 剥离出当前集数锁死持有的流口令密匙
 		FN.lg("fetchVideoSource 1",ru,'u') // 日志记录下放的大切片流媒体直连物理地址
 		if(ru.isNotEmpty()&&!ru.startsWith("http",ignoreCase=true)){ // 鉴别是否属于需要二次转换的短哈希密匙口令
-			u=fS(ru) // 网络功能模块解码返回真实的真实大网络公网流直连地址
+			u=fS(id,ru) // 网络功能模块解码返回真实的真实大网络公网流直连地址
 			FN.lg("fetchVideoSource 2",u,'u') // 日志记录下放的大切片流媒体直连物理地址
 		}else u="" // 清空脏态
 	}
@@ -219,14 +219,14 @@ import coil.compose.AsyncImage
 	}
 }
 
-@Composable private fun PL(d:VD,ep:Int,oe:(Int)->Unit){ // PL 智能移动普通小手机垂直窄视口常规排版流组件
+@Composable private fun PL(id:String,d:VD,ep:Int,oe:(Int)->Unit){ // PL 智能移动普通小手机垂直窄视口常规排版流组件
 	val cc=FN.LC.current // 主题全局配色
 	var u by remember(ep){mutableStateOf("")} // 独立声明托管当前具体解析得到的直连切片流媒体物理大链接URL
 	LaunchedEffect(ep){ // 集数换集触发的切片直连流重解析副作用
 		val ru=d.ep.getOrNull(ep)?:"" // 剥离出当前集数锁死持有的流口令密匙
 		FN.lg("fetchVideoSource 1",ru,'u') // 日志记录下放的大切片流媒体直连物理地址
 		if(ru.isNotEmpty()&&!ru.startsWith("http",ignoreCase=true)){ // 鉴别是否属于需要二次转换的短哈希密匙口令
-			u=fS(ru) // 网络功能模块解码返回真实的真实大网络公网流直连地址
+			u=fS(id,ru) // 网络功能模块解码返回真实的真实大网络公网流直连地址
 			FN.lg("fetchVideoSource 2",u,'u') // 日志记录下放的大切片流媒体直连物理地址
 		}else u="" // 清空脏态
 	}

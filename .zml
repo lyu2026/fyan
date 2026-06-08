@@ -92,10 +92,27 @@ dependencies {
 
 @settings.gradle.kts
 pluginManagement {
+	buildscript {
+		repositories {
+			google()
+			mavenCentral()
+			gradlePluginPortal()
+		}
+		dependencies {
+			classpath("com.android.tools:r8:8.10.14")
+		}
+	}
 	repositories {
 		google()
 		mavenCentral()
 		gradlePluginPortal()
+	}
+	resolutionStrategy {
+		eachPlugin {
+			if(requested.id.id.startsWith("org.jetbrains.kotlin")){
+				useVersion("2.3.10")
+			}
+		}
 	}
 }
 dependencyResolutionManagement {
@@ -117,3 +134,11 @@ org.gradle.caching=true
 org.gradle.configuration-cache=true
 kotlin.incremental=true
 kotlin.parallel.tasks.in.project=true
+
+@app/proguard-rules.pro
+-keep class kotlin.Metadata { *; }
+-dontwarn kotlin.Metadata
+-dontwarn kotlin.jvm.internal.**
+-keepclassmembers class * {
+ @androidx.compose.runtime.Composable *;
+}

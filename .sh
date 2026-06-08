@@ -2,7 +2,7 @@
 
 rm -rf app .gradle *.lock
 
-mkdir -p app/src/main/res/{xml,mipmap-anydpi-v26,drawable}
+mkdir -p app/src/main/res/{xml,mipmap-anydpi-v26,drawable,values,values-night}
 mkdir -p app/src/main/kotlin/com/fyan
 mv *.kt app/src/main/kotlin/com/fyan/
 touch app/proguard-rules.pro

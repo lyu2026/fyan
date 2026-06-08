@@ -84,8 +84,13 @@ suspend fun fS(id:String):String= withContext(Dispatchers.IO){ // fS (fetchSourc
 		val s=o.optJSONObject("data")?.optJSONArray("list")?:return@runCatching "" // 斩获核心排布通道数据链
 		var u:String="" // 直连视频大长URL承载暂存器
 		for(i in 0 until s.length()){ // 条件大搜索
-			val mu=s.optJSONObject(i)?.optString("mediaUrl","") // 取出一条播放链接
-			if(!mu.isNullOrEmpty()){u=mu;break} // 一旦遇到有效流通道直连地址则立即拦截抓取跳出
+			val x=s.optJSONObject(i)?:continue // 取出当前条目
+			val mu=x.optString("mediaUrl","") // 取出播放链接
+			if(mu.isNotEmpty()&&!x.optBoolean("isVip",true)){u=mu;break} // 优先取非VIP且链接有效的免费源
+		}
+		if(u.isEmpty())for(i in 0 until s.length()){ // 若无免费源则降级回退取任意非空链接
+			val mu=s.optJSONObject(i)?.optString("mediaUrl","")?:"" // 兜底取链接
+			if(mu.isNotEmpty()){u=mu;break} // 取到即止
 		}
 		u // 奉还播放公网流直连地址
 	}.getOrElse{e->FN.lg("Source",e.message?:"err",'e');""} // 遇挫落空吐空壳字串

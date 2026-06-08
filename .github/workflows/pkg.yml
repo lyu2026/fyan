@@ -61,8 +61,8 @@ jobs:
 
       - name: 检查缓存
         run: |
-          mkdir -p gradle/wrapper/dists/gradle-8.10.2-bin/
-          wget -q -nc -P gradle/wrapper/dists/gradle-8.10.2-bin/ https://services.gradle.org/distributions/gradle-8.10.2-bin.zip
+          mkdir -p ./gradle/wrapper/dists/gradle-8.10.2-bin/
+          wget -q -nc -P ./gradle/wrapper/ https://services.gradle.org/distributions/gradle-8.10.2-bin.zip
 
       - name: 执行构建
         env:

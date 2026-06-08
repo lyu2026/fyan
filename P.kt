@@ -117,10 +117,9 @@ import coil.compose.AsyncImage
 		ld=false // 打开封面
 	}
 
-	LaunchedEffect(ls.firstVisibleItemIndex){ // 滚屏网格滑动时监控触底增量加载的分页副作用
-		val lt=ls.layoutInfo // 抽取底图网格排版实测信息数据
-		val lx=lt.visibleItemsInfo.lastOrNull()?.index?:return@LaunchedEffect // 计算当屏最底端那个卡片的索引物理排布数值
-		if(lx>=lt.totalItemsCount-3&&hm&&!lm&&!ld){ // 判断是否跨入倒数第三条的自动无限分页追加触发阈值
+	val nr by remember{derivedStateOf{val lt=ls.layoutInfo;val lx=lt.visibleItemsInfo.lastOrNull()?.index?:-1;lx>=lt.totalItemsCount-3&&lt.totalItemsCount>0}} // 派生触底状态：最后可见项接近末尾则为true
+	LaunchedEffect(nr){ // 监听派生触底状态变化触发增量分页副作用
+		if(nr&&hm&&!lm&&!ld){ // 确认触底且有更多数据且无重入
 			lm=true // 夯死触发防抖锁
 			val nq=ds.joinToString(",").ifEmpty{gs.map{"0"}.joinToString(",")} // 获取最新的多参数过滤文本
 			val nx=fL(id,nq,pg+1) // 分页网络请求追加获取pg+1深度块数据

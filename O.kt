@@ -7,34 +7,27 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.compose.setContent
 import androidx.navigation.compose.composable
 
-// ════════════════════════════════════════════════════════════════
-// 入口 Activity
-// ════════════════════════════════════════════════════════════════
-class O:androidx.activity.ComponentActivity(){
-	override fun onCreate(savedInstanceState:Bundle?){
-		super.onCreate(savedInstanceState)
-		enableEdgeToEdge()
-		Prefs.init(applicationContext)
-		setContent{
-			val dark=(resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK)==Configuration.UI_MODE_NIGHT_YES
-			CompositionLocalProvider(Fyan.LC provides Fyan.color(dark)){X()}
+class OA:androidx.activity.ComponentActivity(){ // OA (O-Activity) 应用主窗体唯一运行物理容器Activity入口类
+	override fun onCreate(savedInstanceState:Bundle?){ // 核心生命周期窗体构建起点
+		super.onCreate(savedInstanceState) // 执行基类默认创建
+		enableEdgeToEdge() // 开启系统级别的边缘无缝隙沉浸式全屏渲染支持
+		PR.init(applicationContext) // 挂载注入就地启动本地轻量SharedPreference薄存储封装单例
+		setContent{ // 进入Compose声明式UI画布大根节点
+			val dk=(resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK)==Configuration.UI_MODE_NIGHT_YES // 实时捕获当前系统的深色/夜间/极夜环境主题标志
+			CompositionLocalProvider(FN.LC provides FN.cl(dk)){NV()} // 注入供给主题局部变量，并拉起中央路由引擎大组件
 		}
 	}
 }
 
-// ════════════════════════════════════════════════════════════════
-// 导航路由
-// ════════════════════════════════════════════════════════════════
-@Composable
-private fun X(){
-	val nav=androidx.navigation.compose.rememberNavController()
-	androidx.compose.foundation.layout.Box(modifier="fs".css()){
-		androidx.navigation.compose.NavHost(navController=nav,startDestination="home"){
-			composable("home"){HomeScreen(nav)}
-			composable("history"){HistoryScreen(nav)}
-			composable("filter/{id}"){back->FilterScreen(nav,back.arguments?.getString("id")?:"movie")}
-			composable("detail/{id}"){back->DetailScreen(nav,back.arguments?.getString("id")?:"")}
+@Composable private fun NV(){ // NV (NavHostComponent) 应用声明式全局路由骨干网拓扑分发控制中心组件
+	val nv=androidx.navigation.compose.rememberNavController() // 初始化Compose轻量全局路由核心状态控制器
+	androidx.compose.foundation.layout.Box(modifier="fs".css()){ // 全景绝对满幅包裹的UI最外层箱盒子根节点
+		androidx.navigation.compose.NavHost(navController=nv,startDestination="home"){ // 调度构建路由图谱大图解
+			composable("home"){HS(nv)} // 路由图声明映射首页HS路由物理节点
+			composable("history"){HI(nv)} // 路由图声明映射独立足迹页HI路由物理节点
+			composable("filter/{id}"){bk->FS(nv,id=bk.arguments?.getString("id")?:"movie")} // 路由图声明映射附带过滤参数的分类FS检索网格大页
+			composable("detail/{id}"){bk->DS(nv,id=bk.arguments?.getString("id")?:"")} // 路由图声明映射附带正片ID主键的视频详情DS播放视窗大页
 		}
-		Fyan.LogPanel()
+		FN.LP() // 浮动叠置在应用最顶层物理画布之上的可控日志运行情况打印悬浮卡控制面板板组件
 	}
 }

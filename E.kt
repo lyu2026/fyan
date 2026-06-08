@@ -7,164 +7,94 @@ import androidx.compose.runtime.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-// ════════════════════════════════════════════════════════════════
-// 数据模型
-// ════════════════════════════════════════════════════════════════
-// 首页顶栏 tab 定义
-data class NavTab(val id:String,val label:String)
-val NAV_TABS=listOf(
-	NavTab("history","历史记录"),
-	NavTab("movie","电影"),
-	NavTab("drama","电视剧"),
-	NavTab("anime","动漫"),
-	NavTab("variety","综艺"),
-	NavTab("documentary","纪录片"),
-	NavTab("news","新闻"),
-	NavTab("yule","娱乐"),
-)
-// 筛选 tag 数据
-data class FilterOption(val id:String,val label:String)
-data class FilterGroup(val name:String,val options:List<FilterOption>)
-// 视频列表项
-data class VideoListItem(
-	val id:String,
-	val title:String,
-	val poster:String,
-	val score:String,
-	val update:String,
-)
-// 视频详情
-data class VideoDetail(
-	val id:String,
-	val title:String,val desc:String,val poster:String,
-	val episodes:List<String>,val episodeTitles:List<String>,
-)
+data class NT(val id:String,val lb:String) // NT (NavTab) 首页顶部频道常量结构
+val NAV_TABS=listOf(NT("history","历史记录"),NT("movie","电影"),NT("drama","电视剧"),NT("anime","动漫"),NT("variety","综艺"),NT("documentary","纪录片"),NT("news","新闻"),NT("yule","娱乐")) // 分类常量全局配置序列
+data class FO(val id:String,val lb:String) // FO (FilterOption) 细分检索小标签节点
+data class FG(val nm:String,val op:List<FO>) // FG (FilterGroup) 多属性标签组结构
+data class VI(val id:String,val tt:String,val pt:String,val sc:String,val ut:String) // VI (VideoListItem) 视频流展示简略项结构
+data class VD(val id:String,val tt:String,val ds:String,val pt:String,val ep:List<String>,val et:List<String>) // VD (VideoDetail) 全量详情数据模型
 
-// ════════════════════════════════════════════════════════════════
-// 本地缓存 —— SharedPreferences 薄封装
-// ════════════════════════════════════════════════════════════════
-object Prefs{
-	private lateinit var sp:android.content.SharedPreferences
-	fun init(c:Context){
-		sp=c.getSharedPreferences("fyan_prefs",Context.MODE_PRIVATE)
-	}
-	var lastTab:String
-		set(v){sp.edit().putString("last_tab",v).apply()}
-		get()=sp.getString("last_tab","history")?:"history"
+object PR{ // PR (Prefs) 本地磁盘轻量键值SP数据持久化薄操作封装单例
+	private lateinit var sp:android.content.SharedPreferences // 内部托管SP
+	fun init(cx:Context){sp=cx.getSharedPreferences("fyan_prefs",Context.MODE_PRIVATE)} // 初始化取得磁盘引用
+	var lt:String // 最终停留的主Tab记录
+		set(v){sp.edit().putString("last_tab",v).apply()} // 就地磁盘同步持久化
+		get()=sp.getString("last_tab","history")?:"history" // 默认返回足迹
 }
 
-// ════════════════════════════════════════════════════════════════
-// 网络请求
-// ════════════════════════════════════════════════════════════════
-private const val YF="https://api.iyf.tv/api"
-// 获取筛选 tag 数据
-suspend fun fetchFilterTags(id:String):List<FilterGroup> =
-withContext(Dispatchers.IO){
-	runCatching{
-		var j=JSONObject(URL("$YF/list/getfiltertagsdata?SecondaryCode=$id").readText())
-		j=j.optJSONObject("data")?:return@runCatching emptyList()
-		val s=j.optJSONArray("list")?:return@runCatching emptyList()
-		buildList{
-			for(i in 0 until s.length()){
-				val x=s.getJSONObject(i)
-				val name=x.optString("name","")
-				val z=x.optJSONArray("list")?:continue
-				val options=buildList{
-					for(r in 0 until z.length()){
-						val o=z.getJSONObject(r)
-						add(FilterOption(
-							id=o.optString("classifyId","0"),
-							label=o.optString("classifyName",""),
-						))
+private const val YF="https://api.iyf.tv/api" // 媒体数据源中央服务器根公网API
+
+suspend fun fG(id:String):List<FG> = withContext(Dispatchers.IO){ // fG (fetchGroups) 异步拉取特定分类对应的全量过滤条件属性配置树
+	runCatching{ // 开启防御性异常捕获
+		var j=JSONObject(URL("$YF/list/getfiltertagsdata?SecondaryCode=$id").readText()) // I/O阻塞拉取纯JSON文本
+		j=j.optJSONObject("data")?:return@runCatching emptyList() // 安全解包data大包
+		val s=j.optJSONArray("list")?:return@runCatching emptyList() // 安全解包list数据链
+		buildList{ // 组装列表
+			for(i in 0 until s.length()){ // 层级迭代条件组
+				val x=s.getJSONObject(i) // 拿到当前的过滤大项
+				val nm=x.optString("name","") // 标签大组冠名
+				val z=x.optJSONArray("list")?:continue // 割取内部包含的细分项
+				val op=buildList{ // 迭代解包细分属性小分支
+					for(r in 0 until z.length()){ // 小项大迭代
+						val o=z.getJSONObject(r) // 提取出单个选项
+						add(FO(id=o.optString("classifyId","0"),lb=o.optString("classifyName",""))) // 挂接FO配置节点
 					}
 				}
-				add(FilterGroup(name=name,options=options))
+				add(FG(nm=nm,op=op)) // 归档大FG配置树
 			}
 		}
-	}.getOrElse{e->
-		Fyan.log("拉取筛选数据",e.message?:"未知除外",'e')
-		emptyList()
-	}
-}
-// 分页获取筛选视频列表
-suspend fun fetchVideoList(id:String,ids:String,page:Int,size:Int=21):List<VideoListItem> =
-withContext(Dispatchers.IO){
-	runCatching{
-		var j=JSONObject(URL("$YF/list/getconditionfilterdata?titleid=${id}&ids=${ids}&page=${page}&size=${size}").readText())
-		j=j.optJSONObject("data")?:return@runCatching emptyList()
-		val s=j.optJSONArray("list")?:return@runCatching emptyList()
-		buildList{
-			for(i in 0 until s.length()){
-				val x=s.getJSONObject(i)
-				add(VideoListItem(
-					title=x.optString("title",""),
-					score=x.optString("score",""),
-					id=x.optString("mediaKey",""),
-					poster=x.optString("coverImgUrl",""),
-					update=x.optString("updateStatus",""),
-				))
-			}
-		}
-	}.getOrElse{e->
-		Fyan.log("拉取视频列表数据",e.message?:"未知错误",'e')
-		emptyList()
-	}
-}
-// 获取视频详情
-suspend fun fetchVideoDetail(id:String):VideoDetail?=
-withContext(Dispatchers.IO){
-	runCatching{
-		var o=JSONObject(URL("$YF/video/videodetails?mediaKey=$id").readText())
-		o=o.optJSONObject("data")?:return@runCatching null
-		o=o.optJSONObject("detailInfo")?:return@runCatching null
-		val s=o.optJSONArray("episodes")
-		val ts=mutableListOf<String>()
-		val us=mutableListOf<String>()
-		if(s!=null){
-			for(i in 0 until s.length()){
-				val v=s.getJSONObject(i)
-				us.add(v.optString("episodeKey",""))
-				ts.add(v.optString("episodeTitle","${i+1}"))
-			}
-		}
-		VideoDetail(
-			episodes=us,episodeTitles=ts,
-			id=id,title=o.optString("title",""),
-			desc=o.optString("introduce",""),
-			poster=o.optString("coverImgUrl","")+"?width=500&height=283&scale=both&mode=crop&anchor=topcenter&format=jpg",
-		)
-	}.getOrElse{e->
-		Fyan.log("拉取视频详情",e.message?:"未知错误",'e')
-		null
-	}
-}
-// 获取视频集源
-suspend fun fetchVideoSource(id:String):String=
-withContext(Dispatchers.IO){
-	runCatching{
-		val o=JSONObject(URL("$YF/video/getplaydata?mediaKey=$id").readText())
-		val s=o.optJSONObject("data")?.optJSONArray("list")?:return@runCatching ""
-		var u:String=""
-		for(i in 0 until s.length()){
-			val mu=s.optJSONObject(i)?.optString("mediaUrl","")
-			if(!mu.isNullOrEmpty()){u=mu;break}
-		}
-		u
-	}.getOrElse{e->
-		Fyan.log("拉取视频集源",e.message?:"未知错误",'e')
-		""
-	}
+	}.getOrElse{e->FN.lg("Tags",e.message?:"err",'e');emptyList()} // 发生异常熔断返回零长度空集并打入错误日志
 }
 
-// ════════════════════════════════════════════════════════════════
-// 历史记录 —— 简单内存管理（可扩展持久化）
-// ════════════════════════════════════════════════════════════════
-// 添加或更新历史记录（最新在前）
-fun addHistory(item:Fyan.VideoItem){
-	Fyan.history.removeAll{it.id==item.id}
-	Fyan.history.add(0,item)
+suspend fun fL(id:String,isStr:String,pg:Int,sz:Int=21):List<VI> = withContext(Dispatchers.IO){ // fL (fetchList) 携带复合拼接参数进行多态流式分页抓取视频列表结果集
+	runCatching{ // 异常拦截防御
+		var j=JSONObject(URL("$YF/list/getconditionfilterdata?titleid=${id}&ids=${isStr}&page=${pg}&size=${sz}").readText()) // 高速拉取远端列表
+		j=j.optJSONObject("data")?:return@runCatching emptyList() // 摘除data外衣
+		val s=j.optJSONArray("list")?:return@runCatching emptyList() // 割出视频主体项长序列
+		buildList{ // 安全生成可变队列
+			for(i in 0 until s.length()){ // 迭代打包卡片模型
+				val x=s.getJSONObject(i) // 从索引点提出媒体基本字典
+				add(VI(title=x.optString("title",""),score=x.optString("score",""),id=x.optString("mediaKey",""),poster=x.optString("coverImgUrl",""),update=x.optString("updateStatus",""))) // 组合VI视频项入库
+			}
+		}
+	}.getOrElse{e->FN.lg("List",e.message?:"err",'e');emptyList()} // 捕获错误并归档
 }
-fun removeHistory(id:String){
-	Fyan.history.removeAll{it.id==id}
+
+suspend fun fD(id:String):VD?= withContext(Dispatchers.IO){ // fD (fetchDetail) 携媒体主键主路由参数深度抓取正片详情全量包
+	runCatching{ // 开启防御性捕获
+		var o=JSONObject(URL("$YF/video/videodetails?mediaKey=$id").readText()) // 基础请求拉取
+		o=o.optJSONObject("data")?:return@runCatching null // 摘取data
+		o=o.optJSONObject("detailInfo")?:return@runCatching null // 定位具体核心信息载体detailInfo字典
+		val s=o.optJSONArray("episodes") // 割取出剧集列表大字段
+		val ts=mutableListOf<String>() // 正向保存各集展示标语
+		val us=mutableListOf<String>() // 存储集数跳转用唯一主键哈希口令
+		if(s!=null){ // 判定剧集有效性
+			for(i in 0 until s.length()){ // 迭代切分集数数据
+				val v=s.getJSONObject(i) // 摸出当前分集
+				us.add(v.optString("episodeKey","")) // 注入Key
+				ts.add(v.optString("episodeTitle","${i+1}")) // 填充标题名
+			}
+		}
+		VD(ep=us,et=ts,id=id,tt=o.optString("title",""),ds=o.optString("introduce",""),pt=o.optString("coverImgUrl","")+"?width=500&height=283&scale=both&mode=crop&anchor=topcenter&format=jpg") // 压印返回高定制宽画幅VD详情实体
+	}.getOrElse{e->FN.lg("Detail",e.message?:"err",'e');null} // 崩溃降级丢回空壳引用并记日志
 }
-fun clearHistory()=Fyan.history.clear()
+
+suspend fun fS(id:String):String= withContext(Dispatchers.IO){ // fS (fetchSource) 高级解密正片特定单集哈希密钥转换回公网可播放物理直连URL大地址
+	runCatching{ // 异常防护层
+		val o=JSONObject(URL("$YF/video/getplaydata?mediaKey=$id").readText()) // 网络拉回播放元源字典数据
+		val s=o.optJSONObject("data")?.optJSONArray("list")?:return@runCatching "" // 斩获核心排布通道数据链
+		var u:String="" // 直连视频大长URL承载暂存器
+		for(i in 0 until s.length()){ // 条件大搜索
+			val mu=s.optJSONObject(i)?.optString("mediaUrl","") // 取出一条播放链接
+			if(!mu.isNullOrEmpty()){u=mu;break} // 一旦遇到有效流通道直连地址则立即拦截抓取跳出
+		}
+		u // 奉还播放公网流直连地址
+	}.getOrElse{e->FN.lg("Source",e.message?:"err",'e');""} // 遇挫落空吐空壳字串
+}
+
+fun aH(im:FN.VT){ // 历史记录内存更新追加方法
+	FN.hi.removeAll{it.id==im.id} // 先行干掉当前内存数组中存在的旧有同媒体主键历史项（去重）
+	FN.hi.add(0,im) // 将最新交互产生的新历史卡片足迹强行推入到队列第0位（时序最新排前）
+}
+fun rH(id:String){FN.hi.removeAll{it.id==id}} // 定向擦除单条特定的足迹卡片记录
+fun cH()=FN.hi.clear() // 全面归零当前内存全量足迹队列

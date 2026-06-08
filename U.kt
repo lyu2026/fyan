@@ -548,12 +548,12 @@ fun FilterTabRow(
 					"bs"->Alignment.BottomStart; "bc"->Alignment.BottomCenter; "be"->Alignment.BottomEnd
 					else->null
 				}
-				if(align!=null)@Suppress("UNCHECKED_CAST"){m=m.align(align)}
+				if(align!=null)@Suppress("UNCHECKED_CAST"){m=(m as Modifier).align(align)}
 			}
 			'e'->{val v=s.drop(1)
-				val w=v.toFloatOrNull()?:1f
-				val fill=s.contains("f",ignoreCase=true)
-				@Suppress("UNCHECKED_CAST"){m=m.weight(w,fill)}
+				val fill='f' in v
+				val w=v.filter{it!='f'}.toFloatOrNull()?:1f
+				@Suppress("UNCHECKED_CAST"){m=(m as Modifier).weight(w,fill)}
 			}
 			's'->{
 				when(s){

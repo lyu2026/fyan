@@ -74,7 +74,7 @@ object FN{ // 全局控制单例
 		val tv=(LocalConfiguration.current.uiMode and Configuration.UI_MODE_TYPE_MASK)==Configuration.UI_MODE_TYPE_TELEVISION // 检测是否运行于TV端
 		Box(modifier="fw br6,6,0,0 b0.5,808080,0.70 g1C1C1E.0.92".css().offset(y=ly.roundToInt().dp).pointerInput(Unit){detectDragGestures(onDragEnd={if(ly>100f){lf=true;ly=0f} else ly=0f},onDrag={ch,d->ch.consume();if(ly+d.y>=0f)ly+=d.y})}){ // 核心手势拖拽外罩盒子，最大高度限制为屏高三分之一
 			Column(modifier="fw pv2 ph5 pnb".css()){ // 纵向排布容器，底部导航内边距移至此处
-				Box(modifier="fw h16".css(),contentAlignment=Alignment.Center){Box(modifier="fw40 fh3 c2".css().background(Color(0x66808080)).clickable(enabled=tv){lf=true;ly=0f}.pointerInput(!tv){if(!tv)detectTapGestures(onTap={lf=true;ly=0f})})} // 顶部居中的拖曳手柄横条
+				Box(modifier="fw h16".css(),contentAlignment=Alignment.Center){Box(modifier="w40 h3 c2".css().background(Color(0x66808080)).clickable(enabled=tv){lf=true;ly=0f}.pointerInput(!tv){if(!tv)detectTapGestures(onTap={lf=true;ly=0f})})} // 顶部居中的拖曳手柄横条
 				Row(modifier="fw pv2".css(),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically){ // 工具条横列布局
 					BasicText("日志 · ${lg.size}条",style=BS.copy(color=Color(0xFF9E9E9E),fontFamily=FontFamily.Monospace)) // 指示当前条数
 					Box(modifier="p2 c4".css().clickable{lc()}){BasicText("清空",style=BS.copy(color=Color(0xFFF44336)))} // 触发擦除日志按钮
@@ -88,7 +88,7 @@ object FN{ // 全局控制单例
 						val ec=try{Color(AC.parseColor(hx))}catch(_:Exception){Color(0xFF9E9E9E)} // 转换输出原生显色
 						Row(modifier="fw".css(),verticalAlignment=Alignment.Top,horizontalArrangement=Arrangement.SpaceBetween){ // 单条横向显示行
 							BasicText(pt.getOrElse(1){""},modifier="e1 pe4".css(this),style=BS.copy(color=ec,lineHeight=1.2.em,fontFamily=FontFamily.Monospace)) // 内容核心块
-							Box(modifier="fw20 fh20 c".css().clickable{lr(id)},contentAlignment=Alignment.Center){BasicText("✕",style=BS.copy(color=Color(0xFF9E9E9E)))} // 单一删除把手按钮
+							Box(modifier="w20 h20 c".css().clickable{lr(id)},contentAlignment=Alignment.Center){BasicText("✕",style=BS.copy(color=Color(0xFF9E9E9E)))} // 单一删除把手按钮
 						}
 						Box(modifier="fw h0.5".css().background(Color(0x1A808080))) // 行底浅色微缝线
 					}
@@ -107,8 +107,8 @@ fun TB(tt:String="",ob:(()->Unit)?=null,ed:@Composable RowScope.()->Unit={}){ //
 	Row(modifier="fw h60 psb".css().background(cc.s).border(0.5.dp,cc.ov),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.SpaceBetween){ // 顶条水平根布局
 		Row(modifier="ps2".css(),verticalAlignment=Alignment.CenterVertically){ // 左段标题组合行
 			if(ob!=null){ // 若返回事件不为空
-				Box(modifier="fw36 fh36 c8".css().clickable(onClick=ob),contentAlignment=Alignment.Center){androidx.compose.foundation.Image(painter=androidx.compose.ui.res.painterResource(id=R.drawable.arrow_back),contentDescription=null,modifier="fw20 fh20".css(),colorFilter=androidx.compose.ui.graphics.ColorFilter.tint(cc.os))} // 返回箭头图标按钮
-				if(tt.isNotEmpty())Spacer(modifier="fw6".css()) // 左边距
+				Box(modifier="w28 h28 c8".css().clickable(onClick=ob),contentAlignment=Alignment.Center){androidx.compose.foundation.Image(painter=androidx.compose.ui.res.painterResource(id=R.drawable.arrow_back),contentDescription=null,modifier="w20 h20".css(),colorFilter=androidx.compose.ui.graphics.ColorFilter.tint(cc.os))} // 返回箭头图标按钮
+				if(tt.isNotEmpty())Spacer(modifier="w6".css()) // 左边距
 			}
 			if(tt.isNotEmpty())BasicText(tt,style=FN.TM.copy(color=cc.os),maxLines=1,overflow=TextOverflow.Ellipsis,modifier="e1".css(this)) // 主标题限单一单行显示
 		}
@@ -155,11 +155,11 @@ fun VC(pt:String,tt:String,sb:String,modifier:Modifier,oc:()->Unit,lp:(()->Unit)
 fun CD(tt:String,ct:String="确认",at:String="取消",oc:()->Unit,od:()->Unit){ // CD (ConfirmDialog) 强交互二次确认悬浮弹窗组件
 	val cc=FN.LC.current // 引入当下主题
 	Box(modifier="fs".css().background(Color(0x80000000)),contentAlignment=Alignment.Center){ // 半透明黑色纯底大蒙层
-		Column(modifier="fw300 ph20 pv20 c12".css().background(cc.s).border(0.5.dp,cc.ov,RoundedCornerShape(12.dp)),horizontalAlignment=Alignment.CenterHorizontally){ // 圆角容器主体大框
+		Column(modifier="w300 p20 c6".css().background(cc.s).border(0.1.dp,cc.ov,RoundedCornerShape(6.dp)),horizontalAlignment=Alignment.CenterHorizontally){ // 圆角容器主体大框
 			BasicText(tt,style=FN.BM.copy(color=cc.os,textAlign=TextAlign.Center)) // 提示警示内容
 			Spacer(modifier="h16".css()) // 高度间距
 			Row(horizontalArrangement=Arrangement.spacedBy(12.dp)){ // 下部横列双向按钮控制行
-				Box(modifier="fw ph20 pv10 c8".css().background(cc.sv).clickable(onClick=od),contentAlignment=Alignment.Center){BasicText(at,style=FN.BM.copy(color=cc.os))} // 取消退出按钮
+				Box(modifier="fw0.5 ph20 pv10 c8".css().background(cc.sv).clickable(onClick=od),contentAlignment=Alignment.Center){BasicText(at,style=FN.BM.copy(color=cc.os))} // 取消退出按钮
 				Box(modifier="fw ph20 pv10 c8".css().background(cc.p.copy(alpha=0.15f)).clickable(onClick=oc),contentAlignment=Alignment.Center){BasicText(ct,style=FN.BM.copy(color=cc.p))} // 接受确认按钮
 			}
 		}
@@ -193,8 +193,8 @@ class CW(val m:Modifier,val w:Float?=null,val a:Alignment?=null,val f:Boolean=tr
 		when(t[0]){ // 按照核心标识首字母划分分支
 			'f'->when{ // fill填充流大组
 				t=="fs"->m=m.fillMaxSize() // 填充全屏视口
-				t.startsWith("fw")->{val v=t.drop(2);m=if(v.isEmpty())m.fillMaxWidth() else m.width(v.toDoubleOrNull()?.dp?:0.dp)} // 铺满宽或赋予特定宽
-				t.startsWith("fh")->{val v=t.drop(2);m=if(v.isEmpty())m.fillMaxHeight() else m.height(v.toDoubleOrNull()?.dp?:0.dp)} // 铺满高或赋予特定高
+				t.startsWith("fw")->{val v=t.drop(2);m=if(v.isEmpty())m.fillMaxWidth()else m.fillMaxWidth(v.toDoubleOrNull()?.f?:1.f)} // 铺满宽或赋予特定宽
+				t.startsWith("fh")->{val v=t.drop(2);m=if(v.isEmpty())m.fillMaxHeight()else m.fillMaxHeight(v.toDoubleOrNull()?.f?:1.dp)} // 铺满高或赋予特定高
 			}
 			'w'->{val v=t.drop(1) // 宽度特定修饰流
 				m=when{ // 深度测算区间边界值

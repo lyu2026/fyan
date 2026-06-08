@@ -96,8 +96,8 @@ object Fyan{
 		val t=java.time.LocalTime.now()
 			.format(java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss"))
 		val x=when(c){
-			'i'->"#2196F3"; 'u'->"#9C27B0"; 'e'->"#F44336"
-			's'->"#00BCD4"; 'n'->"#4CAF50"; 'w'->"#FF9800"
+			'i'->"#2196F3";'u'->"#9C27B0";'e'->"#F44336"
+			's'->"#00BCD4";'n'->"#4CAF50";'w'->"#FF9800"
 			else->"#9E9E9E"
 		}
 		logs.add("${UUID.randomUUID().toString().replace("-","")}.$x●$t $m ➜ $o")
@@ -109,7 +109,7 @@ object Fyan{
 	@Composable fun LogPanel(){if(logs_fold)LogHide()else LogShow()}
 	@Composable private fun LogHide(){
 		Box(
-			modifier="fw pnb abc h5 c2.5".css().background(Color(0x80808080)).clickable{logs_fold=false},
+			modifier="fw pnb h5 c2.5".css().background(Color(0x80808080)).clickable{logs_fold=false},
 			contentAlignment=Alignment.Center,
 		){BasicText("· · ·  日志  · · ·",style=BS.copy(color=Color.White.copy(alpha=0.7f)))}
 	}
@@ -119,12 +119,12 @@ object Fyan{
 		val maxH=LocalConfiguration.current.screenHeightDp.dp/3
 		val isTv=(LocalConfiguration.current.uiMode and Configuration.UI_MODE_TYPE_MASK)==Configuration.UI_MODE_TYPE_TELEVISION
 		Box(
-			modifier="fw pnb abc br6,6,0,0 b0.5,808080,0.70 h>${maxH}".css()
+			modifier="fw pnb br6,6,0,0 b0.5,808080,0.70 h>${maxH}".css()
 				.offset(y=logs_y.roundToInt().dp).background(Color(0xEB1C1C1E))
 				.pointerInput(Unit){
 					detectDragGestures(
 						onDragEnd={if(logs_y>100f)logs_fold=true else logs_y=0f},
-						onDrag={ch,d->ch.consume(); if(logs_y+d.y>=0f)logs_y+=d.y}
+						onDrag={ch,d->ch.consume();if(logs_y+d.y>=0f)logs_y+=d.y}
 					)
 				}
 		){
@@ -199,12 +199,6 @@ object Fyan{
 // ════════════════════════════════════════════════════════════════
 
 // ── TopBar ──────────────────────────────────────────────────────
-/**
- * 统一顶栏
- * @param title 标题文字；为空时只渲染 start/end slot
- * @param onBack 不为 null 则左侧显示返回箭头
- * @param end 右侧 slot（图标按钮等）
- */
 @Composable
 fun TopBar(
 	title:String="",
@@ -219,7 +213,6 @@ fun TopBar(
 		verticalAlignment=Alignment.CenterVertically,
 		horizontalArrangement=Arrangement.SpaceBetween,
 	){
-		// 左侧
 		Row(verticalAlignment=Alignment.CenterVertically){
 			if(onBack!=null){
 				IconBtn(label="←",modifier="fw36 fh36 c8".css().background(c.sv),onClick=onBack)
@@ -230,7 +223,6 @@ fun TopBar(
 					style=Fyan.TL.copy(color=c.os),maxLines=1,
 					overflow=TextOverflow.Ellipsis,modifier="e1".css())
 		}
-		// 右侧 slot
 		Row(verticalAlignment=Alignment.CenterVertically){end()}
 	}
 }
@@ -255,7 +247,6 @@ fun LoadingCenter(text:String="加载中…"){
 	val c=Fyan.LC.current
 	Box(modifier="fs".css(),contentAlignment=Alignment.Center){
 		Column(horizontalAlignment=Alignment.CenterHorizontally){
-			// 用旋转文字模拟 spinner（纯 Compose 无动画依赖）
 			BasicText("◌",style=TextStyle(fontSize=32.sp,color=c.p))
 			Spacer(modifier="h8".css())
 			BasicText(text,style=Fyan.BS.copy(color=c.os.copy(alpha=0.6f)))
@@ -264,13 +255,6 @@ fun LoadingCenter(text:String="加载中…"){
 }
 
 // ── VideoCard（竖型卡片）────────────────────────────────────────
-/**
- * @param poster	海报图 URL
- * @param title	 标题
- * @param sub	   副标题（评分 / 更新情况 / 历史集数）
- * @param onClick   单击
- * @param onLongPress 长按（可选）
- */
 @Composable
 fun VideoCard(
 	poster:String,
@@ -295,7 +279,6 @@ fun VideoCard(
 			)
 	){
 		Column{
-			// 海报 3:4 比例
 			Box(
 				modifier="fw".css()
 					.aspectRatio(3f / 4f)
@@ -346,14 +329,12 @@ fun ConfirmDialog(
 			BasicText(text,style=Fyan.BM.copy(color=c.os,textAlign=TextAlign.Center))
 			Spacer(modifier="h16".css())
 			Row(horizontalArrangement=Arrangement.spacedBy(12.dp)){
-				// 取消
 				Box(
 					modifier="fw ph20 pv10 c8".css()
 						.background(c.sv)
 						.clickable(onClick=onDismiss),
 					contentAlignment=Alignment.Center,
 				){BasicText(cancelText,style=Fyan.BM.copy(color=c.os))}
-				// 确认
 				Box(
 					modifier="fw ph20 pv10 c8".css()
 						.background(c.p.copy(alpha=0.15f))
@@ -365,13 +346,7 @@ fun ConfirmDialog(
 	}
 }
 
-// ── TabRow（水平滚动分类栏）─────────────────────────────────────
-/**
- * @param fixedLabel  左侧固定列文字（如"类型"）
- * @param tabs		[(id,label)]
- * @param selected	当前选中 id
- * @param onSelect	选中回调
- */
+// ── FilterTabRow ─────────────────────────────────────────────────
 @Composable
 fun FilterTabRow(
 	fixedLabel:String,
@@ -384,7 +359,7 @@ fun FilterTabRow(
 		modifier="fw h28".css().background(c.s),
 		verticalAlignment=Alignment.CenterVertically,
 	){
-		Row( // 滚动列
+		Row(
 			modifier="fh sh e1".css(),
 			verticalAlignment=Alignment.CenterVertically,
 		){
@@ -408,8 +383,7 @@ fun FilterTabRow(
 	}
 }
 
-
-@Composable fun EpisodeBtn( // EpisodeButton（集数按钮）
+@Composable fun EpisodeBtn(
 	label:String,active:Boolean,modifier:Modifier,onClick:()->Unit){
 	val c=Fyan.LC.current
 	Box(
@@ -427,20 +401,20 @@ fun FilterTabRow(
 }
 
 // ════════════════════════════════════════════════════════════════
-// css() DSL ── 所有 modifier 构建的唯一入口
+// css() DSL — CW + Scope 自动解包
 // ════════════════════════════════════════════════════════════════
-@Composable fun String.css():Modifier{
-	var m:Modifier=Modifier
-	for(it in split(" ")){
-		val s=it.trim()
-		if(s.isEmpty())continue
-		when(s[0]){
+class CW(val m:Modifier,val w:Float?=null,val a:Alignment?=null,val f:Boolean=true)
+@Composable fun pcss(s:String):CW{
+	var m:Modifier=Modifier;var w:Float?=null;var f=true;var a:Alignment?=null
+	for(it in s.split(" ")){
+		val t=it.trim();if(t.isEmpty())continue
+		when(t[0]){
 			'f'->when{
-				s=="fs"->m=m.fillMaxSize()
-				s.startsWith("fw")->{val v=s.drop(2);m=if(v.isEmpty()) m.fillMaxWidth() else m.width(v.toDoubleOrNull()?.dp?:0.dp)}
-				s.startsWith("fh")->{val v=s.drop(2);m=if(v.isEmpty()) m.fillMaxHeight() else m.height(v.toDoubleOrNull()?.dp?:0.dp)}
+				t=="fs"->m=m.fillMaxSize()
+				t.startsWith("fw")->{val v=t.drop(2);m=if(v.isEmpty()) m.fillMaxWidth() else m.width(v.toDoubleOrNull()?.dp?:0.dp)}
+				t.startsWith("fh")->{val v=t.drop(2);m=if(v.isEmpty()) m.fillMaxHeight() else m.height(v.toDoubleOrNull()?.dp?:0.dp)}
 			}
-			'w'->{val v=s.drop(1)
+			'w'->{val v=t.drop(1)
 				m=when{
 					v.toDoubleOrNull()!=null->m.width(v.toDouble().dp)
 					v.startsWith(">")->m.widthIn(min=v.drop(1).toDoubleOrNull()?.dp?:0.dp)
@@ -449,7 +423,7 @@ fun FilterTabRow(
 					else->m
 				}
 			}
-			'h'->{val v=s.drop(1)
+			'h'->{val v=t.drop(1)
 				m=when{
 					v.isEmpty()->m.fillMaxHeight()
 					v.startsWith(">")->m.heightIn(min=v.drop(1).toDoubleOrNull()?.dp?:0.dp)
@@ -457,7 +431,7 @@ fun FilterTabRow(
 					else->m.height(v.toDoubleOrNull()?.dp?:0.dp)
 				}
 			}
-			'p'->{val v=s.drop(1)
+			'p'->{val v=t.drop(1)
 				when{
 					v=="nb"->m=m.navigationBarsPadding()
 					v=="sb"->m=m.statusBarsPadding()
@@ -478,13 +452,13 @@ fun FilterTabRow(
 					}
 				}
 			}
-			'z'->{val v=s.drop(1)
+			'z'->{val v=t.drop(1)
 				when{
-					v.startsWith("x")->{val n=v.drop(1).toDoubleOrNull()?.dp?:0.dp; m=m.offset(x=n)}
-					v.startsWith("y")->{val n=v.drop(1).toDoubleOrNull()?.dp?:0.dp; m=m.offset(y=n)}
+					v.startsWith("x")->{val n=v.drop(1).toDoubleOrNull()?.dp?:0.dp;m=m.offset(x=n)}
+					v.startsWith("y")->{val n=v.drop(1).toDoubleOrNull()?.dp?:0.dp;m=m.offset(y=n)}
 				}
 			}
-			'g'->{val v=s.drop(1)
+			'g'->{val v=t.drop(1)
 				val hex=v.takeWhile{it.isLetterOrDigit()}
 				val rest=v.drop(hex.length)
 				val alpha=if(rest.startsWith(".")) rest.drop(1).toDoubleOrNull()?.toFloat()?:1f else 1f
@@ -499,7 +473,7 @@ fun FilterTabRow(
 					else->m.background(fc)
 				}
 			}
-			'b'->{val v=s.drop(1)
+			'b'->{val v=t.drop(1)
 				when{
 					v.startsWith("r")->{
 						val r=v.drop(1).split(",").mapNotNull{it.toDoubleOrNull()?.dp}
@@ -523,7 +497,7 @@ fun FilterTabRow(
 					}
 				}
 			}
-			'c'->{val v=s.drop(1)
+			'c'->{val v=t.drop(1)
 				m=when{
 					v.isEmpty()->m.clip(CircleShape)
 					v.contains(",")->{
@@ -541,39 +515,26 @@ fun FilterTabRow(
 					else->m.clip(CircleShape)
 				}
 			}
-			'a'->{val v=s.drop(1)
-				val align=when(v){
-					"c"->Alignment.Center;   "cs"->Alignment.CenterStart; "ce"->Alignment.CenterEnd
-					"ts"->Alignment.TopStart; "tc"->Alignment.TopCenter;   "te"->Alignment.TopEnd
-					"bs"->Alignment.BottomStart; "bc"->Alignment.BottomCenter; "be"->Alignment.BottomEnd
-					else->null
-				}
-				if(align!=null){
-					val xx=Modifier::class.java.getMethod("align",Alignment::class.java)
-					m=xx.invoke(m,align) as Modifier
-				}
-			}
-			'e'->{val v=s.drop(1)
-				val fill='f' in v
-				val w=v.filter{it!='f'}.toFloatOrNull()?:1f
-				val xx=Modifier::class.java.getMethod("weight",Float::class.javaPrimitiveType,Boolean::class.javaPrimitiveType)
-				m=xx.invoke(m,w,fill) as Modifier
-			}
-			's'->{
-				when(s){
-					"sh"->m=m.horizontalScroll(rememberScrollState())
-					"sv"->m=m.verticalScroll(rememberScrollState())
-				}
-			}
-			'r'->{val v=s.drop(1)
+			'a'->{a=when(t.drop(1)){
+				"c"->Alignment.Center;"cs"->Alignment.CenterStart;"ce"->Alignment.CenterEnd
+				"ts"->Alignment.TopStart;"tc"->Alignment.TopCenter;"te"->Alignment.TopEnd
+				"bs"->Alignment.BottomStart;"bc"->Alignment.BottomCenter;"be"->Alignment.BottomEnd
+				else->null
+			}}
+			'e'->{val v=t.drop(1);w=v.filter{it!='f'}.toFloatOrNull()?:1f;f='f'!in v}
+			's'->{when(t){"sh"->m=m.horizontalScroll(rememberScrollState());"sv"->m=m.verticalScroll(rememberScrollState())}}
+			'r'->{val v=t.drop(1)
 				if(v.contains("x")){
 					val parts=v.split("x")
-					val w=parts.getOrNull(0)?.toFloatOrNull()?:1f
-					val h=parts.getOrNull(1)?.toFloatOrNull()?:1f
-					if(h!=0f)m=m.aspectRatio(w/h)
+					val ww=parts.getOrNull(0)?.toFloatOrNull()?:1f
+					val hh=parts.getOrNull(1)?.toFloatOrNull()?:1f
+					if(hh!=0f)m=m.aspectRatio(ww/hh)
 				}
 			}
 		}
 	}
-	return m
+	return CW(m,w,a,f)
 }
+@Composable fun RowScope.css(s:String)=pcss(s).let{var m=it.m;it.w?.let{w->m=m.weight(w,it.f)};it.a?.let{a->m=m.align(a)};m}
+@Composable fun BoxScope.css(s:String)=pcss(s).let{var m=it.m;it.a?.let{a->m=m.align(a)};m}
+@Composable fun css(s:String)=pcss(s).m

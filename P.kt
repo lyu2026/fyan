@@ -276,6 +276,7 @@ import androidx.media3.common.MediaItem
 }
 
 @Composable private fun EG(tl:List<String>,ct:Int,cs:Int,os:(Int)->Unit){ // EG 专为防止纵向滚动冲突而使用Column+Row平铺排布的扁平剧集平面网格矩阵组件
+	val cc=FN.LC.current // 上下文取配色
 	val rs=(tl.size+cs-1)/cs // 实行严格向上取整测算出所需排列出的总物理横行层数
 	Column(verticalArrangement=Arrangement.spacedBy(6.dp)){ // 各行按等距6dp堆叠大列
 		repeat(rs){r-> // 根据测算总行数逐层展开迭代
@@ -292,22 +293,8 @@ import androidx.media3.common.MediaItem
 	}
 }
 
-@Composable fun VP(pt:String,sc:String,playing:Boolean,onPlay:()->Unit){
-	var fc by remember{mutableStateOf(false)}
-	if(!playing){
-		Box(modifier="fs".css().onFocusChanged{fc=it.isFocused}.border(if(fc)2.dp else 0.dp,cc.p).clickable{onPlay()},contentAlignment=Alignment.Center){
-			AsyncImage(model=pt,contentDescription="封面",contentScale=ContentScale.Fit,modifier="fs".css())
-			Box(modifier="w56 h56 c".css().background(androidx.compose.ui.graphics.Color.Black.copy(alpha=0.5f)),contentAlignment=Alignment.Center){BasicText("▶",style=FN.TL.copy(color=androidx.compose.ui.graphics.Color.White))}
-		}
-	}else{
-		val ctx=androidx.compose.ui.platform.LocalContext.current
-		val player=remember{ExoPlayer.Builder(ctx).build()}
-		DisposableEffect(player){onDispose{player.release()}}
-		AndroidView(factory={PlayerView(it).apply{setPlayer(player)}},modifier="fs".css())
-	}
-}
-
 @Composable private fun VP(pt:String,sc:String,playing:Boolean,onPlay:()->Unit){ // VP 播放核心画幅前端高真界面模拟卡位占位组件
+	val cc=FN.LC.current // 上下文取配色
 	var fc by remember{mutableStateOf(false)} // 记忆焦点状态
 	if(!playing){
 		Box(modifier="fs".css().onFocusChanged{fc=it.isFocused}.border(if(fc)2.dp else 0.dp,cc.p).clickable{onPlay()},contentAlignment=Alignment.Center){ // 多层压栈覆盖盒子根底

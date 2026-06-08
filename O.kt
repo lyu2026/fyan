@@ -1,16 +1,19 @@
 package com.fyan
 
-import android.app.AlertDialog
+import android.app.DownloadManager
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.*
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import java.io.File
 
 class O:androidx.activity.ComponentActivity(){
 	override fun onCreate(savedInstanceState:Bundle?){
@@ -18,12 +21,12 @@ class O:androidx.activity.ComponentActivity(){
 		setContent{
 			var se by remember{mutableStateOf(false)}
 			BackHandler{se=true}
-			if(se)AlertDialog(onDismissRequest={se=false},title={BasicText("退出")},text={BasicText("确定杀死应用并退出吗？")},confirmButton={androidx.compose.material3.TextButton(onClick={finishAffinity()}){BasicText("确定")}},dismissButton={androidx.compose.material3.TextButton(onClick={se=false}){BasicText("取消")}})
+			if(se)CD(tt="确定杀死应用并退出吗？",od={se=false},oc={finishAffinity();se=false})
 			X();LaunchedEffect(Unit){cu()}
 		}
 	}
 	private fun cu(){
-		CoroutineScope(Dispatchers.IO).launch{
+		lifecycleScope.launch(Dispatchers.IO){
 			runCatching{
 				val client=OkHttpClient.Builder().followRedirects(true).build()
 				val res=client.newCall(Request.Builder().url("https://github.com/lyu2026/fyan/releases/latest").build()).execute()
@@ -39,16 +42,28 @@ class O:androidx.activity.ComponentActivity(){
 		}
 	}
 	private fun ni(url:String){
-		CoroutineScope(Dispatchers.IO).launch{
-			val file=File(cacheDir,"fyan.apk")
-			val client=OkHttpClient()
-			val res=client.newCall(Request.Builder().url(url).build()).execute()
-			file.outputStream().use{it.write(res.body!!.bytes())}
-			withContext(Dispatchers.Main){
-				val intent=Intent(Intent.ACTION_VIEW)
-				intent.setDataAndType(Uri.fromFile(file),"application/vnd.android.package-archive")
-				intent.flags=Intent.FLAG_ACTIVITY_NEW_TASK
-				startActivity(intent)
+		lifecycleScope.launch(Dispatchers.IO){
+			try{
+				val request=android.app.DownloadManager.Request(Uri.parse(url)).apply{
+					setTitle("fyan 更新下载")
+					setDescription("正在下载新版本...")
+					if(android.os.Build.VERSION.SDK_INT>=android.os.Build.VERSION_CODES.Q){
+						setDestinationInExternalFilesDir(this@O,android.os.Environment.DIRECTORY_DOWNLOADS,"fyan.apk")
+					}else{
+						setDestinationInExternalPublicDir(android.os.Environment.DIRECTORY_DOWNLOADS,"fyan.apk")
+					}
+					setNotificationVisibility(android.app.DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+					setMimeType("application/vnd.android.package-archive")
+				}
+				val manager=getSystemService(android.content.Context.DOWNLOAD_SERVICE) as android.app.DownloadManager
+				manager.enqueue(request)
+				withContext(Dispatchers.Main){
+					android.widget.Toast.makeText(this@O,"开始下载，完成后请在通知栏点击安装",android.widget.Toast.LENGTH_LONG).show()
+				}
+			}catch(e:Exception){
+				withContext(Dispatchers.Main){
+					android.widget.Toast.makeText(this@O,"下载失败: ${e.message}",android.widget.Toast.LENGTH_SHORT).show()
+				}
 			}
 		}
 	}

@@ -118,7 +118,7 @@ object Fyan{
 		val maxH=LocalConfiguration.current.screenHeightDp.dp/3
 		val isTv=(LocalConfiguration.current.uiMode and Configuration.UI_MODE_TYPE_MASK)==Configuration.UI_MODE_TYPE_TELEVISION
 		Box(
-			modifier="fw pnb abc b0.5 br6,6,0,0 b808080.70 h>${maxH}".css()
+			modifier="fw pnb abc br6,6,0,0 b0.5,808080,0.70 h>${maxH}".css().border(0.5.d,)
 				.offset(y=logs_y.roundToInt().dp).background(Color(0xEB1C1C1E))
 				.pointerInput(Unit){
 					detectDragGestures(
@@ -512,13 +512,15 @@ fun String.css():Modifier{
 						m=m.clip(shape)
 					}
 					else->{
-						val w=v.takeWhile{it.isDigit() || it=='.'}.toDoubleOrNull()?.dp?:1.dp
-						val tail=v.drop(w.value.toString().length)
-						val hex=tail.takeWhile{it.isLetterOrDigit()}
-						val alpha=tail.drop(hex.length).let{if(it.startsWith(".")) it.drop(1).toDoubleOrNull()?.toFloat()?:1f else 1f}
-						val fc=if(hex.isNotEmpty()) Color(AC.parseColor("#$hex"))else Color.Black
-						val c2=if(alpha!=1f) fc.copy(alpha=alpha)else fc
-						m=m.border(w,c2)
+						val parts=v.split(",")
+						val width=parts.getOrNull(0)?.toDoubleOrNull()?.dp?:1.dp
+						val hex=parts.getOrNull(1)?:""
+						val alpha=parts.getOrNull(2)?.toFloatOrNull()?:1f
+						val fc=if(hex.isNotEmpty()){
+							try{Color(AC.parseColor("#$hex"))}catch(_:Exception){Color.Black}
+						}else Color.Black
+						val c2=if(alpha!=1f)fc.copy(alpha=alpha)else fc
+						m=m.border(width,c2)
 					}
 				}
 			}
@@ -547,6 +549,7 @@ fun String.css():Modifier{
 					"bs"->Alignment.BottomStart; "bc"->Alignment.BottomCenter; "be"->Alignment.BottomEnd
 					else->null
 				}
+				m=m.align(align)
 			}
 			'r'->{val v=s.drop(1)
 				if(v.contains("x")){

@@ -92,16 +92,6 @@ dependencies {
 
 @settings.gradle.kts
 pluginManagement {
-	buildscript {
-		repositories {
-			google()
-			mavenCentral()
-			gradlePluginPortal()
-		}
-		dependencies {
-			classpath("com.android.tools:r8:8.8.14")
-		}
-	}
 	repositories {
 		google()
 		mavenCentral()
@@ -109,7 +99,7 @@ pluginManagement {
 	}
 	resolutionStrategy {
 		eachPlugin {
-			if(requested.id.id.startsWith("org.jetbrains.kotlin")){
+			if (requested.id.id.startsWith("org.jetbrains.kotlin")) {
 				useVersion("2.3.10")
 			}
 		}

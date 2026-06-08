@@ -33,16 +33,16 @@ import coil.compose.AsyncImage
 	val c=Fyan.LC.current
 	// 从缓存恢复或默认 history
 	var tab by remember{mutableStateOf(Prefs.lastTab)}
-	Column(modifier="fs".css().background(c.b)){
+	Column(modifier="fs".css(this).background(c.b)){
 		Row( // 顶部 Tab 栏
-			modifier="fw h56 psb".css().background(c.s).border(0.5.dp,c.ov),
+			modifier="fw h56 psb".css(this).background(c.s).border(0.5.dp,c.ov),
 			verticalAlignment=Alignment.CenterVertically,
 		){
-			Row(modifier="fh e1 sh".css()){
+			Row(modifier="fh e1 sh".css(this)){
 				NAV_TABS.forEach{o->
 					val x=o.id==tab
 					Box(
-						modifier="fh ph10".css()
+						modifier="fh ph10".css(this)
 							.background(if(x)c.p.copy(alpha=0.15f)else androidx.compose.ui.graphics.Color.Transparent)
 							.clickable{
 								tab=o.id
@@ -63,7 +63,7 @@ import coil.compose.AsyncImage
 			}
 		}
 		// 子页面内容区
-		Box(modifier="fw e1".css()){
+		Box(modifier="fw e1".css(this)){
 			key(tab){
 				when(tab){
 					"history"->HistoryScreen(nav,embedded=true)
@@ -88,7 +88,7 @@ import coil.compose.AsyncImage
 		x.screenWidthDp>=600->4 // 折叠手机展开 / 平板
 		else->3 // 手机
 	}
-	Column(modifier="fs".css().background(c.b)){
+	Column(modifier="fs".css(this).background(c.b)){
 		if(!embedded){
 			TopBar(
 				title="历史记录",onBack={nav.popBackStack()},
@@ -96,24 +96,21 @@ import coil.compose.AsyncImage
 			)
 		}else{ // 嵌入模式下保留一个轻量工具栏
 			Row(
-				modifier="fw h40 ph12".css(),
+				modifier="fw h40 ph12".css(this),
 				verticalAlignment=Alignment.CenterVertically,
 				horizontalArrangement=Arrangement.SpaceBetween,
 			){
 				BasicText("历史记录",style=Fyan.TS.copy(color=c.os))
-				IconBtn(
-					label="🗑",onClick={cc=true},
-					modifier="fw32 fh32 c8".css(),
-				)
+				IconBtn(label="🗑",onClick={cc=true},modifier="fw32 fh32 c8".css())
 			}
 		}
 		if(Fyan.history.isEmpty()){
-			Box(modifier="fs".css(),contentAlignment=Alignment.Center){
+			Box(modifier="fs".css(this),contentAlignment=Alignment.Center){
 				BasicText("暂无观看记录",style=Fyan.BM.copy(color=c.os.copy(alpha=0.4f)))
 			}
 		}else{
 			LazyVerticalGrid(
-				modifier="fw e1".css(),
+				modifier="fw".css(),
 				columns=GridCells.Fixed(cs),
 				contentPadding=PaddingValues(12.dp),
 				verticalArrangement=Arrangement.spacedBy(10.dp),
@@ -225,7 +222,7 @@ import coil.compose.AsyncImage
 			}
 		}
 		// 视频宫格
-		Box(modifier="fw e1".css()){
+		Box(modifier="fw e1".css(this)){
 			when{
 				loading->LoadingCenter("加载视频列表…")
 				vs.isEmpty()->Box(modifier="fs".css(),contentAlignment=Alignment.Center){
@@ -314,7 +311,7 @@ fun DetailScreen(nav:NavController,id:String){
 	}
 	Row(modifier="fs".css()){
 		// 左列：播放器 2/3 宽
-		Column(modifier="fh e2".css()){
+		Column(modifier="fh e2".css(this)){
 			Box( // 播放面板（16:9）
 				modifier="fw".css().aspectRatio(16f/9f)
 					.background(androidx.compose.ui.graphics.Color.Black),
@@ -328,7 +325,7 @@ fun DetailScreen(nav:NavController,id:String){
 			}
 			// 集数（水平滚动，单行）
 			LazyRow(
-				modifier="fw e1".css(),
+				modifier="fw".css(),
 				horizontalArrangement=Arrangement.spacedBy(8.dp),
 				contentPadding=PaddingValues(horizontal=10.dp,vertical=8.dp),
 			){
@@ -341,7 +338,7 @@ fun DetailScreen(nav:NavController,id:String){
 			}
 		}
 		// 右列：简介
-		Column(modifier="fh ph16 pv12 e1 sv".css()){
+		Column(modifier="fh ph16 pv12 e1 sv".css(this)){
 			BasicText("简介",style=Fyan.TS.copy(color=c.os.copy(alpha=0.5f)))
 			Spacer(modifier="h6".css())
 			BasicText(d.desc,style=Fyan.BM.copy(color=c.os))
@@ -388,9 +385,9 @@ fun DetailScreen(nav:NavController,id:String){
 					if(i<titles.size){
 						EpisodeBtn(
 							label=titles[i],active=i==current,onClick={onSelect(i)},
-							modifier="fw e1 fh34".css(),
+							modifier="fw e1 fh34".css(this),
 						)
-					}else Spacer(modifier="e1".css())
+					}else Spacer(modifier="e1".css(this))
 				}
 			}
 		}

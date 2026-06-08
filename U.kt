@@ -93,8 +93,7 @@ object Fyan{
 	var logs_y by mutableStateOf(0f)
 
 	fun log(m:String,o:String,c:Char='i'){
-		val t=java.time.LocalTime.now()
-			.format(java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss"))
+		val t=java.time.LocalTime.now().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss"))
 		val x=when(c){
 			'i'->"#2196F3";'u'->"#9C27B0";'e'->"#F44336"
 			's'->"#00BCD4";'n'->"#4CAF50";'w'->"#FF9800"
@@ -109,7 +108,7 @@ object Fyan{
 	@Composable fun LogPanel(){if(logs_fold)LogHide()else LogShow()}
 	@Composable private fun LogHide(){
 		Box(
-			modifier="fw pnb h5 c2.5".css().background(Color(0x80808080)).clickable{logs_fold=false},
+			modifier="fw pnb h5 c2.5".css(this).background(Color(0x80808080)).clickable{logs_fold=false},
 			contentAlignment=Alignment.Center,
 		){BasicText("· · ·  日志  · · ·",style=BS.copy(color=Color.White.copy(alpha=0.7f)))}
 	}
@@ -119,7 +118,7 @@ object Fyan{
 		val maxH=LocalConfiguration.current.screenHeightDp.dp/3
 		val isTv=(LocalConfiguration.current.uiMode and Configuration.UI_MODE_TYPE_MASK)==Configuration.UI_MODE_TYPE_TELEVISION
 		Box(
-			modifier="fw pnb br6,6,0,0 b0.5,808080,0.70 h>${maxH}".css()
+			modifier="fw pnb br6,6,0,0 b0.5,808080,0.70 h>${maxH}".css(this)
 				.offset(y=logs_y.roundToInt().dp).background(Color(0xEB1C1C1E))
 				.pointerInput(Unit){
 					detectDragGestures(
@@ -128,24 +127,23 @@ object Fyan{
 					)
 				}
 		){
-			Column(modifier="fw pv2 ph5".css()){
-				Box(modifier="fw h16".css(),contentAlignment=Alignment.Center){
+			Column(modifier="fw pv2 ph5".css(this)){
+				Box(modifier="fw h16".css(this),contentAlignment=Alignment.Center){
 					Box(
-						modifier="fw40 fh3 c2".css().background(Color(0x66808080))
+						modifier="fw40 fh3 c2".css(this).background(Color(0x66808080))
 							.clickable(enabled=isTv){logs_fold=true}
 							.pointerInput(!isTv){if(!isTv) detectTapGestures(onTap={logs_fold=true})}
 					)
 				}
 				Row(
-					modifier="fw ph4 pv2".css(),
+					modifier="fw ph4 pv2".css(this),
 					horizontalArrangement=Arrangement.SpaceBetween,
 					verticalAlignment=Alignment.CenterVertically,
 				){
 					BasicText("日志 · ${logs.size}条",
 						style=BS.copy(color=Color(0xFF9E9E9E),fontFamily=FontFamily.Monospace))
 					Box(
-						modifier="c4".css().background(Color(0x33F44336))
-							.clickable{log_clear()}.then("ph8 pv2".css())
+						modifier="ph8 pv2 c4".css(this).background(Color(0x33F44336)).clickable{log_clear()}
 					){BasicText("清空",style=BS.copy(color=Color(0xFFF44336)))}
 				}
 				LazyColumn(state=lazy,modifier="fw pt4".css()){
@@ -156,21 +154,20 @@ object Fyan{
 						val hex=if(dot > 0) parts[0].substring(dot+1) else "#9E9E9E"
 						val ec=try{Color(AC.parseColor(hex))}catch(_:Exception){Color(0xFF9E9E9E)}
 						Row(
-							modifier="fw pt1".css(),
+							modifier="fw pt1".css(this),
 							verticalAlignment=Alignment.Top,
 							horizontalArrangement=Arrangement.SpaceBetween,
 						){
 							BasicText(
-								parts.getOrElse(1){""},
+								parts.getOrElse(1){""},modifier="e1 pe4".css(this),
 								style=BS.copy(color=ec,lineHeight=1.2.em,fontFamily=FontFamily.Monospace),
-								modifier="e1 pe4".css(),
 							)
 							Box(
-								modifier="fw24 fh24 c".css().clickable{log_remove(id)},
+								modifier="fw24 fh24 c".css(this).clickable{log_remove(id)},
 								contentAlignment=Alignment.Center,
 							){BasicText("✕",style=BS.copy(color=Color(0xFF9E9E9E)))}
 						}
-						Box(modifier="fw h0.5".css().background(Color(0x1A808080)))
+						Box(modifier="fw h0.5".css(this).background(Color(0x1A808080)))
 					}
 				}
 			}
@@ -207,21 +204,20 @@ fun TopBar(
 ){
 	val c=Fyan.LC.current
 	Row(
-		modifier="fw h56 ph12 psb".css()
-			.background(c.s)
-			.border(0.5.dp,c.ov),
+		modifier="fw h56 ph12 psb".css(this)
+			.background(c.s).border(0.5.dp,c.ov),
 		verticalAlignment=Alignment.CenterVertically,
 		horizontalArrangement=Arrangement.SpaceBetween,
 	){
 		Row(verticalAlignment=Alignment.CenterVertically){
 			if(onBack!=null){
 				IconBtn(label="←",modifier="fw36 fh36 c8".css().background(c.sv),onClick=onBack)
-				if(title.isNotEmpty()) Spacer(modifier="fw12".css())
+				if(title.isNotEmpty())Spacer(modifier="fw12".css())
 			}
 			if(title.isNotEmpty())
 				BasicText(title,
 					style=Fyan.TL.copy(color=c.os),maxLines=1,
-					overflow=TextOverflow.Ellipsis,modifier="e1".css())
+					overflow=TextOverflow.Ellipsis,modifier="e1".css(this))
 		}
 		Row(verticalAlignment=Alignment.CenterVertically){end()}
 	}
@@ -245,7 +241,7 @@ fun IconBtn(
 @Composable
 fun LoadingCenter(text:String="加载中…"){
 	val c=Fyan.LC.current
-	Box(modifier="fs".css(),contentAlignment=Alignment.Center){
+	Box(modifier="fs".css(this),contentAlignment=Alignment.Center){
 		Column(horizontalAlignment=Alignment.CenterHorizontally){
 			BasicText("◌",style=TextStyle(fontSize=32.sp,color=c.p))
 			Spacer(modifier="h8".css())
@@ -279,23 +275,16 @@ fun VideoCard(
 			)
 	){
 		Column{
-			Box(
-				modifier="fw".css()
-					.aspectRatio(3f / 4f)
-					.background(c.s)
-			){
+			Box(modifier="fw r3x4".css(this).background(c.s)){
 				AsyncImage(
-					model=poster,
-					contentDescription=title,
-					contentScale=ContentScale.Crop,
-					modifier="fs".css(),
+					modifier="fs".css(),model=poster,
+					contentDescription=title,contentScale=ContentScale.Crop,
 				)
 			}
-			Column(modifier="fw ph8 pv6".css()){
+			Column(modifier="fw ph8 pv6".css(this)){
 				BasicText(title,
 					style=Fyan.BS.copy(color=c.os),
-					maxLines=2,
-					overflow=TextOverflow.Ellipsis)
+					maxLines=2,overflow=TextOverflow.Ellipsis)
 				if(sub.isNotEmpty()){
 					Spacer(modifier="h2".css())
 					BasicText(sub,style=Fyan.BS.copy(color=c.p),maxLines=1)
@@ -316,29 +305,25 @@ fun ConfirmDialog(
 ){
 	val c=Fyan.LC.current
 	Box(
-		modifier="fs".css().background(Color(0x80000000)),
+		modifier="fs".css(this).background(Color(0x80000000)),
 		contentAlignment=Alignment.Center,
 	){
 		Column(
-			modifier="fw300 c12".css()
-				.background(c.s)
-				.border(0.5.dp,c.ov,RoundedCornerShape(12.dp))
-				.then("ph20 pv20".css()),
+			modifier="fw300 ph20 pv20 c12".css(this)
+				.background(c.s).border(0.5.dp,c.ov,RoundedCornerShape(12.dp)),
 			horizontalAlignment=Alignment.CenterHorizontally,
 		){
 			BasicText(text,style=Fyan.BM.copy(color=c.os,textAlign=TextAlign.Center))
 			Spacer(modifier="h16".css())
 			Row(horizontalArrangement=Arrangement.spacedBy(12.dp)){
 				Box(
-					modifier="fw ph20 pv10 c8".css()
-						.background(c.sv)
-						.clickable(onClick=onDismiss),
+					modifier="fw ph20 pv10 c8".css(this)
+						.background(c.sv).clickable(onClick=onDismiss),
 					contentAlignment=Alignment.Center,
 				){BasicText(cancelText,style=Fyan.BM.copy(color=c.os))}
 				Box(
-					modifier="fw ph20 pv10 c8".css()
-						.background(c.p.copy(alpha=0.15f))
-						.clickable(onClick=onConfirm),
+					modifier="fw ph20 pv10 c8".css(this)
+						.background(c.p.copy(alpha=0.15f)).clickable(onClick=onConfirm),
 					contentAlignment=Alignment.Center,
 				){BasicText(confirmText,style=Fyan.BM.copy(color=c.p))}
 			}
@@ -356,19 +341,18 @@ fun FilterTabRow(
 ){
 	val c=Fyan.LC.current
 	Row(
-		modifier="fw h28".css().background(c.s),
+		modifier="fw h28".css(this).background(c.s),
 		verticalAlignment=Alignment.CenterVertically,
 	){
 		Row(
-			modifier="fh sh e1".css(),
+			modifier="fh sh e1".css(this),
 			verticalAlignment=Alignment.CenterVertically,
 		){
 			tabs.forEach{(id,label)->
 				val active=id==selected
 				Box(
-					modifier="fh ph2".css()
-						.background(if(active)c.p.copy(alpha=0.15f)else Color.Transparent)
-						.clickable{onSelect(id)},
+					modifier="fh ph2".css(this).clickable{onSelect(id)}
+						.background(if(active)c.p.copy(alpha=0.15f)else Color.Transparent),
 					contentAlignment=Alignment.Center,
 				){
 					BasicText(
@@ -535,7 +519,8 @@ class CW(val m:Modifier,val w:Float?=null,val a:Alignment?=null,val f:Boolean=tr
 	}
 	return CW(m,w,a,f)
 }
-@Composable fun ColumnScope.css(s:String)=pcss(s).let{var m=it.m;it.w?.let{w->m=m.weight(w,it.f)};m}
-@Composable fun RowScope.css(s:String)=pcss(s).let{var m=it.m;it.w?.let{w->m=m.weight(w,it.f)};it.a?.let{a->m=m.align(a)};m}
-@Composable fun BoxScope.css(s:String)=pcss(s).let{var m=it.m;it.a?.let{a->m=m.align(a)};m}
-@Composable fun css(s:String)=pcss(s).m
+
+@Composable fun String.css()=remember(this){pcss(this).m}
+@Composable fun String.css(s:ColumnScope)=remember(this,s){pcss(this).let{var m=it.m;it.w?.let{w->m=m.weight(w,it.f)};m}}
+@Composable fun String.css(s:RowScope)=remember(this,s){pcss(this).let{var m=it.m;it.w?.let{w->m=m.weight(w,it.f)};it.a?.let{a->m=m.align(a)};m}}
+@Composable fun String.css(s:BoxScope)=remember(this,s){pcss(this).let{var m=it.m;it.a?.let{a->m=m.align(a)};m}}

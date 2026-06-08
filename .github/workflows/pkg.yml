@@ -46,23 +46,23 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
 
-      - name: 缓存处理
-        uses: actions/cache@v4
-        with:
-          path: gradle/wrapper/dists
-          key: ${{ runner.os }}-gradle-wrapper-8.10.2
-
-      - name: 检查缓存
-        run: |
-          mkdir -p gradle/wrapper/dists/gradle-8.10.2-bin/
-          wget -q -nc -P gradle/wrapper/dists/gradle-8.10.2-bin/ https://services.gradle.org/distributions/gradle-8.10.2-bin.zip
-
       - name: 整理配置
         run: chmod +x ./.sh;./.sh
 
       - name: 解密签名
         run: |
           echo "${{ secrets.KS_B64 }}" | base64 --decode > "$GITHUB_WORKSPACE/fyan.keystore"
+
+      - name: 缓存处理
+        uses: actions/cache@v4
+        with:
+          path: gradle/wrapper/dists
+          key: fyan-gradle-wrapper-8.10.2
+
+      - name: 检查缓存
+        run: |
+          mkdir -p gradle/wrapper/dists/gradle-8.10.2-bin/
+          wget -q -nc -P gradle/wrapper/dists/gradle-8.10.2-bin/ https://services.gradle.org/distributions/gradle-8.10.2-bin.zip
 
       - name: 执行构建
         env:

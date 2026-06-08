@@ -535,6 +535,7 @@ class CW(val m:Modifier,val w:Float?=null,val a:Alignment?=null,val f:Boolean=tr
 	}
 	return CW(m,w,a,f)
 }
+@Composable fun ColumnScope.css(s:String)=pcss(s).let{var m=it.m;it.w?.let{w->m=m.weight(w,it.f)};m}
 @Composable fun RowScope.css(s:String)=pcss(s).let{var m=it.m;it.w?.let{w->m=m.weight(w,it.f)};it.a?.let{a->m=m.align(a)};m}
 @Composable fun BoxScope.css(s:String)=pcss(s).let{var m=it.m;it.a?.let{a->m=m.align(a)};m}
 @Composable fun css(s:String)=pcss(s).m

@@ -95,11 +95,11 @@ object FN{ // 全局控制单例
 							val id=if(dt>0)pt[0].substring(0,dt) else pt[0]
 							val hx=if(dt>0)pt[0].substring(dt+1) else "#9E9E9E"
 							val ec=try{Color(AC.parseColor(hx))}catch(_:Exception){Color(0xFF9E9E9E)}
-							Row(modifier="fw".css(),verticalAlignment=Alignment.Top,horizontalArrangement=Arrangement.SpaceBetween){
-								BasicText(pt.getOrElse(1){""},modifier="e1 pe4".css(this),style=BS.copy(color=ec,lineHeight=1.2.em,fontFamily=FontFamily.Monospace))
-								Box(modifier="w20 h20 c".css().clickable{lr(id)},contentAlignment=Alignment.Center){BasicText("✕",style=BS.copy(color=Color(0xFF9E9E9E)))}
-							}
 							Box(modifier="fw h0.5".css().background(Color(0x1A808080)))
+							Row(modifier="fw".css(),verticalAlignment=Alignment.Top,horizontalArrangement=Arrangement.SpaceBetween){
+								BasicText(pt.getOrElse(1){""},modifier="e1 pe4".css(this),style=BS.copy(color=ec,lineHeight=1.1.em,fontFamily=FontFamily.Monospace))
+								Box(modifier="w18 h18 c".css().clickable{lr(id)},contentAlignment=Alignment.Center){BasicText("✕",style=BS.copy(color=Color(0xFF9E9E9E)))}
+							}
 						}
 					}
 				}

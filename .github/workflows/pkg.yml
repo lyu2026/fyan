@@ -86,12 +86,21 @@ jobs:
       - name: 更新明细
         id: commit
         run: |
-          cm=$(git log --pretty=format:"%s" | while read m; do
-            if [ -n "$m" ] && [ "$m" != "." ] && [ "$m" != " " ]; then
-              echo "$m"
-              break
-            fi
-          done)
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          if [ -n "$PREV_TAG" ]; then
+            cm=$(git log --pretty=format:"%s" "$PREV_TAG..HEAD" | while read m; do
+              if [ -n "$m" ] && [ "$m" != "." ] && [ "$m" != " " ]; then
+                echo "$m"
+              fi
+            done)
+          else
+            cm=$(git log --pretty=format:"%s" | while read m; do
+              if [ -n "$m" ] && [ "$m" != "." ] && [ "$m" != " " ]; then
+                echo "$m"
+                break
+              fi
+            done)
+          fi
           if [ -z "$cm" ]; then
             cm="暂未补充"
           fi

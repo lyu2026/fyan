@@ -48,11 +48,13 @@ object FN{ // 全局控制单例
 	data class tc(val p:Color,val b:Color,val s:Color,val sv:Color,val o:Color,val os:Color,val ov:Color) // 主题色彩配置
 	fun cl(dk:Boolean=true)=if(dk) tc(p=Color(0xFF8AB4F8),b=Color(0xFF1C1C1E),s=Color(0xFF2C2C2E),sv=Color(0xFF3A3A3C),o=Color(0xFF938F99),os=Color(0xFFE6E1E5),ov=Color(0xFF49454F)) else tc(p=Color(0xFF1A73E8),b=Color(0xFFF5F5F5),s=Color(0xFFFFFFFF),sv=Color(0xFFE8EAF6),o=Color(0xFFCAC4D0),os=Color(0xFF1C1B1F),ov=Color(0xFFE7E0EC)) // 明暗色彩分发
 	val LC=staticCompositionLocalOf{cl()} // 全局主题本地提供变量
+
 	val TL get()=TextStyle(fontSize=22.sp,fontWeight=FontWeight.W600,lineHeight=28.sp) // 大号字形
 	val TM get()=TextStyle(fontSize=16.sp,fontWeight=FontWeight.W500,lineHeight=24.sp) // 中号导航字形
 	val TS get()=TextStyle(fontSize=14.sp,fontWeight=FontWeight.W500,lineHeight=20.sp) // 小号强调字形
 	val BM get()=TextStyle(fontSize=14.sp,fontWeight=FontWeight.W400,lineHeight=20.sp) // 标准字形
 	val BS get()=TextStyle(fontSize=12.sp,fontWeight=FontWeight.W400,lineHeight=16.sp) // 极小脚注字形
+
 	val lg=mutableStateListOf<String>() // 运行日志队列
 	var lf by mutableStateOf(false) // 日志是否折叠
 	var lh by mutableStateOf(false) // 日志是否隐藏

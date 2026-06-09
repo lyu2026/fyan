@@ -290,7 +290,15 @@ import kotlinx.coroutines.launch
 		val cfg=LocalConfiguration.current
 		val tv=(cfg.uiMode and Configuration.UI_MODE_TYPE_MASK)==Configuration.UI_MODE_TYPE_TELEVISION
 		var fs by remember{mutableStateOf(false)}
-		val player=remember{ExoPlayer.Builder(c).build().apply{playWhenReady=true;addListener(object:Player.Listener{override fun onPlaybackStateChanged(s:Int){if(s==Player.STATE_READY)FN.lg("VP:Ready","可播放",'n')}})}}
+		var xo by remember{mutableStateOf(0f)}
+		val player=remember{ExoPlayer.Builder(c).build().apply{
+			playWhenReady=true
+			addListener(object:com.google.android.exoplayer2.Player.Listener{
+				override fun onPlaybackStateChanged(s:Int){
+					if(s==com.google.android.exoplayer2.Player.STATE_READY)FN.lg("VP:Ready","可播放",'n')
+				}
+			})
+		}}
 		DisposableEffect(player){onDispose{player.release()}}
 		LaunchedEffect(sc){
 			FN.lg("VideoPlay",sc,'u')
@@ -303,8 +311,8 @@ import kotlinx.coroutines.launch
 		val h=if(fs)cfg.screenHeightDp.dp else Dp.Unspecified
 		val mo=if(fs)"w${w.value} h${h.value} pnb pim".css().offset(x=if(fs)xo.roundToInt().dp else 0.dp)else"fs".css()
 		Box(modifier=mo.pointerInput(fs){if(fs)detectDragGestures(
-			onDragEnd={if(xo>80f)fs=false;xo=0f},
-			onDrag={ch,d->ch.consume();if(d.x>0)xo+=d.x else if(xo>0)xo=(xo+d.x).coerceAtLeast(0f)}
+			onDragEnd={if(xo>80f){fs=false;xo=0f}else xo=0f},
+			onDrag={ch:androidx.compose.ui.input.pointer.PointerInputChange,d:androidx.compose.ui.geometry.Offset->ch.consume();if(d.x>0)xo+=d.x else if(xo>0)xo=(xo+d.x).coerceAtLeast(0f)}
 		)}.clickable{if(!tv)fs=!fs}){
 			AndroidView(factory={PlayerView(c).apply{this.player=player;useController=fs}},modifier="fs".css())
 			if(fs&&!tv)Box(modifier="w32 h32 c mt6 ms6".css().background(androidx.compose.ui.graphics.Color.Black.copy(alpha=0.5f)).clickable{fs=false}){BasicText("✕",style=FN.BM.copy(color=androidx.compose.ui.graphics.Color.White))}

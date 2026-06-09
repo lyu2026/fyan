@@ -54,7 +54,7 @@ jobs:
         if: steps.setup-java.outputs.cache-hit != 'true'
         run: |
           wget -q -nc -P ./gradle/wrapper/ https://services.gradle.org/distributions/gradle-8.14.5-bin.zip
-          ./gradlew help -Dorg.gradle.welcome.provider.enabled=false
+          ./gradlew help -q
 
       - name: 解密签名
         run: echo "${{ secrets.KS_B64 }}" | base64 --decode > "$GITHUB_WORKSPACE/fyan.keystore"

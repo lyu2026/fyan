@@ -74,7 +74,7 @@ jobs:
           KS_PSWD: ${{ secrets.KS_PSWD }}
           K_ALIAS: ${{ secrets.K_ALIAS }}
           K_PSWD: ${{ secrets.K_PSWD }}
-        run: set -o pipefail ; ./gradlew :app:assembleRelease --console=plain -Dorg.gradle.welcome=never -Dorg.gradle.internal.logging.warnings=false 2>&1 | grep -v "R8: An error occurred when parsing kotlin metadata" || true
+        run: ./gradlew :app:assembleRelease --console=plain -Dorg.gradle.welcome=never -Dorg.gradle.internal.logging.warnings=false
 
       - name: 提取产物
         id: copy

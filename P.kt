@@ -301,7 +301,7 @@ import java.util.UUID
 		val cfg=LocalConfiguration.current
 		val tv=(cfg.uiMode and Configuration.UI_MODE_TYPE_MASK)==Configuration.UI_MODE_TYPE_TELEVISION // TV设备检测
 		val isLandscape=cfg.orientation==Configuration.ORIENTATION_LANDSCAPE // 当前是否横屏
-		var fs by remember{mutablestateOf(isLandscape)} // 全屏状态，横屏时初始为true
+		var fs by remember{mutableStateOf(isLandscape)} // 全屏状态，横屏时初始为true
 		var xo by remember{mutableStateOf(0f)} // 全屏侧滑位移量
 		val listener=object:Player.Listener{ // 播放器状态监听
 			override fun onPlaybackStateChanged(s:Int){

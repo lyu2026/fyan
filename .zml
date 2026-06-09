@@ -89,10 +89,6 @@ dependencies {
 	// 开发工具
 	debugImplementation("androidx.compose.ui:ui-tooling")
 }
-tasks.withType<com.android.build.gradle.internal.tasks.R8Task> {
-	// 抑制 R8 警告
-	outputs.upToDateWhen { false }
-}
 
 @settings.gradle.kts
 pluginManagement {

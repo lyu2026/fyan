@@ -300,7 +300,8 @@ import java.util.UUID
 		val c=LocalContext.current
 		val cfg=LocalConfiguration.current
 		val tv=(cfg.uiMode and Configuration.UI_MODE_TYPE_MASK)==Configuration.UI_MODE_TYPE_TELEVISION // TV设备检测
-		var fs by remember{mutableStateOf(false)} // 全屏状态
+		val isLandscape=cfg.orientation==Configuration.ORIENTATION_LANDSCAPE // 当前是否横屏
+		var fs by remember{mutablestateOf(isLandscape)} // 全屏状态，横屏时初始为true
 		var xo by remember{mutableStateOf(0f)} // 全屏侧滑位移量
 		val listener=object:Player.Listener{ // 播放器状态监听
 			override fun onPlaybackStateChanged(s:Int){
@@ -309,11 +310,16 @@ import java.util.UUID
 		}
 		val player=remember{ExoPlayer.Builder(c).build().apply{playWhenReady=true;addListener(listener)}}
 		DisposableEffect(player){onDispose{player.release()}} // 组件销毁时释放播放器
-		DisposableEffect(fs){ // 全屏时强制横屏，退出全屏时恢复竖屏
+		LaunchedEffect(fs){ // 全屏状态变化时切换屏幕方向
 			val act=c as? android.app.Activity
-			if(fs&&!tv)act?.requestedOrientation=ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-			else act?.requestedOrientation=ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-			onDispose{act?.requestedOrientation=ActivityInfo.SCREEN_ORIENTATION_PORTRAIT}
+			if(fs&&!tv&&!isLandscape)act?.requestedOrientation=ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+			else if(!fs&&!tv&&isLandscape)act?.requestedOrientation=ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+		}
+		DisposableEffect(Unit){ // 组件销毁时恢复竖屏
+			onDispose{
+				val act=c as? android.app.Activity
+				act?.requestedOrientation=ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+			}
 		}
 		LaunchedEffect(sc){ // 根据视频源类型加载媒体
 			FN.lg("VideoPlay",sc,'u')
@@ -322,15 +328,15 @@ import java.util.UUID
 			player.setMediaSource(factory.createMediaSource(MediaItem.fromUri(Uri.parse(sc))))
 			player.prepare()
 		}
-		Box(modifier=if(fs)"w${cfg.screenWidthDp} h${cfg.screenHeightDp} pnb pim".css().offset(x=xo.dp)else"fs".css() // 全屏时全尺寸+偏移，非全屏时填满父容器
-			.pointerInput(fs){if(fs)detectDragGestures( // 全屏时支持侧滑手势
+		Box(modifier=if(isLandscape)"w${cfg.screenWidthDp} h${cfg.screenHeightDp} pnb pim".css().offset(x=xo.dp)else"fs".css() // 横屏时全尺寸+偏移，竖屏时填满父容器
+			.pointerInput(isLandscape){if(isLandscape)detectDragGestures( // 横屏时支持侧滑手势
 				onDragEnd={if(xo>80f){fs=false;xo=0f}else xo=0f}, // 右滑超过80dp退出全屏
 				onDrag={ch:PointerInputChange,d:Offset->ch.consume();xo=if(d.x>0)xo+d.x else if(xo>0)maxOf(xo+d.x,0f)else 0f} // 仅允许向右滑动
 			)}
 			.clickable{if(!tv)fs=!fs} // 非TV设备点击切换全屏
 		){
-			AndroidView(factory={PlayerView(c).apply{this.player=player;useController=fs}},modifier="fs".css()) // 全屏时显示控制器
-			if(fs&&!tv)Box(modifier="w32 h32 c mt6 ms6".css().background(Color.Black.copy(alpha=0.5f)).clickable{fs=false}){BasicText("✕",style=FN.BM.copy(color=Color.White))} // 全屏关闭按钮
+			AndroidView(factory={PlayerView(c).apply{this.player=player;useController=isLandscape}},modifier="fs".css()) // 横屏时显示控制器
+			if(isLandscape&&!tv)Box(modifier="w32 h32 c mt6 ms6".css().background(Color.Black.copy(alpha=0.5f)).clickable{fs=false}){BasicText("✕",style=FN.BM.copy(color=Color.White))} // 横屏关闭按钮
 		}
 	}
 }

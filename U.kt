@@ -68,7 +68,7 @@ object FN{ // 全局控制单例
 	fun lc()=lg.clear() // 清除全部日志
 	fun lr(i:String)=lg.removeAll{it.startsWith(i)} // 删除单条日志
 	@Composable fun LP(){if(lf)LH()else LS()}
-	@Composable private fun LH(){Box(modifier="fw0.5 h3 pnb pb6 c2.5".css().background(Color(0x80808080)).clickable{lf=false;ly=0f},contentAlignment=Alignment.Center){}}
+	@Composable private fun LH(){Box(modifier="fw0.5 h3 pb12 c2.5".css().background(Color(0x80808080)).clickable{lf=false;ly=0f},contentAlignment=Alignment.Center){}}
 	@Composable private fun LS(){
 		val ls=rememberLazyListState()
 		LaunchedEffect(lg.lastOrNull()){if(lg.isNotEmpty())ls.animateScrollToItem(lg.size-1)}

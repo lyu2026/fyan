@@ -72,8 +72,8 @@ object FN{ // 全局控制单例
 		LaunchedEffect(lg.lastOrNull()){if(lg.isNotEmpty())ls.animateScrollToItem(lg.size-1)}
 		val tv=(LocalConfiguration.current.uiMode and Configuration.UI_MODE_TYPE_MASK)==Configuration.UI_MODE_TYPE_TELEVISION
 		val h=androidx.compose.ui.platform.LocalConfiguration.current.screenHeightDp/3
-		Box(modifier="fw h<$h br6,6,0,0 b1,808080,0.50 g1C1C1E.0.88".css().offset(y=ly.roundToInt().dp).pointerInput(Unit){detectDragGestures(onDragEnd={if(ly>100f){lf=true;ly=0f}else ly=0f},onDrag={ch,d->ch.consume();if(ly+d.y>=0f)ly+=d.y})}){
-			Column(modifier="fw pv2 ph5 pnb".css()){
+		Box(modifier="fw h<$h pnb br6,6,0,0 b1,808080,0.50 g1C1C1E.0.88".css().offset(y=ly.roundToInt().dp).pointerInput(Unit){detectDragGestures(onDragEnd={if(ly>100f){lf=true;ly=0f}else ly=0f},onDrag={ch,d->ch.consume();if(ly+d.y>=0f)ly+=d.y})}){
+			Column(modifier="fw pv2 ph5".css()){
 				Box(modifier="fw".css(),contentAlignment=Alignment.Center){Box(modifier="fw0.25 h3 c2".css().background(Color(0x66808080)).clickable(enabled=tv){lf=true;ly=0f}.pointerInput(!tv){if(!tv)detectTapGestures(onTap={lf=true;ly=0f})})}
 				Row(modifier="fw pb2".css(),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically){
 					BasicText("日志 · ${lg.size}条",style=BS.copy(color=Color(0xFF9E9E9E),fontFamily=FontFamily.Monospace))

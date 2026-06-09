@@ -72,25 +72,35 @@ object FN{ // 全局控制单例
 		LaunchedEffect(lg.lastOrNull()){if(lg.isNotEmpty())ls.animateScrollToItem(lg.size-1)}
 		val tv=(LocalConfiguration.current.uiMode and Configuration.UI_MODE_TYPE_MASK)==Configuration.UI_MODE_TYPE_TELEVISION
 		val h=androidx.compose.ui.platform.LocalConfiguration.current.screenHeightDp/3
-		Box(modifier="fw h<$h pnb br6,6,0,0 b1,808080,0.50 g1C1C1E.0.88".css().offset(y=ly.roundToInt().dp).pointerInput(Unit){detectDragGestures(onDragEnd={if(ly>100f){lf=true;ly=0f}else ly=0f},onDrag={ch,d->ch.consume();if(ly+d.y>=0f)ly+=d.y})}){
-			Column(modifier="fw pv2 ph5".css()){
-				Box(modifier="fw".css(),contentAlignment=Alignment.Center){Box(modifier="fw0.25 h3 c2".css().background(Color(0x66808080)).clickable(enabled=tv){lf=true;ly=0f}.pointerInput(!tv){if(!tv)detectTapGestures(onTap={lf=true;ly=0f})})}
-				Row(modifier="fw pb2".css(),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically){
-					BasicText("日志 · ${lg.size}条",style=BS.copy(color=Color(0xFF9E9E9E),fontFamily=FontFamily.Monospace))
-					Box(modifier="p2 c4".css().clickable{lc()}){BasicText("清空",style=BS.copy(color=Color(0xFFF44336)))}
-				}
-				LazyColumn(state=ls,modifier="fw pt4".css()){
-					items(lg){ey->
-						val pt=ey.split("●",limit=2)
-						val dt=pt[0].lastIndexOf('.')
-						val id=if(dt>0)pt[0].substring(0,dt) else pt[0]
-						val hx=if(dt>0)pt[0].substring(dt+1) else "#9E9E9E"
-						val ec=try{Color(AC.parseColor(hx))}catch(_:Exception){Color(0xFF9E9E9E)}
-						Row(modifier="fw".css(),verticalAlignment=Alignment.Top,horizontalArrangement=Arrangement.SpaceBetween){
-							BasicText(pt.getOrElse(1){""},modifier="e1 pe4".css(this),style=BS.copy(color=ec,lineHeight=1.2.em,fontFamily=FontFamily.Monospace))
-							Box(modifier="w20 h20 c".css().clickable{lr(id)},contentAlignment=Alignment.Center){BasicText("✕",style=BS.copy(color=Color(0xFF9E9E9E)))}
+		Box(
+			modifier="fw h<$h pnb".css().offset(y=ly.roundToInt().dp)
+				.pointerInput(Unit){detectDragGestures(
+					onDragEnd={
+						if(ly>100f){lf=true;ly=0f}else ly=0f
+					},
+					onDrag={ch,d->ch.consume();if(ly+d.y>=0f)ly+=d.y}
+				)}
+		){
+			Box(modifier="fw br6,6,0,0 b1,808080,0.50 g1C1C1E.0.88".css()){
+				Column(modifier="fw pv2 ph5".css()){
+					Box(modifier="fw".css(),contentAlignment=Alignment.Center){Box(modifier="fw0.25 h3 c2".css().background(Color(0x66808080)).clickable(enabled=tv){lf=true;ly=0f}.pointerInput(!tv){if(!tv)detectTapGestures(onTap={lf=true;ly=0f})})}
+					Row(modifier="fw pb2".css(),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically){
+						BasicText("日志 · ${lg.size}条",style=BS.copy(color=Color(0xFF9E9E9E),fontFamily=FontFamily.Monospace))
+						Box(modifier="p2 c4".css().clickable{lc()}){BasicText("清空",style=BS.copy(color=Color(0xFFF44336)))}
+					}
+					LazyColumn(state=ls,modifier="fw pt4".css()){
+						items(lg){ey->
+							val pt=ey.split("●",limit=2)
+							val dt=pt[0].lastIndexOf('.')
+							val id=if(dt>0)pt[0].substring(0,dt) else pt[0]
+							val hx=if(dt>0)pt[0].substring(dt+1) else "#9E9E9E"
+							val ec=try{Color(AC.parseColor(hx))}catch(_:Exception){Color(0xFF9E9E9E)}
+							Row(modifier="fw".css(),verticalAlignment=Alignment.Top,horizontalArrangement=Arrangement.SpaceBetween){
+								BasicText(pt.getOrElse(1){""},modifier="e1 pe4".css(this),style=BS.copy(color=ec,lineHeight=1.2.em,fontFamily=FontFamily.Monospace))
+								Box(modifier="w20 h20 c".css().clickable{lr(id)},contentAlignment=Alignment.Center){BasicText("✕",style=BS.copy(color=Color(0xFF9E9E9E)))}
+							}
+							Box(modifier="fw h0.5".css().background(Color(0x1A808080)))
 						}
-						Box(modifier="fw h0.5".css().background(Color(0x1A808080)))
 					}
 				}
 			}
@@ -152,11 +162,11 @@ fun TB(tt:String="",ob:(()->Unit)?=null,ed:@Composable RowScope.()->Unit={}){
 	val cc=FN.LC.current
 	Box(modifier="fs".css().background(Color(0x80000000)),contentAlignment=Alignment.Center){
 		Column(modifier="w300 p20 c4".css().background(cc.s).border(0.1.dp,cc.ov,RoundedCornerShape(4.dp)),horizontalAlignment=Alignment.CenterHorizontally){
-			Spacer(modifier="fw h12".css())
+			Spacer(modifier="fw h18".css())
 			BasicText(tt,style=FN.BM.copy(color=cc.os,textAlign=TextAlign.Center))
-			Row(modifier="fw pt16 pb8".css(),horizontalArrangement=Arrangement.spacedBy(10.dp)){
-				Box(modifier="fw0.5 h24 ph10 pv6 c2".css().background(cc.sv).clickable(onClick=od),contentAlignment=Alignment.Center){BasicText(at,style=FN.BM.copy(color=cc.os))}
-				Box(modifier="fw h24 ph10 pv6 c2".css().background(cc.p.copy(alpha=0.15f)).clickable(onClick=oc),contentAlignment=Alignment.Center){BasicText(ct,style=FN.BM.copy(color=cc.os))}
+			Row(modifier="fw pt20 pb8".css(),horizontalArrangement=Arrangement.spacedBy(10.dp)){
+				Box(modifier="fw0.42 h32 ph10 c2".css().background(cc.sv).clickable(onClick=od),contentAlignment=Alignment.Center){BasicText(at,style=FN.BM.copy(color=cc.os))}
+				Box(modifier="fw h32 ph10 c2".css().background(cc.p.copy(alpha=0.15f)).clickable(onClick=oc),contentAlignment=Alignment.Center){BasicText(ct,style=FN.BM.copy(color=cc.os))}
 			}
 		}
 	}

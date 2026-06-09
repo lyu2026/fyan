@@ -278,6 +278,40 @@ import kotlinx.coroutines.launch
 	}
 }
 
+@Composable private fun VP(pt:String,sc:String,playing:Boolean,onPlay:()->Unit){
+	val cc=FN.LC.current
+	if(!playing){
+		Box(modifier="fs".css().clickable{onPlay()},contentAlignment=Alignment.Center){
+			AsyncImage(model=pt,contentDescription="封面",contentScale=ContentScale.Fit,modifier="fs".css())
+			Box(modifier="w56 h56 c".css().background(androidx.compose.ui.graphics.Color.Black.copy(alpha=0.5f)),contentAlignment=Alignment.Center){BasicText("▶",style=FN.TL.copy(color=androidx.compose.ui.graphics.Color.White))}
+		}
+	}else{
+		val c=LocalContext.current
+		val cfg=LocalConfiguration.current
+		val tv=(cfg.uiMode and Configuration.UI_MODE_TYPE_MASK)==Configuration.UI_MODE_TYPE_TELEVISION
+		var fs by remember{mutableStateOf(false)}
+		val player=remember{ExoPlayer.Builder(c).build().apply{playWhenReady=true;addListener(object:Player.Listener{override fun onPlaybackStateChanged(s:Int){if(s==Player.STATE_READY)FN.lg("VP:Ready","可播放",'n')}})}}
+		DisposableEffect(player){onDispose{player.release()}}
+		LaunchedEffect(sc){
+			FN.lg("VideoPlay",sc,'u')
+			val factory=if(sc.contains(".m3u8"))HlsMediaSource.Factory(DefaultHttpDataSource.Factory())
+			else ProgressiveMediaSource.Factory(DefaultHttpDataSource.Factory())
+			player.setMediaSource(factory.createMediaSource(MediaItem.fromUri(Uri.parse(sc))))
+			player.prepare()
+		}
+		val w=if(fs)cfg.screenWidthDp.dp else Dp.Unspecified
+		val h=if(fs)cfg.screenHeightDp.dp else Dp.Unspecified
+		val mo=if(fs)"w${w.value} h${h.value} pnb pim".css().offset(x=if(fs)xo.roundToInt().dp else 0.dp)else"fs".css()
+		Box(modifier=mo.pointerInput(fs){if(fs)detectDragGestures(
+			onDragEnd={if(xo>80f)fs=false;xo=0f},
+			onDrag={ch,d->ch.consume();if(d.x>0)xo+=d.x else if(xo>0)xo=(xo+d.x).coerceAtLeast(0f)}
+		)}.clickable{if(!tv)fs=!fs}){
+			AndroidView(factory={PlayerView(c).apply{this.player=player;useController=fs}},modifier="fs".css())
+			if(fs&&!tv)Box(modifier="w32 h32 c mt6 ms6".css().background(androidx.compose.ui.graphics.Color.Black.copy(alpha=0.5f)).clickable{fs=false}){BasicText("✕",style=FN.BM.copy(color=androidx.compose.ui.graphics.Color.White))}
+		}
+	}
+}
+/*
 @Composable private fun VP(pt:String,sc:String,playing:Boolean,onPlay:()->Unit){ // VP 播放器核心组件
 	val cc=FN.LC.current
 	if(!playing){
@@ -299,3 +333,4 @@ import kotlinx.coroutines.launch
 		AndroidView(factory={PlayerView(c).apply{this.player=player}},modifier="fs".css())
 	}
 }
+*/

@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.RectangleShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -293,7 +294,7 @@ class CW(val m:Modifier,val w:Float?=null,val a:Alignment?=null,val f:Boolean=tr
 						val rr=pt.getOrNull(3)?.toDoubleOrNull()?.dp?:0.dp // 第4位圆角，与clip配合防溢出
 						val fc=if(hx.isNotEmpty()){try{Color(AC.parseColor("#$hx"))}catch(_:Exception){Color.Black}}else Color.Black
 						val c2=if(ap!=1f)fc.copy(alpha=ap)else fc
-						val sh=if(rr>0.dp)RoundedCornerShape(rr)else androidx.compose.foundation.shape.RectangleShape
+						val sh=if(rr>0.dp)RoundedCornerShape(rr)else RectangleShape
 						m=m.border(wd,c2,sh)
 					}
 				}

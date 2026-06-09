@@ -101,6 +101,7 @@ import kotlinx.coroutines.launch
 		val s=fG(id)
 		gs=s
 		ds=s.map{"0"}
+		FN.lg("FilterScreen","ids=${ds.joinToString(",")}",'i')
 		vs=fL(id,ds.joinToString(","),1)
 		pg=1
 		hm=vs.size>=21
@@ -111,6 +112,7 @@ import kotlinx.coroutines.launch
 	suspend fun rl(){
 		ld=true
 		val nq=ds.joinToString(",").ifEmpty{gs.map{"0"}.joinToString(",")}
+		FN.lg("FilterScreen","ids=$nq",'i')
 		vs=fL(id,nq,1)
 		pg=1
 		hm=vs.size>=21
@@ -122,6 +124,7 @@ import kotlinx.coroutines.launch
 		if(nr&&hm&&!lm&&!ld){
 			lm=true
 			val nq=ds.joinToString(",").ifEmpty{gs.map{"0"}.joinToString(",")}
+			FN.lg("FilterScreen","ids=$nq",'i')
 			val nx=fL(id,nq,pg+1)
 			if(nx.isNotEmpty()){vs=vs+nx;pg++}
 			else hm=false

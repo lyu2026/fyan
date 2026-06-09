@@ -91,7 +91,7 @@ suspend fun fD(id:String):VD?= withContext(Dispatchers.IO){ // fD (fetchDetail) 
 				ts.add(v.optString("episodeTitle","${i+1}"))
 			}
 		}
-		VD(ep=us,et=ts,id=id,tt=o.optString("title","未知"),ds=o.optString("introduce","空空如也"),pt=o.optString("coverImgUrl","")+"?width=500&height=283&scale=both&mode=crop&anchor=topcenter&format=jpg")
+		VD(ep=us,et=ts,id=id,tt=o.optString("title","").takeIf{it.isNotEmpty()}?:"未知",ds=o.optString("introduce","").takeIf{it.isNotEmpty()}?:"空空如也",pt=o.optString("coverImgUrl","").takeIf{it.isNotEmpty()}?.let{"$it?width=500&height=283&scale=both&mode=crop&anchor=topcenter&format=jpg"}?:"")
 	}.getOrElse{e->FN.lg("Detail",e.message?:"err",'e');null}
 }
 

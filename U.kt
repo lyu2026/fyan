@@ -66,7 +66,7 @@ object FN{ // 全局控制单例
 	fun lc()=lg.clear() // 清除全部日志
 	fun lr(i:String)=lg.removeAll{it.startsWith(i)} // 删除单条日志
 	@Composable fun LP(){if(lf)LH()else LS()}
-	@Composable private fun LH(){Box(modifier="fw fw0.5 h3 pnb c2.5".css().background(Color(0x80808080)).clickable{lf=false;ly=0f},contentAlignment=Alignment.Center){}}
+	@Composable private fun LH(){Box(modifier="fw0.5 h3 pnb pb6 c2.5".css().background(Color(0x80808080)).clickable{lf=false;ly=0f},contentAlignment=Alignment.Center){}}
 	@Composable private fun LS(){
 		val ls=rememberLazyListState()
 		LaunchedEffect(lg.lastOrNull()){if(lg.isNotEmpty())ls.animateScrollToItem(lg.size-1)}
@@ -163,10 +163,10 @@ fun TB(tt:String="",ob:(()->Unit)?=null,ed:@Composable RowScope.()->Unit={}){
 	Box(modifier="fs".css().background(Color(0x80000000)),contentAlignment=Alignment.Center){
 		Column(modifier="w300 p20 c4".css().background(cc.s).border(0.1.dp,cc.ov,RoundedCornerShape(4.dp)),horizontalAlignment=Alignment.CenterHorizontally){
 			Spacer(modifier="fw h18".css())
-			BasicText(tt,style=FN.BM.copy(color=cc.os,textAlign=TextAlign.Center))
-			Row(modifier="fw pt20 pb8".css(),horizontalArrangement=Arrangement.spacedBy(10.dp)){
-				Box(modifier="fw0.42 h32 ph10 c2".css().background(cc.sv).clickable(onClick=od),contentAlignment=Alignment.Center){BasicText(at,style=FN.BM.copy(color=cc.os))}
-				Box(modifier="fw h32 ph10 c2".css().background(cc.p.copy(alpha=0.15f)).clickable(onClick=oc),contentAlignment=Alignment.Center){BasicText(ct,style=FN.BM.copy(color=cc.os))}
+			BasicText(tt,style=FN.TM.copy(color=cc.os,textAlign=TextAlign.Center))
+			Row(modifier="fw pt20 pb10".css(),horizontalArrangement=Arrangement.spacedBy(6.dp)){
+				Box(modifier="fw0.47 h30 ph10 c2".css().background(cc.sv).clickable(onClick=od),contentAlignment=Alignment.Center){BasicText(at,style=FN.BM.copy(color=cc.os))}
+				Box(modifier="fw h30 ph10 c2".css().background(cc.p.copy(alpha=0.15f)).clickable(onClick=oc),contentAlignment=Alignment.Center){BasicText(ct,style=FN.BM.copy(color=cc.os))}
 			}
 		}
 	}

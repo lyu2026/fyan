@@ -75,7 +75,7 @@ object FN{ // 全局UI控制单例，持有主题/日志/历史等共享状态
 	@Composable fun LP(){if(lf)LH()else LS()} // 日志面板入口：折叠态显示横条，展开态显示完整面板
 
 	@Composable private fun LH(){ // 折叠态横条：宽70%居中，加导航栏padding防止被系统栏遮挡
-		Box(modifier="fw0.7 h6 pb18 c2.5 pnb".css()
+		Box(modifier="fw0.7 h6 pb2 c2.5 pnb".css()
 			.background(Color(0x80808080))
 			.clickable{lf=false;ly=0f}, // 点击恢复展开
 			contentAlignment=Alignment.Center){}

@@ -157,7 +157,8 @@ import kotlinx.coroutines.launch
 					gridItems(vs,key={it.id}){o->
 						when{
 							id=="news"->Box(modifier="fw".css().aspectRatio(16f/9f).background(Color.Black),contentAlignment=Alignment.Center){
-								var playing by remember(ep){mutableStateOf(false)}
+								var pg by remember{mutableIntStateOf(0)}
+								var playing by remember(pg){mutableStateOf(false)}
 								VP(pt=o.pt,sc=o.id,playing=playing,onPlay={playing=true})
 							}else->VC(pt=o.pt,tt=o.tt,modifier="fw".css(),oc={
 								aH(FN.VT(o.id,o.type,o.tt,o.pt));

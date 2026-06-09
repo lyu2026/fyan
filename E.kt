@@ -28,7 +28,7 @@ val NAV_TABS=listOf(NT("history","历史记录"),NT("movie","电影"),NT("drama"
 data class FO(val id:String,val lb:String) // 过滤选项节点（id=classifyId/lb=显示标签）
 data class FG(val op:List<FO>) // 过滤选项分组，包含一组互斥选项
 data class VI(val id:String,val type:String,val tt:String,val pt:String,val sc:String,val ut:String) // 视频列表简略项（id/type=类型/tt=标题/pt=封面/sc=评分/ut=更新状态）
-data class VD(val id:String,val tt:String,val ds:String,val pt:String,val ep:List<String>,val et:List<String>) // 视频详情全量模型（ep=各集episodeId列表/et=各集标题列表）
+data class VD(val id:String,val type:String,val tt:String,val ds:String,val pt:String,val ep:List<String>,val et:List<String>) // 视频详情全量模型（ep=各集episodeId列表/et=各集标题列表）
 
 object PR{ // 本地SharedPreferences薄封装，持久化用户偏好
 	private lateinit var sp:android.content.SharedPreferences // SP实例，由init()注入

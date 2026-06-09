@@ -319,7 +319,7 @@ private suspend fun rs(id:String,d:VD,ep:Int):String{
 				properties=DialogProperties(usePlatformDefaultWidth=false,dismissOnBackPress=true,dismissOnClickOutside=false)
 			){
 				// ★ 修复点：手机设备触发横屏，TV设备保持自然状态；使用标准 requestedOrientation 触发旋转
-				LaunchedEffect(Unit){if(!tv)(c as? Activity)?.requestedOrientation=ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE}
+				LaunchedEffect(Unit){if(!tv)(c as? Activity)?.requestedOrientation=ActivityInfo.SCREEN_ORIENTATION_PORTRAIT}
 				// ★ 修复点：Dialog 关闭时恢复竖屏
 				DisposableEffect(Unit){onDispose{if(!tv)(c as? Activity)?.requestedOrientation=ActivityInfo.SCREEN_ORIENTATION_PORTRAIT}}
 				

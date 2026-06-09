@@ -18,7 +18,8 @@
 		</provider>
 		<activity
 			android:name="com.fyan.O" android:exported="true"
-			android:theme="@style/Theme.Fyan" android:windowSoftInputMode="adjustResize">
+			android:theme="@style/Theme.Fyan" android:windowSoftInputMode="adjustResize"
+			android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboard|keyboardHidden|navigation">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 				<category android:name="android.intent.category.LAUNCHER" />

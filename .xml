@@ -8,18 +8,19 @@
 	<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 	<application
 		android:label="仏琰"
+		android:icon="@mipmap/icon" android:banner="@drawable/banner"
 		android:theme="@style/Theme.Fyan" android:allowBackup="true"
-		android:icon="@mipmap/icon" android:banner="@drawable/banner">
+		android:hardwareAccelerated="true" android:largeHeap="false">
 		<provider
 			android:name="androidx.core.content.FileProvider"
 			android:authorities="com.fyan.fileprovider"
-			android:exported="false"
-			android:grantUriPermissions="true">
+			android:exported="false" android:grantUriPermissions="true">
 			<meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/paths" />
 		</provider>
 		<activity
 			android:name="com.fyan.O" android:exported="true"
-			android:theme="@style/Theme.Fyan" android:windowSoftInputMode="adjustResize"
+			android:theme="@style/Theme.Fyan" android:launchMode="singleTop"
+			android:windowSoftInputMode="adjustResize" android:enableOnBackInvokedCallback="true"
 			android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboard|keyboardHidden|navigation">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
@@ -41,19 +42,60 @@
 
 @app/src/main/res/values/themes.xml
 <resources>
-	<style name="Theme.Fyan" parent="android:Theme.Material.Light.NoActionBar">
-		<item name="android:statusBarColor">#FFFFFF</item>
+	<style name="Theme.Fyan" parent="android:Theme.DeviceDefault.Light.NoActionBar">
+		<!-- 状态栏 / 导航栏透明，由 Compose WindowInsets 统一控制 -->
+		<item name="android:statusBarColor">@android:color/transparent</item>
+		<item name="android:navigationBarColor">@android:color/transparent</item>
+		<!-- 亮色图标（深色文字/图标在白色背景上） -->
 		<item name="android:windowLightStatusBar">true</item>
-		<item name="android:navigationBarColor">#FFFFFF</item>
+		<item name="android:windowLightNavigationBar">true</item>
+		<!-- 允许内容绘制到系统栏区域（edge-to-edge 基础） -->
+		<item name="android:fitsSystemWindows">false</item>
+		<!-- 刘海屏：内容延伸到刘海区域 -->
+		<item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+		<!-- 启动画面背景色（冷启动闪屏） -->
+		<item name="android:windowBackground">@android:color/white</item>
 	</style>
 </resources>
 
 @app/src/main/res/values-night/themes.xml
 <resources>
-	<style name="Theme.Fyan" parent="android:Theme.Material.Light.NoActionBar">
-		<item name="android:statusBarColor">#121212</item>
+	<style name="Theme.Fyan" parent="android:Theme.DeviceDefault.NoActionBar">
+		<item name="android:statusBarColor">@android:color/transparent</item>
+		<item name="android:navigationBarColor">@android:color/transparent</item>
 		<item name="android:windowLightStatusBar">false</item>
-		<item name="android:navigationBarColor">#121212</item>
+		<item name="android:windowLightNavigationBar">false</item>
+		<item name="android:fitsSystemWindows">false</item>
+		<item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+		<item name="android:windowBackground">#121212</item>
+	</style>
+</resources>
+
+@app/src/main/res/values-v35/themes.xml
+<resources>
+	<style name="Theme.Fyan" parent="android:Theme.DeviceDefault.Light.NoActionBar">
+		<item name="android:statusBarColor">@android:color/transparent</item>
+		<item name="android:navigationBarColor">@android:color/transparent</item>
+		<item name="android:windowLightStatusBar">true</item>
+		<item name="android:windowLightNavigationBar">true</item>
+		<item name="android:fitsSystemWindows">false</item>
+		<item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+		<item name="android:windowBackground">@android:color/white</item>
+		<item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>
+	</style>
+</resources>
+
+@app/src/main/res/values-night-v35/themes.xml
+<resources>
+	<style name="Theme.Fyan" parent="android:Theme.DeviceDefault.NoActionBar">
+		<item name="android:statusBarColor">@android:color/transparent</item>
+		<item name="android:navigationBarColor">@android:color/transparent</item>
+		<item name="android:windowLightStatusBar">false</item>
+		<item name="android:windowLightNavigationBar">false</item>
+		<item name="android:fitsSystemWindows">false</item>
+		<item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+		<item name="android:windowBackground">#121212</item>
+		<item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>
 	</style>
 </resources>
 
@@ -107,4 +149,3 @@ delete:M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h1
 edit:M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z
 search:M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z
 close:M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z
-

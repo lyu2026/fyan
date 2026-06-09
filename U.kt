@@ -66,7 +66,7 @@ object FN{ // 全局控制单例
 	fun lc()=lg.clear() // 清除全部日志
 	fun lr(i:String)=lg.removeAll{it.startsWith(i)} // 删除单条日志
 	@Composable fun LP(){if(lf)LH()else LS()}
-	@Composable private fun LH(){Box(modifier="fw fw0.5 h3 pb8 pnb c2.5".css().background(Color(0x80808080)).clickable{lf=false;ly=0f},contentAlignment=Alignment.Center){}}
+	@Composable private fun LH(){Box(modifier="fw fw0.5 h3 pb8 c2.5".css().background(Color(0x80808080)).clickable{lf=false;ly=0f},contentAlignment=Alignment.Center){}}
 	@Composable private fun LS(){
 		val ls=rememberLazyListState()
 		LaunchedEffect(lg.lastOrNull()){if(lg.isNotEmpty())ls.animateScrollToItem(lg.size-1)}
@@ -124,10 +124,10 @@ fun TB(tt:String="",ob:(()->Unit)?=null,ed:@Composable RowScope.()->Unit={}){
 @Composable fun CL(vc:Boolean=false,tt:String="加载中…"){
 	val cc=FN.LC.current
 	Box(modifier=if(vc)"fs".css()else"fw".css(),contentAlignment=Alignment.Center){
-		Row(modifier=if(vc)"fw".css()else"fw h30".css(),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.Center){
-			BasicText("◌",style=TextStyle(fontSize=20.sp,color=cc.p))
+		Row(modifier=Modifier.wrapContentSize(),verticalAlignment=Alignment.CenterVertically){
+			BasicText("◌",style=TextStyle(fontSize=if(vc)30.sp else 18.sp,color=cc.p))
 			Spacer(modifier="w8".css())
-			BasicText(tt,style=FN.BS.copy(color=cc.os.copy(alpha=0.6f)))
+			BasicText(tt,style=(if(vc)FN.BM else FN.BS).copy(color=cc.os.copy(alpha=0.6f)))
 		}
 	}
 }
@@ -154,9 +154,9 @@ fun TB(tt:String="",ob:(()->Unit)?=null,ed:@Composable RowScope.()->Unit={}){
 		Column(modifier="w300 p20 c4".css().background(cc.s).border(0.1.dp,cc.ov,RoundedCornerShape(4.dp)),horizontalAlignment=Alignment.CenterHorizontally){
 			Spacer(modifier="fw h12".css())
 			BasicText(tt,style=FN.BM.copy(color=cc.os,textAlign=TextAlign.Center))
-			Row(modifier="fw pt16".css(),horizontalArrangement=Arrangement.spacedBy(10.dp)){
-				Box(modifier="fw0.5 h16 ph20 pv10 c4".css().background(cc.sv).clickable(onClick=od),contentAlignment=Alignment.Center){BasicText(at,style=FN.BM.copy(color=cc.os))}
-				Box(modifier="fw h16 ph20 pv10 c4".css().background(cc.p.copy(alpha=0.15f)).clickable(onClick=oc),contentAlignment=Alignment.Center){BasicText(ct,style=FN.BM.copy(color=cc.p))}
+			Row(modifier="fw pt16 pb8".css(),horizontalArrangement=Arrangement.spacedBy(10.dp)){
+				Box(modifier="fw0.5 h24 ph10 pv6 c2".css().background(cc.sv).clickable(onClick=od),contentAlignment=Alignment.Center){BasicText(at,style=FN.BM.copy(color=cc.os))}
+				Box(modifier="fw h24 ph10 pv6 c2".css().background(cc.p.copy(alpha=0.15f)).clickable(onClick=oc),contentAlignment=Alignment.Center){BasicText(ct,style=FN.BM.copy(color=cc.os))}
 			}
 		}
 	}

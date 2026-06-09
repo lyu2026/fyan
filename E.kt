@@ -107,7 +107,7 @@ suspend fun fD(id:String):VD?= withContext(Dispatchers.IO){ // 拉取视频完�
 				ts.add(v.optString("episodeTitle","${i+1}")) // 无标题则用序号
 			}
 		}
-		VD(ep=us,et=ts,id=id,tt=o.optString("title","").takeIf{it.isNotEmpty()}?:"未知",ds=o.optString("introduce","").takeIf{it.isNotEmpty()}?:"空空如也",pt=o.optString("coverImgUrl","").takeIf{it.isNotEmpty()}?.let{"$it?width=500&height=283&scale=both&mode=crop&anchor=topcenter&format=jpg"}?:"")
+		VD(ep=us,et=ts,id=id,type=o.optString("videoType","1"),tt=o.optString("title","").takeIf{it.isNotEmpty()}?:"未知",ds=o.optString("introduce","").takeIf{it.isNotEmpty()}?:"空空如也",pt=o.optString("coverImgUrl","").takeIf{it.isNotEmpty()}?.let{"$it?width=500&height=283&scale=both&mode=crop&anchor=topcenter&format=jpg"}?:"")
 	}.getOrElse{e->FN.lg("Detail",e.message?:"err",'e');null}
 }
 

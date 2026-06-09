@@ -11,20 +11,24 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.*
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.PointerInputChange
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.navigation.NavController
 import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.hls.HlsMediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.ui.PlayerView
 import coil3.compose.AsyncImage
-import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
+import java.util.UUID
 
 @Composable fun HS(nv:NavController){ // HS (HomeScreen) 应用首页主架
 	val cc=FN.LC.current
@@ -283,7 +287,7 @@ import kotlinx.coroutines.launch
 	if(!playing){
 		Box(modifier="fs".css().clickable{onPlay()},contentAlignment=Alignment.Center){
 			AsyncImage(model=pt,contentDescription="封面",contentScale=ContentScale.Fit,modifier="fs".css())
-			Box(modifier="w56 h56 c".css().background(androidx.compose.ui.graphics.Color.Black.copy(alpha=0.5f)),contentAlignment=Alignment.Center){BasicText("▶",style=FN.TL.copy(color=androidx.compose.ui.graphics.Color.White))}
+			Box(modifier="w56 h56 c".css().background(Color.Black.copy(alpha=0.5f)),contentAlignment=Alignment.Center){BasicText("▶",style=FN.TL.copy(color=Color.White))}
 		}
 	}else{
 		val c=LocalContext.current
@@ -291,14 +295,12 @@ import kotlinx.coroutines.launch
 		val tv=(cfg.uiMode and Configuration.UI_MODE_TYPE_MASK)==Configuration.UI_MODE_TYPE_TELEVISION
 		var fs by remember{mutableStateOf(false)}
 		var xo by remember{mutableStateOf(0f)}
-		val player=remember{ExoPlayer.Builder(c).build().apply{
-			playWhenReady=true
-			addListener(object:com.google.android.exoplayer2.Player.Listener{
-				override fun onPlaybackStateChanged(s:Int){
-					if(s==com.google.android.exoplayer2.Player.STATE_READY)FN.lg("VP:Ready","可播放",'n')
-				}
-			})
-		}}
+		val listener=object:Player.Listener{
+			override fun onPlaybackStateChanged(s:Int){
+				if(s==Player.STATE_READY)FN.lg("VP:Ready","可播放",'n')
+			}
+		}
+		val player=remember{ExoPlayer.Builder(c).build().apply{playWhenReady=true;addListener(listener)}}
 		DisposableEffect(player){onDispose{player.release()}}
 		LaunchedEffect(sc){
 			FN.lg("VideoPlay",sc,'u')
@@ -307,15 +309,15 @@ import kotlinx.coroutines.launch
 			player.setMediaSource(factory.createMediaSource(MediaItem.fromUri(Uri.parse(sc))))
 			player.prepare()
 		}
-		val w=if(fs)cfg.screenWidthDp.dp else Dp.Unspecified
-		val h=if(fs)cfg.screenHeightDp.dp else Dp.Unspecified
-		val mo=if(fs)"w${w.value} h${h.value} pnb pim".css().offset(x=if(fs)xo.roundToInt().dp else 0.dp)else"fs".css()
-		Box(modifier=mo.pointerInput(fs){if(fs)detectDragGestures(
-			onDragEnd={if(xo>80f){fs=false;xo=0f}else xo=0f},
-			onDrag={ch:androidx.compose.ui.input.pointer.PointerInputChange,d:androidx.compose.ui.geometry.Offset->ch.consume();if(d.x>0)xo+=d.x else if(xo>0)xo=(xo+d.x).coerceAtLeast(0f)}
-		)}.clickable{if(!tv)fs=!fs}){
+		Box(modifier=if(fs)"w${cfg.screenWidthDp} h${cfg.screenHeightDp} pnb pim".css().offset(x=xo.dp)else"fs".css()
+			.pointerInput(fs){if(fs)detectDragGestures(
+				onDragEnd={if(xo>80f){fs=false;xo=0f}else xo=0f},
+				onDrag={ch:PointerInputChange,d:Offset->ch.consume();xo=if(d.x>0)xo+d.x else if(xo>0)maxOf(xo+d.x,0f)else 0f}
+			)}
+			.clickable{if(!tv)fs=!fs}
+		){
 			AndroidView(factory={PlayerView(c).apply{this.player=player;useController=fs}},modifier="fs".css())
-			if(fs&&!tv)Box(modifier="w32 h32 c mt6 ms6".css().background(androidx.compose.ui.graphics.Color.Black.copy(alpha=0.5f)).clickable{fs=false}){BasicText("✕",style=FN.BM.copy(color=androidx.compose.ui.graphics.Color.White))}
+			if(fs&&!tv)Box(modifier="w32 h32 c mt6 ms6".css().background(Color.Black.copy(alpha=0.5f)).clickable{fs=false}){BasicText("✕",style=FN.BM.copy(color=Color.White))}
 		}
 	}
 }

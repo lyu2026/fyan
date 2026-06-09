@@ -1,8 +1,10 @@
 package com.fyan
 
+import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.net.Uri
 import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.lazy.grid.*
@@ -12,11 +14,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.media3.common.MediaItem
@@ -26,8 +30,9 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.hls.HlsMediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.ui.PlayerView
+import androidx.navigation.NavController
 import coil3.compose.AsyncImage
-import kotlin.math.roundToInt
+import kotlinx.coroutines.launch
 import java.util.UUID
 
 @Composable fun HS(nv:NavController){ // HS (HomeScreen) 应用首页主架
@@ -40,10 +45,10 @@ import java.util.UUID
 					val ac=o.id==tb
 					Box(
 						modifier="fh".css()
-							.background(if(ac)cc.p.copy(alpha=0.15f)else androidx.compose.ui.graphics.Color.Transparent)
+							.background(if(ac)cc.p.copy(alpha=0.15f)else Color.Transparent)
 							.clickable{tb=o.id;PR.lt=o.id;FN.lg("HomeTab","切换 → ${o.id}",'u')},contentAlignment=Alignment.Center
 					){
-						BasicText("  ${o.lb}  ",style=FN.TM.copy(color=if(ac)cc.p else cc.os.copy(alpha=0.7f),fontWeight=if(ac)androidx.compose.ui.text.font.FontWeight.W600 else androidx.compose.ui.text.font.FontWeight.W400))
+						BasicText("  ${o.lb}  ",style=FN.TM.copy(color=if(ac)cc.p else cc.os.copy(alpha=0.7f),fontWeight=if(ac)FontWeight.W600 else FontWeight.W400))
 					}
 				}
 			}
@@ -64,7 +69,7 @@ import java.util.UUID
 	var cl by remember{mutableStateOf(false)} // 清空二次确认触发器
 	var rk by remember{mutableStateOf<String?>(null)} // 待删除记录主键
 	val cf=LocalConfiguration.current
-	val cs=when{
+	val cs=when{ // 自适应列数
 		cf.screenWidthDp>=840->5
 		cf.screenWidthDp>=600->4
 		else->3
@@ -113,7 +118,7 @@ import java.util.UUID
 		FN.lg("FilterScreen","tab=$id list=${s.size}",'i')
 	}
 
-	suspend fun rl(){
+	suspend fun rl(){ // 重新加载过滤结果
 		ld=true
 		val nq=ds.joinToString(",").ifEmpty{gs.map{"0"}.joinToString(",")}
 		FN.lg("FilterScreen","ids=$nq",'i')
@@ -123,7 +128,7 @@ import java.util.UUID
 		ld=false
 	}
 
-	val nr by remember{derivedStateOf{val lt=ls.layoutInfo;val lx=lt.visibleItemsInfo.lastOrNull()?.index?:-1;lx>=lt.totalItemsCount-3&&lt.totalItemsCount>0}}
+	val nr by remember{derivedStateOf{val lt=ls.layoutInfo;val lx=lt.visibleItemsInfo.lastOrNull()?.index?:-1;lx>=lt.totalItemsCount-3&&lt.totalItemsCount>0}} // 触底检测
 	LaunchedEffect(nr){
 		if(nr&&hm&&!lm&&!ld){
 			lm=true
@@ -137,7 +142,7 @@ import java.util.UUID
 	}
 
 	val cf=LocalConfiguration.current
-	val cs=when{cf.screenWidthDp>=840->6;cf.screenWidthDp>=600->4;else->3}
+	val cs=when{cf.screenWidthDp>=840->6;cf.screenWidthDp>=600->4;else->3} // 自适应列数
 	Column(modifier="fs".css().background(cc.b)){
 		if(gs.isNotEmpty()){
 			Column(modifier="fw".css().background(cc.s).border(0.5.dp,cc.ov)){
@@ -217,7 +222,7 @@ import java.util.UUID
 	}
 	Row(modifier="fs".css()){
 		Column(modifier="fh e2".css(this)){
-			Box(modifier="fw".css().aspectRatio(16f/9f).background(androidx.compose.ui.graphics.Color.Black),contentAlignment=Alignment.Center){
+			Box(modifier="fw".css().aspectRatio(16f/9f).background(Color.Black),contentAlignment=Alignment.Center){
 				if(u.isNotEmpty()){VP(pt=d.pt,sc=u,playing=playing,onPlay={playing=true})}else{BasicText("加载中...",style=FN.TS.copy(color=cc.os))}
 			}
 			LazyRow(modifier="fw".css(),horizontalArrangement=Arrangement.spacedBy(8.dp),contentPadding=PaddingValues(horizontal=10.dp,vertical=8.dp)){
@@ -245,7 +250,7 @@ import java.util.UUID
 		FN.lg("VideoSource","${ep}: $ru -> $u",'u');
 	}
 	Column(modifier="fs sv".css()){
-		Box(modifier="fw".css().aspectRatio(16f/9f).background(androidx.compose.ui.graphics.Color.Black),contentAlignment=Alignment.Center){
+		Box(modifier="fw".css().aspectRatio(16f/9f).background(Color.Black),contentAlignment=Alignment.Center){
 			if(u.isNotEmpty()){VP(pt=d.pt,sc=u,playing=playing,onPlay={playing=true})}else{BasicText("加载中...",style=FN.TS.copy(color=cc.os))}
 		}
 		Column(modifier="fw ph14 pv12".css()){
@@ -282,65 +287,50 @@ import java.util.UUID
 	}
 }
 
-@Composable private fun VP(pt:String,sc:String,playing:Boolean,onPlay:()->Unit){
+@Composable private fun VP(pt:String,sc:String,playing:Boolean,onPlay:()->Unit){ // VP 播放器核心组件（支持全屏横屏+侧滑退出）
 	val cc=FN.LC.current
 	if(!playing){
+		// 未播放状态：显示封面+播放按钮
 		Box(modifier="fs".css().clickable{onPlay()},contentAlignment=Alignment.Center){
 			AsyncImage(model=pt,contentDescription="封面",contentScale=ContentScale.Fit,modifier="fs".css())
 			Box(modifier="w56 h56 c".css().background(Color.Black.copy(alpha=0.5f)),contentAlignment=Alignment.Center){BasicText("▶",style=FN.TL.copy(color=Color.White))}
 		}
 	}else{
+		// 播放状态：初始化播放器+全屏控制
 		val c=LocalContext.current
 		val cfg=LocalConfiguration.current
-		val tv=(cfg.uiMode and Configuration.UI_MODE_TYPE_MASK)==Configuration.UI_MODE_TYPE_TELEVISION
-		var fs by remember{mutableStateOf(false)}
-		var xo by remember{mutableStateOf(0f)}
-		val listener=object:Player.Listener{
+		val tv=(cfg.uiMode and Configuration.UI_MODE_TYPE_MASK)==Configuration.UI_MODE_TYPE_TELEVISION // TV设备检测
+		var fs by remember{mutableStateOf(false)} // 全屏状态
+		var xo by remember{mutableStateOf(0f)} // 全屏侧滑位移量
+		val listener=object:Player.Listener{ // 播放器状态监听
 			override fun onPlaybackStateChanged(s:Int){
 				if(s==Player.STATE_READY)FN.lg("VP:Ready","可播放",'n')
 			}
 		}
 		val player=remember{ExoPlayer.Builder(c).build().apply{playWhenReady=true;addListener(listener)}}
-		DisposableEffect(player){onDispose{player.release()}}
-		LaunchedEffect(sc){
+		DisposableEffect(player){onDispose{player.release()}} // 组件销毁时释放播放器
+		DisposableEffect(fs){ // 全屏时强制横屏，退出全屏时恢复竖屏
+			val act=c as? android.app.Activity
+			if(fs&&!tv)act?.requestedOrientation=ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+			else act?.requestedOrientation=ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+			onDispose{act?.requestedOrientation=ActivityInfo.SCREEN_ORIENTATION_PORTRAIT}
+		}
+		LaunchedEffect(sc){ // 根据视频源类型加载媒体
 			FN.lg("VideoPlay",sc,'u')
 			val factory=if(sc.contains(".m3u8"))HlsMediaSource.Factory(DefaultHttpDataSource.Factory())
 			else ProgressiveMediaSource.Factory(DefaultHttpDataSource.Factory())
 			player.setMediaSource(factory.createMediaSource(MediaItem.fromUri(Uri.parse(sc))))
 			player.prepare()
 		}
-		Box(modifier=if(fs)"w${cfg.screenWidthDp} h${cfg.screenHeightDp} pnb pim".css().offset(x=xo.dp)else"fs".css()
-			.pointerInput(fs){if(fs)detectDragGestures(
-				onDragEnd={if(xo>80f){fs=false;xo=0f}else xo=0f},
-				onDrag={ch:PointerInputChange,d:Offset->ch.consume();xo=if(d.x>0)xo+d.x else if(xo>0)maxOf(xo+d.x,0f)else 0f}
+		Box(modifier=if(fs)"w${cfg.screenWidthDp} h${cfg.screenHeightDp} pnb pim".css().offset(x=xo.dp)else"fs".css() // 全屏时全尺寸+偏移，非全屏时填满父容器
+			.pointerInput(fs){if(fs)detectDragGestures( // 全屏时支持侧滑手势
+				onDragEnd={if(xo>80f){fs=false;xo=0f}else xo=0f}, // 右滑超过80dp退出全屏
+				onDrag={ch:PointerInputChange,d:Offset->ch.consume();xo=if(d.x>0)xo+d.x else if(xo>0)maxOf(xo+d.x,0f)else 0f} // 仅允许向右滑动
 			)}
-			.clickable{if(!tv)fs=!fs}
+			.clickable{if(!tv)fs=!fs} // 非TV设备点击切换全屏
 		){
-			AndroidView(factory={PlayerView(c).apply{this.player=player;useController=fs}},modifier="fs".css())
-			if(fs&&!tv)Box(modifier="w32 h32 c mt6 ms6".css().background(Color.Black.copy(alpha=0.5f)).clickable{fs=false}){BasicText("✕",style=FN.BM.copy(color=Color.White))}
+			AndroidView(factory={PlayerView(c).apply{this.player=player;useController=fs}},modifier="fs".css()) // 全屏时显示控制器
+			if(fs&&!tv)Box(modifier="w32 h32 c mt6 ms6".css().background(Color.Black.copy(alpha=0.5f)).clickable{fs=false}){BasicText("✕",style=FN.BM.copy(color=Color.White))} // 全屏关闭按钮
 		}
 	}
 }
-/*
-@Composable private fun VP(pt:String,sc:String,playing:Boolean,onPlay:()->Unit){ // VP 播放器核心组件
-	val cc=FN.LC.current
-	if(!playing){
-		Box(modifier="fs".css().clickable{onPlay()},contentAlignment=Alignment.Center){
-			AsyncImage(model=pt,contentDescription="封面",contentScale=ContentScale.Fit,modifier="fs".css())
-			Box(modifier="w56 h56 c".css().background(androidx.compose.ui.graphics.Color.Black.copy(alpha=0.5f)),contentAlignment=Alignment.Center){BasicText("▶",style=FN.TL.copy(color=androidx.compose.ui.graphics.Color.White))}
-		}
-	}else{
-		val c=LocalContext.current
-		val player=remember{ExoPlayer.Builder(c).build().apply{playWhenReady=true}}
-		DisposableEffect(player){onDispose{player.release()}}
-		LaunchedEffect(sc){
-			FN.lg("VideoPlay",sc,'u');
-			val factory=if(sc.contains(".m3u8"))HlsMediaSource.Factory(DefaultHttpDataSource.Factory())
-			else ProgressiveMediaSource.Factory(DefaultHttpDataSource.Factory())
-			player.setMediaSource(factory.createMediaSource(MediaItem.fromUri(Uri.parse(sc))))
-			player.prepare()
-		}
-		AndroidView(factory={PlayerView(c).apply{this.player=player}},modifier="fs".css())
-	}
-}
-*/

@@ -136,7 +136,7 @@ import kotlinx.coroutines.launch
 	}
 
 	val cf=LocalConfiguration.current
-	val cs=when{cf.screenWidthDp>=840->6;cf.screenWidthDp>=600->4;else->3}
+	val cs=when{id=="news"=>1;cf.screenWidthDp>=840->6;cf.screenWidthDp>=600->4;else->3}
 	Column(modifier="fs".css().background(cc.b)){
 		if(gs.isNotEmpty()){
 			Column(modifier="fw".css().background(cc.s).border(0.5.dp,cc.ov)){
@@ -155,9 +155,15 @@ import kotlinx.coroutines.launch
 				vs.isEmpty()->Box(modifier="fs".css(),contentAlignment=Alignment.Center){BasicText("暂无视频",style=FN.BM.copy(color=cc.os.copy(alpha=0.4f)))}
 				else->LazyVerticalGrid(state=ls,modifier="fw".css(),columns=GridCells.Fixed(cs),contentPadding=PaddingValues(2.dp),verticalArrangement=Arrangement.spacedBy(2.dp),horizontalArrangement=Arrangement.spacedBy(2.dp)){
 					gridItems(vs,key={it.id}){o->
-						VC(pt=o.pt,tt=o.tt,modifier="fw".css(),oc={
-							aH(FN.VT(o.id,o.tt,o.pt));nv.navigate("detail/${o.id}")
-						},sb=listOfNotNull(o.sc.takeIf{it.isNotEmpty()},o.ut.takeIf{it.isNotEmpty()}).joinToString(" · "))
+						when{
+							id=="news"=>Box(modifier="fw".css().aspectRatio(16f/9f).background(Color.Black),contentAlignment=Alignment.Center){
+								VP(pt=d.pt,sc=u,playing=playing,onPlay={playing=true})
+							}
+							else=>VC(pt=o.pt,tt=o.tt,modifier="fw".css(),oc={
+								aH(FN.VT(o.id,o.type,o.tt,o.pt));
+								nv.navigate("detail/${o.id}")
+							},sb=listOfNotNull(o.sc.takeIf{it.isNotEmpty()},o.ut.takeIf{it.isNotEmpty()}).joinToString(" · "))
+						}
 					}
 					if(lm)item{CL(tt="加载更多…")}
 				}
@@ -180,7 +186,7 @@ import kotlinx.coroutines.launch
 		ld=true;pg=0 // 切视频时重置集数指针
 		o=fD(id);ld=false
 		FN.lg("DetailScreen","id=$id",'i')
-		if(FN.hi.none{it.id==id})o?.let{aH(FN.VT(id=it.id,tt=it.tt,pt=it.pt,pg="第1集"))}
+		if(FN.hi.none{it.id==id})o?.let{aH(FN.VT(it.id,it.type,it.tt,it.pt,"第1集"))}
 	}
 
 	Column(modifier="fs".css().background(cc.b)){
@@ -196,8 +202,8 @@ import kotlinx.coroutines.launch
 			}
 			else->{
 				val d=o!!
-				if(tv||(tt&&lp))TV(id,d,pg){i->pg=i;aH(FN.VT(d.id,d.tt,d.pt,"第${i+1}集"))}
-				else PL(id,d,pg){i->pg=i;aH(FN.VT(d.id,d.tt,d.pt,"第${i+1}集"))}
+				if(tv||(tt&&lp))TV(id,d,pg){i->pg=i;aH(FN.VT(d.id,d.type,d.tt,d.pt,"第${i+1}集"))}
+				else PL(id,d,pg){i->pg=i;aH(FN.VT(d.id,d.type,d.tt,d.pt,"第${i+1}集"))}
 			}
 		}
 	}
@@ -259,7 +265,7 @@ import kotlinx.coroutines.launch
 // 提取公共集数解析：TV和PL共用，避免重复代码
 private suspend fun rs(id:String,d:VD,ep:Int):String{
 	val ru=d.ep.getOrNull(ep)?:""
-	return if(ru.isNotEmpty()&&!ru.startsWith("http",ignoreCase=true))fS(id,ru) else ""
+	return if(!ru.isNotEmpty()||!ru.startsWith("http",ignoreCase=true))fS(id,d.type,ru)else""
 }
 
 @Composable private fun EG(tl:List<String>,ct:Int,cs:Int,os:(Int)->Unit){ // 静态剧集矩阵网格，避免嵌套滚动冲突
@@ -308,7 +314,7 @@ private suspend fun rs(id:String,d:VD,ep:Int):String{
 
 		LaunchedEffect(sc){
 			FN.lg("VideoPlay",sc,'u')
-			val factory=if(sc.contains(".m3u8",ignoreCase=true)) HlsMediaSource.Factory(DefaultHttpDataSource.Factory()) else ProgressiveMediaSource.Factory(DefaultHttpDataSource.Factory())
+			val factory=if(sc.contains(".m3u8",ignoreCase=true))HlsMediaSource.Factory(DefaultHttpDataSource.Factory()) else ProgressiveMediaSource.Factory(DefaultHttpDataSource.Factory())
 			player.setMediaSource(factory.createMediaSource(MediaItem.fromUri(Uri.parse(sc))))
 			player.prepare()
 		}
@@ -322,7 +328,6 @@ private suspend fun rs(id:String,d:VD,ep:Int):String{
 				LaunchedEffect(Unit){if(!tv)(c as? Activity)?.requestedOrientation=ActivityInfo.SCREEN_ORIENTATION_PORTRAIT}
 				// ★ 修复点：Dialog 关闭时恢复竖屏
 				DisposableEffect(Unit){onDispose{if(!tv)(c as? Activity)?.requestedOrientation=ActivityInfo.SCREEN_ORIENTATION_PORTRAIT}}
-				
 				Box(
 					modifier=Modifier.fillMaxSize().background(Color.Black)
 						.pointerInput(Unit){detectDragGestures(

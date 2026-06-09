@@ -129,7 +129,7 @@ object FN{ // 全局UI控制单例，持有主题/日志/历史等共享状态
 
 	var ht by mutableStateOf<String?>(null) // 当前激活的主导航标识（预留）
 	val hi=mutableStateListOf<VT>() // 播放历史队列（内存，同步持久化到SP）
-	data class VT(val id:String,val tt:String,val pt:String,val pg:String="") // 历史记录条目（id=视频key/tt=标题/pt=封面url/pg=进度描述）
+	data class VT(val id:String,val type:String,val tt:String,val pt:String,val pg:String="") // 历史记录条目（id=视频key/type=类型/tt=标题/pt=封面url/pg=进度描述）
 }
 
 @Composable

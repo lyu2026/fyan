@@ -136,7 +136,7 @@ import kotlinx.coroutines.launch
 	}
 
 	val cf=LocalConfiguration.current
-	val cs=when{id=="news"=>1;cf.screenWidthDp>=840->6;cf.screenWidthDp>=600->4;else->3}
+	val cs=when{id=="news"->1;cf.screenWidthDp>=840->6;cf.screenWidthDp>=600->4;else->3}
 	Column(modifier="fs".css().background(cc.b)){
 		if(gs.isNotEmpty()){
 			Column(modifier="fw".css().background(cc.s).border(0.5.dp,cc.ov)){
@@ -156,10 +156,10 @@ import kotlinx.coroutines.launch
 				else->LazyVerticalGrid(state=ls,modifier="fw".css(),columns=GridCells.Fixed(cs),contentPadding=PaddingValues(2.dp),verticalArrangement=Arrangement.spacedBy(2.dp),horizontalArrangement=Arrangement.spacedBy(2.dp)){
 					gridItems(vs,key={it.id}){o->
 						when{
-							id=="news"=>Box(modifier="fw".css().aspectRatio(16f/9f).background(Color.Black),contentAlignment=Alignment.Center){
-								VP(pt=d.pt,sc=u,playing=playing,onPlay={playing=true})
-							}
-							else=>VC(pt=o.pt,tt=o.tt,modifier="fw".css(),oc={
+							id=="news"->Box(modifier="fw".css().aspectRatio(16f/9f).background(Color.Black),contentAlignment=Alignment.Center){
+								var playing by remember(ep){mutableStateOf(false)}
+								VP(pt=o.pt,sc=o.id,playing=playing,onPlay={playing=true})
+							}else->VC(pt=o.pt,tt=o.tt,modifier="fw".css(),oc={
 								aH(FN.VT(o.id,o.type,o.tt,o.pt));
 								nv.navigate("detail/${o.id}")
 							},sb=listOfNotNull(o.sc.takeIf{it.isNotEmpty()},o.ut.takeIf{it.isNotEmpty()}).joinToString(" · "))

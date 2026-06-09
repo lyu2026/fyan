@@ -281,7 +281,6 @@ private suspend fun rs(id:String,d:VD,ep:Int):String{
 @Composable private fun VP(pt:String,sc:String,playing:Boolean,onPlay:()->Unit){ // 播放器核心组件
 	val cc=FN.LC.current
 	if(!playing){
-		// 未播放态：封面 + 播放按钮
 		Box(modifier="fs".css().clickable{onPlay()},contentAlignment=Alignment.Center){
 			AsyncImage(model=pt,contentDescription="封面",contentScale=ContentScale.Fit,modifier="fs".css())
 			Box(modifier="w56 h56 c".css().background(Color.Black.copy(alpha=0.5f)),contentAlignment=Alignment.Center){BasicText("▶",style=FN.TL.copy(color=Color.White))}
@@ -290,63 +289,40 @@ private suspend fun rs(id:String,d:VD,ep:Int):String{
 		val c=LocalContext.current
 		val cfg=LocalConfiguration.current
 		val tv=(cfg.uiMode and Configuration.UI_MODE_TYPE_MASK)==Configuration.UI_MODE_TYPE_TELEVISION
-		val isLandscape=cfg.orientation==Configuration.ORIENTATION_LANDSCAPE
+		var fs by remember{mutableStateOf(false)} // 全屏状态开关
 
-		// ★ 全屏状态独立于 isLandscape，不绑定 key
-		//   全屏由用户主动点击触发，不随 Configuration 重组自动重置
-		var fs by remember{mutableStateOf(false)}
-
-		// ★ listener 用 remember 缓存，避免重组重复注册导致回调触发多次
 		val listener=remember{object:Player.Listener{
 			override fun onPlaybackStateChanged(s:Int){if(s==Player.STATE_READY)FN.lg("VP","可播放",'n')}
 		}}
 
-		// ★ player 整个 playing=true 生命周期内唯一实例
 		val player=remember{ExoPlayer.Builder(c).build().apply{playWhenReady=true}}
 		DisposableEffect(player){
 			player.addListener(listener)
 			onDispose{player.removeListener(listener);player.release()}
 		}
 
-		// ★ 组件离开时恢复竖屏，防止退出播放后残留横屏
+		// 组件彻底销毁时，如果是手机则强制切回竖屏
 		DisposableEffect(Unit){onDispose{
 			if(!tv)(c as? Activity)?.requestedOrientation=ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 		}}
 
-		// 视频源变化时重新构建 MediaSource
 		LaunchedEffect(sc){
 			FN.lg("VideoPlay",sc,'u')
-			val factory=if(sc.contains(".m3u8",ignoreCase=true))
-				HlsMediaSource.Factory(DefaultHttpDataSource.Factory())
-			else
-				ProgressiveMediaSource.Factory(DefaultHttpDataSource.Factory())
+			val factory=if(sc.contains(".m3u8",ignoreCase=true)) HlsMediaSource.Factory(DefaultHttpDataSource.Factory()) else ProgressiveMediaSource.Factory(DefaultHttpDataSource.Factory())
 			player.setMediaSource(factory.createMediaSource(MediaItem.fromUri(Uri.parse(sc))))
 			player.prepare()
 		}
 
-		// ★ 核心修复：全屏不在原父布局内撑大，而是用 Dialog 完全脱离父约束树
-		//   Dialog 拥有独立的 Window，不受任何父 Modifier 约束限制，彻底解决容器炸的问题
-		//   同时不依赖 requestedOrientation 旋转 Activity，避免 Activity 重建导致状态丢失
 		if(fs){
 			Dialog(
 				onDismissRequest={fs=false},
-				properties=DialogProperties(
-					usePlatformDefaultWidth=false, // 禁用平台默认宽度，允许铺满全屏
-					dismissOnBackPress=true,
-					dismissOnClickOutside=false
-				)
+				properties=DialogProperties(usePlatformDefaultWidth=false,dismissOnBackPress=true,dismissOnClickOutside=false)
 			){
-				// ★ Dialog 内强制横屏：直接操作 Dialog 的 Window，不触发 Activity 重建
-				val dialogWindow=androidx.compose.ui.platform.LocalView.current.parent as? android.view.ViewGroup
-				LaunchedEffect(Unit){
-					val win=(c as? Activity)?.window
-					win?.attributes=win?.attributes?.also{it.screenOrientation=ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE}
-				}
-				DisposableEffect(Unit){onDispose{
-					// Dialog关闭时恢复 Window 方向为跟随系统
-					val win=(c as? Activity)?.window
-					win?.attributes=win?.attributes?.also{it.screenOrientation=ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED}
-				}}
+				// ★ 修复点：手机设备触发横屏，TV设备保持自然状态；使用标准 requestedOrientation 触发旋转
+				LaunchedEffect(Unit){if(!tv)(c as? Activity)?.requestedOrientation=ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE}
+				// ★ 修复点：Dialog 关闭时恢复竖屏
+				DisposableEffect(Unit){onDispose{if(!tv)(c as? Activity)?.requestedOrientation=ActivityInfo.SCREEN_ORIENTATION_PORTRAIT}}
+				
 				Box(
 					modifier=Modifier.fillMaxSize().background(Color.Black)
 						.pointerInput(Unit){detectDragGestures(
@@ -355,34 +331,25 @@ private suspend fun rs(id:String,d:VD,ep:Int):String{
 						)},
 					contentAlignment=Alignment.Center
 				){
-					AndroidView(
-						factory={PlayerView(c).apply{this.player=player;useController=true}},
-						modifier=Modifier.fillMaxSize()
-					)
-					// 左上角关闭全屏按钮
+					AndroidView(factory={PlayerView(c).apply{this.player=player;useController=true}},modifier=Modifier.fillMaxSize())
 					Box(
-						modifier=Modifier.align(Alignment.TopStart).padding(8.dp)
-							.size(32.dp).clip(androidx.compose.foundation.shape.CircleShape)
-							.background(Color.Black.copy(alpha=0.5f))
-							.clickable{fs=false},
+						modifier=Modifier.align(Alignment.TopStart).padding(8.dp).size(32.dp).clip(androidx.compose.foundation.shape.CircleShape).background(Color.Black.copy(alpha=0.5f)).clickable{fs=false},
 						contentAlignment=Alignment.Center
 					){BasicText("✕",style=FN.BM.copy(color=Color.White))}
 				}
 			}
 		}
 
-		// 竖屏内嵌播放器（始终渲染，保持 player 实例存活；全屏时被 Dialog 遮挡）
 		Box(
-			modifier=Modifier.fillMaxSize().clickable{if(!tv)fs=true}, // 点击进入全屏
+			// ★ 修复点：移除 if(!tv) 限制，允许 TV 设备同样响应点击事件放大全屏（或唤起带有控制器的界面）
+			modifier=Modifier.fillMaxSize().clickable{fs=true}, 
 			contentAlignment=Alignment.Center
 		){
-			AndroidView(
-				factory={PlayerView(c).apply{this.player=player;useController=false}}, // 竖屏隐藏控制条
-				modifier=Modifier.fillMaxSize()
-			)
+			AndroidView(factory={PlayerView(c).apply{this.player=player;useController=false}},modifier=Modifier.fillMaxSize())
 		}
 	}
 }
+
 
 // xo 需要在 VP 作用域外声明以便 Dialog 内的手势访问（提升到文件级私有）
 private var xo=0f

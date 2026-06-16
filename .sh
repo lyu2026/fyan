@@ -5,9 +5,8 @@ rm -rf app .gradle *.lock
 mkdir -p app/src/main/res/{xml,mipmap-anydpi-v26,drawable,values,values-night}
 mkdir -p app/src/main/kotlin/com/fyan
 mv *.kt app/src/main/kotlin/com/fyan/
-touch app/proguard-rules.pro
 
-for f in .xml .zml;do
+for f in .zh;do
 	[ -f "$f" ]||continue
 	x=false;o="";p=""
 	while IFS= read -r r||[ -n "$r" ];do
@@ -45,9 +44,9 @@ for f in .xml .zml;do
 	}
 done
 
-rm -r .xml .zml .sh
+rm -r .zh .sh
 
 vc=$(TZ="Asia/Shanghai" date +%Y%-m%-d)
 vn=$(TZ="Asia/Shanghai" date +%Y.%-m.%-d)
-sed -i "s/versionCode = .*/versionCode = $vc/" app/build.gradle.kts
-sed -i "s/versionName = \".*\"/versionName = \"$vn\"/" app/build.gradle.kts
+sed -i "s/versionCode=.*/versionCode=$vc/" app/build.gradle.kts
+sed -i "s/versionName=\".*\"/versionName=\"$vn\"/" app/build.gradle.kts

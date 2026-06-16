@@ -1,13 +1,152 @@
+
+@build.gradle.kts
+plugins {
+	id("com.android.library") version "9.2.1" apply false
+	id("com.android.application") version "9.2.1" apply false
+	id("org.jetbrains.kotlin.plugin.compose") version "2.4.0" apply false
+}
+
+@app/build.gradle.kts
+plugins {
+	id("com.android.application")
+	id("org.jetbrains.kotlin.plugin.compose")
+}
+android {
+	namespace="com.fyan"
+	compileSdk=36
+	signingConfigs {
+		create("release") {
+			val e=System.getenv("KS_PATH")
+			storeFile=if(!e.isNullOrEmpty())file(e)else file("../fyan.keystore")
+			storePassword=System.getenv("KS_PSWD")?:""
+			keyAlias=System.getenv("K_ALIAS")?:""
+			keyPassword=System.getenv("K_PSWD")?:""
+		}
+	}
+	defaultConfig {
+		applicationId="com.fyan"
+		minSdk=26
+		targetSdk=36
+		versionCode=0
+		versionName="0"
+		testInstrumentationRunner="androidx.test.runner.AndroidJUnitRunner"
+		vectorDrawables { useSupportLibrary=true }
+	}
+	sourceSets {
+		getByName("main") {
+			res.srcDirs("src/main/res")
+		}
+	}
+	buildTypes {
+		debug {
+			isMinifyEnabled=false
+			isShrinkResources=false
+		}
+		release {
+			isMinifyEnabled=true
+			isShrinkResources=true
+			signingConfig=signingConfigs.getByName("release")
+			proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"),"proguard-rules.pro")
+		}
+	}
+	compileOptions {
+		sourceCompatibility=JavaVersion.VERSION_21
+		targetCompatibility=JavaVersion.VERSION_21
+	}
+	buildFeatures { compose=true }
+	packaging {
+		resources { excludes+="/META-INF/{AL2.0,LGPL2.1}" }
+		jniLibs { keepDebugSymbols+="**/libandroidx.graphics.path.so" }
+	}
+}
+kotlin {
+	compilerOptions {
+		jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+	}
+}
+dependencies {
+	implementation(platform("androidx.compose:compose-bom:2026.05.00"))
+	implementation("androidx.core:core-ktx:1.15.0")
+	implementation("androidx.activity:activity-compose:1.13.0")
+	implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.10.0")
+	implementation("androidx.navigation:navigation-compose:2.9.0")
+	implementation("androidx.compose.ui:ui")
+	implementation("androidx.compose.ui:ui-graphics")
+	implementation("androidx.compose.foundation:foundation")
+	implementation("androidx.media3:media3-exoplayer:1.11.0")
+	implementation("androidx.media3:media3-exoplayer-hls:1.11.0")
+	implementation("androidx.media3:media3-ui:1.11.0")
+	implementation("io.coil-kt.coil3:coil-compose:3.5.0")
+	implementation("io.coil-kt.coil3:coil-network-okhttp:3.5.0")
+	debugImplementation("androidx.compose.ui:ui-tooling")
+}
+
+@settings.gradle.kts
+pluginManagement {
+	repositories {
+		google()
+		mavenCentral()
+		gradlePluginPortal()
+	}
+	resolutionStrategy {
+		eachPlugin {
+			if(requested.id.id.startsWith("org.jetbrains.kotlin"))useVersion("2.4.0")
+		}
+	}
+}
+dependencyResolutionManagement {
+	repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+	repositories {
+		google()
+		mavenCentral()
+	}
+}
+rootProject.name="fyan"
+include(":app")
+
+@gradle.properties
+android.useAndroidX=true
+android.enableJetifier=false
+org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1024m -XX:+UseG1GC
+org.gradle.parallel=true
+org.gradle.caching=true
+org.gradle.configuration-cache=true
+kotlin.incremental=true
+kotlin.parallel.tasks.in.project=true
+org.gradle.daemon=true
+org.gradle.configuration-cache.problems=warn
+kotlin.code.style=official
+
+@app/proguard-rules.pro
+-keep class kotlin.Metadata { *; }
+-keepclassmembers class * {
+	@androidx.compose.runtime.Composable *;
+}
+
+@.properties
+distributionBase=GRADLE_USER_HOME
+distributionPath=wrapper/dists
+distributionUrl=9.5.1.zip
+networkTimeout=10000
+retries=0
+retryBackOffMs=500
+validateDistributionUrl=true
+zipStoreBase=GRADLE_USER_HOME
+zipStorePath=wrapper/dists
+
+
+
 @app/src/main/AndroidManifest.xml
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 	<uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+	<uses-feature android:name="android.hardware.faketouch" android:required="false" />
 	<uses-feature android:name="android.software.leanback" android:required="false" />
-	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 	<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+	<uses-permission android:name="android.permission.INTERNET" />
 	<application
-		android:label="仏琰"
+		android:label="附琰"
 		android:theme="@style/Theme.Fyan" android:allowBackup="true"
 		android:icon="@mipmap/icon" android:banner="@drawable/banner">
 		<provider
@@ -107,4 +246,6 @@ delete:M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h1
 edit:M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z
 search:M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z
 close:M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z
+
+
 

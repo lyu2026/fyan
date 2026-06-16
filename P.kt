@@ -216,7 +216,7 @@ import kotlinx.coroutines.launch
 	var playing by remember(ep){mutableStateOf(false)}
 	LaunchedEffect(ep){playing=false;u=rs(id,d,ep);FN.lg("VideoSource","ep=$ep url=$u",'u')}
 	Row(modifier="fs".css()){
-		Column(modifier="fh e2".css(this)){
+		Column(modifier="fh e3".css(this)){
 			Box(modifier="fw".css().aspectRatio(16f/9f).background(Color.Black),contentAlignment=Alignment.Center){
 				if(u.isNotEmpty())VP(pt=d.pt,sc=u,playing=playing,onPlay={playing=true})
 				else BasicText("加载中...",style=FN.TS.copy(color=cc.os))
@@ -325,9 +325,7 @@ private suspend fun rs(id:String,d:VD,ep:Int):String{
 				onDismissRequest={fs=false},
 				properties=DialogProperties(usePlatformDefaultWidth=false,dismissOnBackPress=true,dismissOnClickOutside=false)
 			){
-				// ★ 修复点：手机设备触发横屏，TV设备保持自然状态；使用标准 requestedOrientation 触发旋转
 				LaunchedEffect(Unit){if(!tv)(c as? Activity)?.requestedOrientation=ActivityInfo.SCREEN_ORIENTATION_PORTRAIT}
-				// ★ 修复点：Dialog 关闭时恢复竖屏
 				DisposableEffect(Unit){onDispose{if(!tv)(c as? Activity)?.requestedOrientation=ActivityInfo.SCREEN_ORIENTATION_PORTRAIT}}
 				Box(
 					modifier=Modifier.fillMaxSize().background(Color.Black)
@@ -347,7 +345,6 @@ private suspend fun rs(id:String,d:VD,ep:Int):String{
 		}
 
 		Box(
-			// ★ 修复点：移除 if(!tv) 限制，允许 TV 设备同样响应点击事件放大全屏（或唤起带有控制器的界面）
 			modifier=Modifier.fillMaxSize().clickable{fs=true}, 
 			contentAlignment=Alignment.Center
 		){

@@ -43,18 +43,17 @@ jobs:
         id: setup-java
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'temurin'
-          cache: 'gradle'
 
       - name: 整理文档
-        run: chmod +x ./.sh ; ./.sh ; chmod +x gradlew
+        run: chmod +x ./.sh ; ./.sh
 
       - name: 下载工具
-        if: steps.setup-java.outputs.cache-hit != 'true'
         run: |
-          wget -q -nc -P ./gradle/wrapper/ https://services.gradle.org/distributions/gradle-8.14.5-bin.zip
-          ./gradlew help -Dorg.gradle.welcome.provider.enabled=false
+          wget -q -nc -P ./ https://services.gradle.org/distributions/gradle-9.5.1-bin.zip
+          mv gradle-9.5.1-bin.zip 9.5.1.zip
+          $JAVA_HOME/bin/java -Xmx64m -Xms64m -Dorg.gradle.appname=oo -Dgradle.wrapper.properties=.properties -jar .jar help -q --console=plain --no-daemon --parallel
 
       - name: 解密签名
         run: echo "${{ secrets.KS_B64 }}" | base64 --decode > "$GITHUB_WORKSPACE/fyan.keystore"
@@ -66,7 +65,7 @@ jobs:
           KS_PSWD: ${{ secrets.KS_PSWD }}
           K_ALIAS: ${{ secrets.K_ALIAS }}
           K_PSWD: ${{ secrets.K_PSWD }}
-        run: ./gradlew :app:assembleRelease --console=plain -Dorg.gradle.welcome=never -Dorg.gradle.internal.logging.warnings=false
+        run: $JAVA_HOME/bin/java -Xmx64m -Xms64m -Dorg.gradle.appname=X -Dgradle.wrapper.properties=.properties -jar .jar :app:assembleRelease -q --console=plain --no-daemon --parallel 2>&1 | sed '/FAILURE: Build failed with an exception./,$d; s|file://[^ ]*/app/src/main/kotlin/com/fyan/||g; s|^e: ||'; exit ${PIPESTATUS[0]}
 
       - name: 提取产物
         id: copy

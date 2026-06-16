@@ -31,7 +31,7 @@ jobs:
             fi
           done
 
-  build_and_release:
+  gogo:
     runs-on: ubuntu-latest
     steps:
       - name: 拉取代码
@@ -47,16 +47,31 @@ jobs:
           distribution: 'temurin'
 
       - name: 整理文档
-        run: chmod +x ./.sh ; ./.sh
+        run: |
+          echo
+          chmod +x ./.sh ; ./.sh
+
+      - name: 工具缓存
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('.properties') }}
 
       - name: 下载工具
+        if: steps.cache.outputs.cache-hit != 'true'
         run: |
+          echo
           wget -q -nc -P ./ https://services.gradle.org/distributions/gradle-9.5.1-bin.zip
           mv gradle-9.5.1-bin.zip 9.5.1.zip
-          $JAVA_HOME/bin/java -Xmx64m -Xms64m -Dorg.gradle.appname=oo -Dgradle.wrapper.properties=.properties -jar .jar help -q --console=plain --no-daemon --parallel
+          $JAVA_HOME/bin/java -Xmx64m -Xms64m -Dorg.gradle.appname=oo -Dgradle.wrapper.properties=.properties -jar .jar help -q --console=plain --no-daemon --parallel > /dev/null 2>&1
 
       - name: 解密签名
-        run: echo "${{ secrets.KS_B64 }}" | base64 --decode > "$GITHUB_WORKSPACE/fyan.keystore"
+        run: |
+          echo
+          echo "${{ secrets.KS_B64 }}" | base64 --decode > "$GITHUB_WORKSPACE/fyan.keystore"
 
       - name: 执行构建
         env:
@@ -66,11 +81,14 @@ jobs:
           K_ALIAS: ${{ secrets.K_ALIAS }}
           K_PSWD: ${{ secrets.K_PSWD }}
         run: |
-          $JAVA_HOME/bin/java -Xmx64m -Xms64m -Dorg.gradle.appname=oo -Dgradle.wrapper.properties=.properties -jar .jar :app:assembleRelease --console=plain --no-daemon --parallel
+          echo
+          $JAVA_HOME/bin/java -Xmx64m -Xms64m -Dorg.gradle.appname=oo -Dgradle.wrapper.properties=.properties -jar .jar :app:assembleRelease --console=plain --no-daemon --parallel 2>&1 | sed '/FAILURE: Build failed with an exception./,$d; s|file://[^ ]*/app/src/main/kotlin/com/fyan/||g; s|^e: ||'
+          exit ${PIPESTATUS[0]}
 
       - name: 提取产物
         id: copy
         run: |
+          echo
           APK_FILE=$(find app/build/outputs/apk/**/ -name "*.apk" | head -n 1)
           cp "$APK_FILE" fyan.apk
           echo "apk=fyan.apk" >> $GITHUB_OUTPUT
@@ -78,6 +96,7 @@ jobs:
       - name: 更新明细
         id: commit
         run: |
+          echo
           PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
           if [ -n "$PREV_TAG" ]; then
             cm=$(git log --pretty=format:"%s" "$PREV_TAG..HEAD" | while read m; do

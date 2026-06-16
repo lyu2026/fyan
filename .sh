@@ -46,7 +46,7 @@ done
 
 rm -r .rz .sh
 
-vc=$(TZ="Asia/Shanghai" date +%Y%-m%-d)
-vn=$(TZ="Asia/Shanghai" date +%Y.%-m.%-d)
+vc=$(TZ="Asia/Shanghai" date +%Y%m%d)
+vn=$(TZ="Asia/Shanghai" date +%Y.%m.%d)
 sed -i "s/versionCode=.*/versionCode=$vc/" app/build.gradle.kts
 sed -i "s/versionName=\".*\"/versionName=\"$vn\"/" app/build.gradle.kts

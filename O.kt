@@ -49,8 +49,7 @@ class O:androidx.activity.ComponentActivity(){ // 唯一Activity，承载Compose
 					packageManager.getPackageInfo(packageName,android.content.pm.PackageManager.PackageInfoFlags.of(0)).versionName
 				else
 					@Suppress("DEPRECATION")packageManager.getPackageInfo(packageName,0).versionName
-				val cv="v"+vn // 当前版本号加v前缀对齐格式
-				if(ver.startsWith("v")&&ver!=cv){ // 远端版本与本地不同则触发更新
+				if(ver.drop(1).filter(Char::isDigit).toLong()>vn.filter(Char::isDigit).toLong()){
 					withContext(Dispatchers.Main){ni(ver,"https://github.com/lyu2026/fyan/releases/download/$ver/fyan.apk")}
 				}
 			}

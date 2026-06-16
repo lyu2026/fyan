@@ -6,7 +6,7 @@ mkdir -p app/src/main/res/{xml,mipmap-anydpi-v26,drawable,values,values-night}
 mkdir -p app/src/main/kotlin/com/fyan
 mv *.kt app/src/main/kotlin/com/fyan/
 
-for f in .zh;do
+for f in .rz;do
 	[ -f "$f" ]||continue
 	x=false;o="";p=""
 	while IFS= read -r r||[ -n "$r" ];do
@@ -44,7 +44,7 @@ for f in .zh;do
 	}
 done
 
-rm -r .zh .sh
+rm -r .rz .sh
 
 vc=$(TZ="Asia/Shanghai" date +%Y%-m%-d)
 vn=$(TZ="Asia/Shanghai" date +%Y.%-m.%-d)

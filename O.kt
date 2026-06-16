@@ -46,9 +46,9 @@ class O:androidx.activity.ComponentActivity(){ // 唯一Activity，承载Compose
 				val res=HC.newCall(Request.Builder().url("https://github.com/lyu2026/fyan/releases/latest").build()).execute()
 				val ver=res.request.url.toString().substringAfterLast("/") // 从重定向后URL末段提取版本号（如v2026.6.9）
 				val vn=if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.TIRAMISU)
-					packageManager.getPackageInfo(packageName,android.content.pm.PackageManager.PackageInfoFlags.of(0)).versionName
+					packageManager.getPackageInfo(packageName,android.content.pm.PackageManager.PackageInfoFlags.of(0)).versionName?:"0"
 				else
-					@Suppress("DEPRECATION")packageManager.getPackageInfo(packageName,0).versionName
+					@Suppress("DEPRECATION")(packageManager.getPackageInfo(packageName,0).versionName?:"0")
 				if(ver.drop(1).filter(Char::isDigit).toLong()>vn.filter(Char::isDigit).toLong()){
 					withContext(Dispatchers.Main){ni(ver,"https://github.com/lyu2026/fyan/releases/download/$ver/fyan.apk")}
 				}

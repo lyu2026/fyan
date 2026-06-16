@@ -24,7 +24,7 @@ private fun SF(url:String):String{
 }
 
 data class NT(val id:String,val lb:String) // 顶部导航Tab常量结构（id=路由标识/lb=显示名）
-val NAV_TABS=listOf(NT("history","历史记录"),NT("movie","电影"),NT("drama","电视剧"),NT("anime","动漫"),NT("variety","综艺"),NT("documentary","纪录片"),NT("news","新闻"),NT("yule","娱乐")) // 全局导航Tab配置表
+val NAV_TABS=listOf(NT("history","历史记录"),NT("movie","电影"),NT("drama","电视剧"),NT("anime","动漫"),NT("variety","综艺"),NT("documentary","纪录片"),NT("news","新闻")) // 全局导航Tab配置表
 data class FO(val id:String,val lb:String) // 过滤选项节点（id=classifyId/lb=显示标签）
 data class FG(val op:List<FO>) // 过滤选项分组，包含一组互斥选项
 data class VI(val id:String,val type:String,val tt:String,val pt:String,val sc:String,val ut:String) // 视频列表简略项（id/type=类型/tt=标题/pt=封面/sc=评分/ut=更新状态）

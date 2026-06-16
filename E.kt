@@ -138,7 +138,7 @@ fun lH(){ // 从SP反序列化历史记录到内存队列
 	FN.hi.clear()
 	runCatching{
 		val j=org.json.JSONArray(PR.hs)
-		for(i in 0 until j.length()){val o=j.getJSONObject(i);FN.hi.add(FN.VT(o.optString("id"),o.optString("tt"),o.optString("pt"),o.optString("pg")))}
+		for(i in 0 until j.length()){val o=j.getJSONObject(i);FN.hi.add(FN.VT(o.optString("id"),o.optString("type"),o.optString("tt"),o.optString("pt"),o.optString("pg")))}
 	}
 }
 fun aH(im:FN.VT){ // 追加或更新历史记录（同id去重后置顶）

@@ -163,15 +163,15 @@ object Fyan{
 				drawContent()
 				val (w,r)=0.5.dp.toPx() to 4.dp.toPx()
 				drawPath(
-					Path().apply{
+					path=Path().apply{
 						moveTo(0f,size.height);lineTo(0f,r)
 						arcTo(Rect(0f,0f,r*2,r*2),180f,-90f,false)
 						lineTo(size.width-r,0f)
 						arcTo(Rect(size.width-r*2,0f,size.width,r*2),90f,-90f,false)
 						lineTo(size.width,size.height)
 					},
-					Fyan.cc.bd,
-					Stroke(w,cap=StrokeCap.Round,join=StrokeJoin.Round)
+					color=Fyan.cc.bd,
+					style=Stroke(w,cap=StrokeCap.Round,join=StrokeJoin.Round)
 				)
 			}){
 				Column(modifier=Modifier.fillMaxWidth().padding(4.dp)){

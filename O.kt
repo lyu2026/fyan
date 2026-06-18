@@ -165,13 +165,15 @@ object Fyan{
 				val (w,r)=0.5.dp.toPx() to 4.dp.toPx()
 				drawPath(
 					path=Path().apply{
-						moveTo(0f,size.height);lineTo(0f,r)
+						moveTo(0f,r)
 						arcTo(Rect(0f,0f,r*2,r*2),180f,-90f,false)
 						lineTo(size.width-r,0f)
 						arcTo(Rect(size.width-r*2,0f,size.width,r*2),90f,-90f,false)
 						lineTo(size.width,size.height)
-					},
-					color=bc,style=Stroke(w,cap=StrokeCap.Round,join=StrokeJoin.Round)
+						moveTo(0f,size.height)
+						lineTo(0f,r)
+					},color=bc,
+					style=Stroke(w,cap=StrokeCap.Round,join=StrokeJoin.Round)
 				)
 			}){
 				Column(modifier=Modifier.fillMaxWidth().padding(4.dp)){
@@ -181,7 +183,7 @@ object Fyan{
 					}
 					Row(modifier=Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically){
 						BasicText("日志 · ${gs.size}条",style=Fyan.ff.ps.copy(color=Fyan.cc.c))
-						Box(modifier=Modifier.padding(3.dp).clickable{gc()}){BasicText("清空",style=Fyan.ff.ps.copy(color=Color(0xFFF44336)))}
+						Box(modifier=Modifier.clickable{gc()}){BasicText("清空",style=Fyan.ff.ps.copy(color=Color(0xFFF44336)))}
 					}
 					LazyColumn(state=s,modifier=Modifier.fillMaxWidth()){
 						items(gs){o->

@@ -270,7 +270,7 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 	}
 	DisposableEffect(P){onDispose{P?.release()}}
 
-	@Suppress("UNCHECKED_CAST") val sl:List<Map<String,String>>=if(O!=null)O!!["s"] as List<Map<String,String>> else emptyList()
+	@Suppress("UNCHECKED_CAST") val sl:List<Map<String,String>> = if(O!=null)O!!["s"] as List<Map<String,String>> else emptyList()
 
 	Column(modifier=Modifier.fillMaxSize().background(Fyan.cc.bg)){
 		Row(modifier=Modifier.fillMaxWidth().height(38.dp).padding(horizontal=2.dp).background(Fyan.cc.cg),verticalAlignment=Alignment.CenterVertically){

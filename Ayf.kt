@@ -45,6 +45,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.hls.HlsMediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.ui.PlayerView
+import androidx.activity.compose.BackHandler
 import coil3.compose.AsyncImage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -269,10 +270,10 @@ import org.json.JSONObject
 						},horizontalAlignment=Alignment.CenterHorizontally){
 							Box(modifier=Modifier.fillMaxWidth().aspectRatio(0.7f).background(Fyan.cc.ag)){
 								AsyncImage(model=o["cover"],contentDescription=null,modifier=Modifier.fillMaxSize(),contentScale=ContentScale.Crop)
-								if(!o["score"].isNullOrEmpty())Box(modifier=Modifier.align(Alignment.TopStart).padding(2.dp).background(Fyan.cc.m,RoundedCornerShape(4.dp)).padding(2.dp)){
+								if(!o["score"].isNullOrEmpty())Box(modifier=Modifier.align(Alignment.TopStart).padding(2.dp,6.dp).background(Fyan.cc.m,RoundedCornerShape(10.dp)).padding(2.dp)){
 									BasicText(o["score"]!!,style=Fyan.ff.ps.copy(color=Fyan.cc.c))
 								}
-								if(!o["tip"].isNullOrEmpty())Box(modifier=Modifier.align(Alignment.BottomCenter).padding(4.dp,2.dp).background(Fyan.cc.m,RoundedCornerShape(2.dp)).padding(2.dp)){
+								if(!o["tip"].isNullOrEmpty())Box(modifier=Modifier.align(Alignment.BottomCenter).padding(2.dp,6.dp).background(Fyan.cc.m,RoundedCornerShape(6.dp)).padding(2.dp)){
 									BasicText(o["tip"]!!,style=Fyan.ff.ps.copy(color=Fyan.cc.c))
 								}
 							}
@@ -305,6 +306,7 @@ import org.json.JSONObject
 	var uc by remember{mutableStateOf("")} // 当前集播放 URL
 	var pr by remember{mutableStateOf(false)} // 是否已点击播放（显示播放器）
 	var fs by remember{mutableStateOf(false)} // 是否全屏播放弹窗
+	val c=Fyan.cc // 顶层读取单例化主题，彻底切断重组过程中的多余对象分配
 	val sc=rememberCoroutineScope()
 	Fyan.log("路由","进入爱壹帆视频详情页")
 
@@ -316,7 +318,6 @@ import org.json.JSONObject
 				val j=JSONObject(Fyan.fetch("https://api.iyf.tv/api/video/videodetails?mediaKey=$id")).optJSONObject("data")?.optJSONObject("detailInfo")?:return@runCatching null
 				val x=j.optJSONArray("episodes")
 				val s=mutableListOf<Map<String,String>>()
-				// 解析集数列表（episodeId + episodeTitle）
 				if(x!=null)for(i in 0 until x.length()){val v=x.getJSONObject(i);s.add(mapOf("id" to v.optString("episodeId",""),"title" to v.optString("episodeTitle","${i+1}")))}
 				mapOf("id" to id,"type" to j.optString("videoType","1"),"title" to j.optString("title","未知"),"brief" to j.optString("introduce","空空如也"),"cover" to j.optString("coverImgUrl",""),"s" to s)
 			}.getOrElse{null}
@@ -325,7 +326,6 @@ import org.json.JSONObject
 		if(O!=null){
 			val h=Fyan.co("ayf_history","")
 			val x=h.lines().firstOrNull{it.startsWith("$id ")}
-			// 写入历史记录：新条目置顶，去重同 id 旧条目
 			if(x.isNullOrBlank()){
 				ec=0;ep=0L
 				Fyan.cs("ayf_history",(listOf("$id ${O!!["type"]} ${O!!["title"]} ${O!!["cover"]} 0 0")+h.lines().filter{it.isNotEmpty()}).joinToString("\n"))
@@ -350,20 +350,19 @@ import org.json.JSONObject
 		@Suppress("UNCHECKED_CAST") val ei=(O!!["s"] as List<Map<String,String>>).getOrNull(ec)?.get("id")?:""
 		val url=withContext(Dispatchers.IO){
 			runCatching<String>{
-				// 请求播放数据接口，取第一个非空 mediaUrl
 				val s=JSONObject(Fyan.fetch("https://api.iyf.tv/api/video/getplaydata?mediaKey=$id&videoId=$ei&videoType=${O!!["type"]}")).optJSONObject("data")?.optJSONArray("list")?:return@runCatching ""
 				var u=""
 				for(i in 0 until s.length()){val v=s.getJSONObject(i).optString("mediaUrl","");if(v.isNotEmpty()){u=v;break}};u
 			}.getOrElse{""}
 		}
-		uc=url // 确保 ep 就绪后再赋值触发播放器创建，时序完美闭环
+		uc=url
 		Fyan.cs("ayf_history",(listOf("$id ${O!!["type"]} ${O!!["title"]} ${O!!["cover"]} ${ec} ${ep}")+h.lines().filter{it.isNotEmpty()&&!it.startsWith("${id} ")}).joinToString("\n"))
 	}
 
-	// 根据 URL 创建播放器实例（纯粹创建，隔离副作用）
+	// 根据 URL 创建播放器实例
 	val P:ExoPlayer?=remember(uc){if(uc.isNotEmpty())ExoPlayer.Builder(Fyan.me).build() else null}
 
-	// 统一管控换源、历史寻道控制，杜绝状态竞争
+	// 统一管控换源与历史寻道控制
 	LaunchedEffect(P,uc){
 		P?.apply{
 			val f=if(uc.contains(".m3u8",true))HlsMediaSource.Factory(DefaultHttpDataSource.Factory())else ProgressiveMediaSource.Factory(DefaultHttpDataSource.Factory())
@@ -386,7 +385,6 @@ import org.json.JSONObject
 				val cp=P.currentPosition
 				val t=O!!["type"];val tl=O!!["title"];val cv=O!!["cover"]
 				kotlinx.coroutines.CoroutineScope(Dispatchers.IO).launch{
-					// 直接在后台协程中拉取最新历史，彻底干掉全页面的 State 监听
 					val h=Fyan.co("ayf_history","")
 					val s=listOf("$id $t $tl $cv $ec $cp")+h.lines().filter{it.isNotEmpty()&&!it.startsWith("$id ")}
 					Fyan.cs("ayf_history",s.joinToString("\n"))
@@ -398,88 +396,80 @@ import org.json.JSONObject
 
 	@Suppress("UNCHECKED_CAST") val sl:List<Map<String,String>> = if(O!=null)O!!["s"] as List<Map<String,String>> else emptyList()
 
-	// 根布局采用 Box 包裹，方便 TV 端全屏时直接在顶层覆盖全屏
 	Box(modifier=Modifier.fillMaxSize()){
-		Column(modifier=Modifier.fillMaxSize().background(Fyan.cc.bg)){
+		Column(modifier=Modifier.fillMaxSize().background(c.bg)){
 			// 顶部导航栏：返回箭头 + 视频标题
-			Row(modifier=Modifier.fillMaxWidth().height(38.dp).background(Fyan.cc.cg),verticalAlignment=Alignment.CenterVertically){
+			Row(modifier=Modifier.fillMaxWidth().height(38.dp).background(c.cg),verticalAlignment=Alignment.CenterVertically){
 				Box(modifier=Modifier.size(32.dp).clip(CircleShape).padding(3.dp).clickable{Fyan.nc.popBackStack()},contentAlignment=Alignment.Center){
-					Image(painter=painterResource(R.drawable.arrow_back),contentDescription=null,modifier=Modifier.size(20.dp),colorFilter=ColorFilter.tint(Fyan.cc.c))
+					Image(painter=painterResource(R.drawable.arrow_back),contentDescription=null,modifier=Modifier.size(20.dp),colorFilter=ColorFilter.tint(c.c))
 				}
-				BasicText((O?.get("title") as? String)?:"视频详情",modifier=Modifier.weight(1f).padding(start=3.dp),maxLines=1,overflow=TextOverflow.Ellipsis,style=Fyan.ff.h4.copy(color=Fyan.cc.c))
+				BasicText((O?.get("title") as? String)?:"视频详情",modifier=Modifier.weight(1f).padding(start=3.dp),maxLines=1,overflow=TextOverflow.Ellipsis,style=Fyan.ff.h4.copy(color=c.c))
 			}
 			when{
-				// 加载态
 				X->Box(modifier=Modifier.fillMaxSize(),contentAlignment=Alignment.Center){
-					BasicText("◌ 加载视频详情…",style=Fyan.ff.p.copy(color=Fyan.cc.c.copy(alpha=0.5f)))
+					BasicText("◌ 加载视频详情…",style=Fyan.ff.p.copy(color=c.c.copy(alpha=0.5f)))
 				}
-				// 加载失败态，提供重试入口
 				O==null->Box(modifier=Modifier.fillMaxSize(),contentAlignment=Alignment.Center){
 					Column(horizontalAlignment=Alignment.CenterHorizontally){
-						BasicText("◑ 加载失败",style=Fyan.ff.p.copy(color=Fyan.cc.c.copy(alpha=0.5f)))
-						Box(modifier=Modifier.padding(top=8.dp).clip(RoundedCornerShape(4.dp)).background(Fyan.cc.ag).clickable{X=true}.padding(horizontal=16.dp,vertical=6.dp),contentAlignment=Alignment.Center){
-							BasicText("重试",style=Fyan.ff.p.copy(color=Fyan.cc.primary))
+						BasicText("◑ 加载失败",style=Fyan.ff.p.copy(color=c.c.copy(alpha=0.5f)))
+						Box(modifier=Modifier.padding(top=8.dp).clip(RoundedCornerShape(4.dp)).background(c.ag).clickable{X=true}.padding(horizontal=16.dp,vertical=6.dp),contentAlignment=Alignment.Center){
+							BasicText("重试",style=Fyan.ff.p.copy(color=c.primary))
 						}
 					}
 				}
-				// TV 横屏布局：左侧 3 份播放区 + 右侧 1 份简介区
+				// TV 横屏布局
 				Fyan.tv->Row(modifier=Modifier.fillMaxSize()){
 					Column(modifier=Modifier.fillMaxHeight().weight(3f)){
 						Box(modifier=Modifier.fillMaxWidth().aspectRatio(16f/9f).background(Color.Black),contentAlignment=Alignment.Center){
-							if(uc.isEmpty())BasicText("◉ 加载中...",style=Fyan.ff.ps.copy(color=Fyan.cc.c.copy(alpha=0.5f)))
+							if(uc.isEmpty())BasicText("◉ 加载中...",style=Fyan.ff.ps.copy(color=c.c.copy(alpha=0.5f)))
 							else if(!pr)Box(modifier=Modifier.fillMaxSize().clickable{pr=true},contentAlignment=Alignment.Center){
-								// 点击封面播放
 								AsyncImage(model=O!!["cover"].toString()+"?width=500&height=283&scale=both&mode=crop&anchor=topcenter&format=jpg",contentDescription=null,contentScale=ContentScale.Fit,modifier=Modifier.fillMaxSize())
-								Box(modifier=Modifier.size(56.dp).clip(CircleShape).background(Fyan.cc.m),contentAlignment=Alignment.Center){BasicText("▶",style=Fyan.ff.h2.copy(color=Color.White))}
+								Box(modifier=Modifier.size(56.dp).clip(CircleShape).background(c.m),contentAlignment=Alignment.Center){BasicText("▶",style=Fyan.ff.h2.copy(color=Color.White))}
 							}else{
-								// TV 预览态播放器：点击或按确定键直接切入全屏
 								Box(modifier=Modifier.fillMaxSize().clickable{fs=true},contentAlignment=Alignment.Center){
-									AndroidView(factory={PlayerView(Fyan.me).apply{player=P;useController=false;requestFocus()}},modifier=Modifier.fillMaxSize())
+									// 渲染环境调优：factory 内传入专属生命周期上下文，全屏时动态解绑续播并安全转移遥控器焦点
+									AndroidView(factory={ctx->PlayerView(ctx).apply{useController=true}},update={it.player=if(fs)null else P;if(!fs)it.requestFocus()},modifier=Modifier.fillMaxSize())
 								}
 							}
 						}
-						// TV 模式下集数选择使用横向 LazyRow
 						if(sl.isNotEmpty())LazyRow(modifier=Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(8.dp),contentPadding=PaddingValues(10.dp,8.dp)){
 							items(sl.indices.toList()){k->
-								Box(modifier=Modifier.width(50.dp).height(24.dp).clip(RoundedCornerShape(2.dp)).background(if(k==ec)Fyan.cc.primary else Fyan.cc.x).clickable{ec=k},contentAlignment=Alignment.Center){
-									BasicText(sl[k]["title"]!!,style=Fyan.ff.ps.copy(color=if(k==ec)Color.White else Fyan.cc.c,fontWeight=if(k==ec)FontWeight.W600 else FontWeight.W400))
+								Box(modifier=Modifier.width(50.dp).height(24.dp).clip(RoundedCornerShape(2.dp)).background(if(k==ec)c.primary else c.x).clickable{if(ec!=k)ec=k},contentAlignment=Alignment.Center){
+									BasicText(sl[k]["title"]!!,style=Fyan.ff.ps.copy(color=if(k==ec)Color.White else c.c,fontWeight=if(k==ec)FontWeight.W600 else FontWeight.W400))
 								}
 							}
 						}
 					}
-					// TV 简介侧边栏，可竖向滚动
 					Column(modifier=Modifier.fillMaxHeight().padding(16.dp,12.dp).weight(1f).verticalScroll(rememberScrollState())){
-						BasicText("视频简介",style=Fyan.ff.ps.copy(color=Fyan.cc.c.copy(alpha=0.5f)))
-						BasicText(O!!["brief"] as String,modifier=Modifier.padding(top=6.dp),style=Fyan.ff.p.copy(color=Fyan.cc.c))
+						BasicText("视频简介",style=Fyan.ff.ps.copy(color=c.c.copy(alpha=0.5f)))
+						BasicText(O!!["brief"] as String,modifier=Modifier.padding(top=6.dp),style=Fyan.ff.p.copy(color=c.c))
 					}
 				}
-				// 手机竖屏布局：整体可竖向滚动
+				// 手机竖屏布局
 				else->Column(modifier=Modifier.fillMaxSize().verticalScroll(rememberScrollState())){
 					Box(modifier=Modifier.fillMaxWidth().aspectRatio(16f/9f).background(Color.Black),contentAlignment=Alignment.Center){
-						if(uc.isEmpty())BasicText("◌ 加载中...",style=Fyan.ff.ps.copy(color=Fyan.cc.c.copy(alpha=0.5f)))
+						if(uc.isEmpty())BasicText("◌ 加载中...",style=Fyan.ff.ps.copy(color=c.c.copy(alpha=0.5f)))
 						else if(!pr)Box(modifier=Modifier.fillMaxSize().clickable{pr=true},contentAlignment=Alignment.Center){
 							AsyncImage(model=O!!["cover"],contentDescription=null,contentScale=ContentScale.Fit,modifier=Modifier.fillMaxSize())
-							Box(modifier=Modifier.size(56.dp).clip(CircleShape).background(Fyan.cc.m),contentAlignment=Alignment.Center){BasicText("▶",style=Fyan.ff.h2.copy(color=Color.White))}
+							Box(modifier=Modifier.size(56.dp).clip(CircleShape).background(c.m),contentAlignment=Alignment.Center){BasicText("▶",style=Fyan.ff.h2.copy(color=Color.White))}
 						}else Box(modifier=Modifier.fillMaxSize().clickable{fs=true},contentAlignment=Alignment.Center){
-							AndroidView(factory={PlayerView(Fyan.me).apply{player=P;useController=false;requestFocus()}},modifier=Modifier.fillMaxSize())
+							AndroidView(factory={ctx->PlayerView(ctx).apply{useController=false}},update={it.player=if(fs)null else P},modifier=Modifier.fillMaxSize())
 						}
 					}
-					// 视频简介区
 					Column(modifier=Modifier.padding(14.dp,12.dp)){
-						BasicText("视频简介",style=Fyan.ff.ps.copy(color=Fyan.cc.c.copy(alpha=0.5f)))
-						BasicText(O!!["brief"] as String,modifier=Modifier.padding(top=4.dp),style=Fyan.ff.p.copy(color=Fyan.cc.c))
+						BasicText("视频简介",style=Fyan.ff.ps.copy(color=c.c.copy(alpha=0.5f)))
+						BasicText(O!!["brief"] as String,modifier=Modifier.padding(top=4.dp),style=Fyan.ff.p.copy(color=c.c))
 					}
-					Box(modifier=Modifier.fillMaxWidth().height(0.5.dp).padding(horizontal=14.dp).background(Fyan.cc.bd))
-					// 集数选择区（每行5个，自动换行）
+					Box(modifier=Modifier.fillMaxWidth().height(0.5.dp).padding(horizontal=14.dp).background(c.bd))
 					if(sl.isNotEmpty())Column(modifier=Modifier.padding(12.dp,8.dp)){
-						BasicText("选集",style=Fyan.ff.ps.copy(color=Fyan.cc.c.copy(alpha=0.5f)))
+						BasicText("选集",style=Fyan.ff.ps.copy(color=c.c.copy(alpha=0.5f)))
 						Column(modifier=Modifier.padding(top=8.dp),verticalArrangement=Arrangement.spacedBy(6.dp)){
 							repeat((sl.size+4)/5){r->
 								Row(horizontalArrangement=Arrangement.spacedBy(6.dp)){
-									repeat(5){c->
-										val i=r*5+c
-										if(i<sl.size)Box(modifier=Modifier.weight(1f).height(24.dp).clip(RoundedCornerShape(2.dp)).background(if(i==ec)Fyan.cc.primary else Fyan.cc.x).clickable{ec=i},contentAlignment=Alignment.Center){
-											BasicText(sl[i]["title"]!!,style=Fyan.ff.ps.copy(color=if(i==ec)Color.White else Fyan.cc.c,fontWeight=if(i==ec)FontWeight.W600 else FontWeight.W400))
+									repeat(5){cIdx->
+										val i=r*5+cIdx
+										if(i<sl.size)Box(modifier=Modifier.weight(1f).height(24.dp).clip(RoundedCornerShape(2.dp)).background(if(i==ec)c.primary else c.x).clickable{if(ec!=i)ec=i},contentAlignment=Alignment.Center){
+											BasicText(sl[i]["title"]!!,style=Fyan.ff.ps.copy(color=if(i==ec)Color.White else c.c,fontWeight=if(i==ec)FontWeight.W600 else FontWeight.W400))
 										}else Box(modifier=Modifier.weight(1f))
 									}
 								}
@@ -491,40 +481,33 @@ import org.json.JSONObject
 			}
 		}
 
-		// 独立于 when 分支外的全局全屏渲染层
+		// 全局全屏覆盖层
 		if(fs){
 			if(Fyan.tv){
-				// TV 专属全屏架构：采用原生 Box 顶层平铺覆盖，完美保留遥控器 D-Pad 进度条寻道焦点
 				Box(modifier=Modifier.fillMaxSize().background(Color.Black),contentAlignment=Alignment.Center){
-					AndroidView(factory={
-						PlayerView(Fyan.me).apply{
-							player=P;useController=true
-							// 绑定 Click 监听：遥控器 OK 键直接控制控制栏显示与隐藏切换
+					AndroidView(factory={ctx->
+						PlayerView(ctx).apply{
+							useController=true
 							setOnClickListener{if(isControllerFullyVisible)hideController() else showController()}
-							requestFocus()
 						}
-					},modifier=Modifier.fillMaxSize())
-					// 拦截遥控器返回键：直接退出全屏模式回到简介页
+					},update={it.player=P;it.requestFocus()},modifier=Modifier.fillMaxSize())
 					BackHandler{fs=false}
 				}
 			}else{
-				// 手机专属全屏架构：继续沿用 Dialog 方便进行强制横屏控制
 				Dialog(onDismissRequest={fs=false},properties=DialogProperties(usePlatformDefaultWidth=false,dismissOnBackPress=true,dismissOnClickOutside=false)){
 					val ctx=LocalContext.current
 					DisposableEffect(Unit){
-						// 使用 SENSOR_LANDSCAPE 锁定横屏并支持重力感应 180 度翻转
 						(ctx as? Activity)?.requestedOrientation=ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
 						onDispose{(ctx as? Activity)?.requestedOrientation=ActivityInfo.SCREEN_ORIENTATION_PORTRAIT}
 					}
 					Box(modifier=Modifier.fillMaxSize().background(Color.Black),contentAlignment=Alignment.Center){
-						AndroidView(factory={
-							PlayerView(Fyan.me).apply{
-								player=P;useController=true
+						AndroidView(factory={cxt->
+							PlayerView(cxt).apply{
+								useController=true
 								setOnClickListener{if(isControllerFullyVisible)hideController() else showController()}
-								requestFocus()
 							}
-						},modifier=Modifier.fillMaxSize())
-						Box(modifier=Modifier.align(Alignment.TopStart).padding(8.dp).size(32.dp).clip(CircleShape).background(Fyan.cc.m).clickable{fs=false},contentAlignment=Alignment.Center){
+						},update={it.player=P;it.requestFocus()},modifier=Modifier.fillMaxSize())
+						Box(modifier=Modifier.align(Alignment.TopStart).padding(8.dp).size(32.dp).clip(CircleShape).background(c.m).clickable{fs=false},contentAlignment=Alignment.Center){
 							BasicText("✕",style=Fyan.ff.p.copy(color=Color.White))
 						}
 					}

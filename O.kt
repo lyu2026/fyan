@@ -136,8 +136,9 @@ object Fyan{ // 全局数据
 		val success=if(o)Color(0xFF4CAF50)else Color(0xFF2E7D32) // 日志：成功级别
 		val primary=if(o)Color(0xFF66AFFF)else Color(0xFF0066FF) // 主题强调色（选中/按钮）
 	}
-	// Composable 内获取当前主题色，跟随系统深色模式实时响应
-	val cc:CC @Composable get()=CC(isSystemInDarkTheme())
+	private val cd=CC(true);private val cl=CC(false)
+	// Composable 内获取当前主题色，直接映射返回对应单例，零对象分配
+	val cc:CC @Composable get()=if(isSystemInDarkTheme())cd else cl
 
 	// 自定义高性能交互指示器节点，适配 2026 最新版 BOM 架构，消除弃用报错
 	private class Idn(private val s:InteractionSource,private val f:Color,private val p:Color):Modifier.Node(),DrawModifierNode{

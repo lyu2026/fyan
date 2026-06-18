@@ -215,7 +215,7 @@ object Fyan{ // 全局数据
 	// 日志面板入口：折叠时显示细横条，展开时显示完整面板
 	@Composable fun Record(){if(gn||gs.isEmpty())RX()else RO()}
 	// 折叠态：显示可点击的细横条，点击恢复展开
-	@Composable private fun RX(){Box(modifier=Modifier.fillMaxWidth(0.7f).height(4.dp).padding(bottom=2.dp).clip(RoundedCornerShape(2.dp)).background(Fyan.cc.cg).clickable{gn=false;gy=0f},contentAlignment=Alignment.Center){}}
+	@Composable private fun RX(){Box(modifier=Modifier.fillMaxWidth(0.7f).height(8.dp).padding(bottom=2.dp).clip(RoundedCornerShape(2.dp)).background(Fyan.cc.cg).clickable{gn=false;gy=0f},contentAlignment=Alignment.Center){}}
 	// 展开态：完整日志面板，支持下拉折叠手势
 	@Composable private fun RO(){
 		val s=rememberLazyListState()
@@ -278,6 +278,8 @@ object Fyan{ // 全局数据
 							}
 						}
 					}
+					// 底部留白撑开，使日志内容不被屏幕底部圆角遮挡
+					Box(modifier=Modifier.fillMaxWidth().height(10.dp))
 				}
 			}
 		}

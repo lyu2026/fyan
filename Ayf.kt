@@ -272,11 +272,13 @@ import org.json.JSONObject
 							// 新闻类不进详情页
 							if(id!="news")Fyan.goto("ayf_info/"+o["id"])
 						},horizontalAlignment=Alignment.CenterHorizontally){
-							Box(modifier=Modifier.fillMaxWidth().aspectRatio(0.7f).background(Fyan.cc.ag),contentAlignment=Alignment.BottomCenter){
+							Box(modifier=Modifier.fillMaxWidth().aspectRatio(0.7f).background(Fyan.cc.ag)){
 								AsyncImage(model=o["cover"],contentDescription=null,modifier=Modifier.fillMaxSize(),contentScale=ContentScale.Crop)
-								val bd=listOfNotNull(o["score"]?.takeIf{it.isNotEmpty()},o["tip"]?.takeIf{it.isNotEmpty()}).joinToString(" · ")
-								if(bd.isNotEmpty())Box(modifier=Modifier.padding(2.dp).background(Fyan.cc.m,RoundedCornerShape(1.dp)).padding(4.dp,2.dp)){
-									BasicText(bd,style=Fyan.ff.ps.copy(color=Fyan.cc.w))
+								if(o["score"]?.isNotEmpty())Box(modifier=Modifier.align(Alignment.TopStart).padding(2.dp).background(Fyan.cc.m,RoundedCornerShape(2.dp)).padding(2.dp)){
+									BasicText(o["score"],style=Fyan.ff.ps.copy(color=Fyan.cc.c))
+								}
+								if(o["tip"]?.isNotEmpty())Box(modifier=Modifier.align(Alignment.BottomCenter).padding(4.dp,2.dp).background(Fyan.cc.m,RoundedCornerShape(2.dp)).padding(2.dp)){
+									BasicText(o["tip"],style=Fyan.ff.ps.copy(color=Fyan.cc.c))
 								}
 							}
 							BasicText(o["title"]!!,modifier=Modifier.padding(4.dp),maxLines=1,overflow=TextOverflow.Ellipsis,style=Fyan.ff.ps.copy(color=Fyan.cc.c,textAlign=TextAlign.Center))

@@ -274,10 +274,10 @@ import org.json.JSONObject
 						},horizontalAlignment=Alignment.CenterHorizontally){
 							Box(modifier=Modifier.fillMaxWidth().aspectRatio(0.7f).background(Fyan.cc.ag)){
 								AsyncImage(model=o["cover"],contentDescription=null,modifier=Modifier.fillMaxSize(),contentScale=ContentScale.Crop)
-								if(o["score"]?.isNotEmpty())Box(modifier=Modifier.align(Alignment.TopStart).padding(2.dp).background(Fyan.cc.m,RoundedCornerShape(2.dp)).padding(2.dp)){
+								if(!o["score"].isNullOrEmpty())Box(modifier=Modifier.align(Alignment.TopStart).padding(2.dp).background(Fyan.cc.m,RoundedCornerShape(2.dp)).padding(2.dp)){
 									BasicText(o["score"],style=Fyan.ff.ps.copy(color=Fyan.cc.c))
 								}
-								if(o["tip"]?.isNotEmpty())Box(modifier=Modifier.align(Alignment.BottomCenter).padding(4.dp,2.dp).background(Fyan.cc.m,RoundedCornerShape(2.dp)).padding(2.dp)){
+								if(!o["tip"].isNullOrEmpty())Box(modifier=Modifier.align(Alignment.BottomCenter).padding(4.dp,2.dp).background(Fyan.cc.m,RoundedCornerShape(2.dp)).padding(2.dp)){
 									BasicText(o["tip"],style=Fyan.ff.ps.copy(color=Fyan.cc.c))
 								}
 							}

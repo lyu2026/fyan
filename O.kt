@@ -90,20 +90,26 @@ object Fyan{
 		val h3=TextStyle(fontSize=18.sp,fontWeight=FontWeight.Bold)
 		val h4=TextStyle(fontSize=16.sp,fontWeight=FontWeight.Bold)
 		val p=TextStyle(fontSize=14.sp,fontWeight=FontWeight.Normal)
+		val px=TextStyle(fontSize=8.sp,fontWeight=FontWeight.Normal)
 		val ps=TextStyle(fontSize=12.sp,fontWeight=FontWeight.Normal)
 		val pb=TextStyle(fontSize=16.sp,fontWeight=FontWeight.Normal)
 	}
 
 	class CC(o:Boolean){
-		val m=if(o)Color(0x99000000)else Color(0x66000000)
-		val bg=if(o)Color(0xFF111111)else Color(0xFFF5F5F5)
-		val cg=if(o)Color(0xFF222222)else Color(0xFFFFFFFF)
+		val m=if(o)Color(0xAAFFFFFF)else Color(0xAA000000)
+		val bg=if(o)Color(0xFF000000)else Color(0xFFFFFFFF)
+		val cg=if(o)Color(0xFF222222)else Color(0xFFDDDDDD)
 		val ag=if(o)Color(0xFF333333)else Color(0xFFEEEEEE)
-		val c=if(o)Color(0xFFDDDDDD)else Color(0xFF222222)
+		val c=if(o)Color(0xFFFFFFFF)else Color(0xFF000000)
 		val bd=if(o)Color(0xFF444444)else Color(0xFFDDDDDD)
 		val fc=if(o)Color(0xFF66AFFF)else Color(0xFF0066FF)
 		val hv=if(o)Color(0xFF444444)else Color(0xFFE0E0E0)
 		val x=if(o)Color(0xFF555555)else Color(0xFFCCCCCC)
+		val info=if(o)Color(0xFF2196F3)else Color(0xFF1565C0)
+		val error=if(o)Color(0xFFF44336)else Color(0xFFF44336)
+		val warn=if(o)Color(0xFFFF9800)else Color(0xFFFF9800)
+		val debug=if(o)Color(0xFFCE93D8)else Color(0xFF6A1B9A)
+		val success=if(o)Color(0xFF4CAF50)else Color(0xFF2E7D32)
 	}
 	val cc:CC @Composable get()=CC(isSystemInDarkTheme())
 
@@ -132,8 +138,7 @@ object Fyan{
 	private fun gx(i:String)=gs.removeAll{it.startsWith(i)}
 	fun log(m:String,o:String,c:Char='i'){
 		val t=java.text.SimpleDateFormat("HH:mm:ss",java.util.Locale.getDefault()).format(java.util.Date())
-		val x=when(c){'i'->"#2196F3";'u'->"#9C27B0";'e'->"#F44336";'s'->"#00BCD4";'n'->"#4CAF50";'w'->"#FF9800";else->"#9E9E9E"}
-		val v=UUID.randomUUID().toString().replace("-","")+".$x●$t $m ➜ $o"
+		val v=UUID.randomUUID().toString().replace("-","")+".${c}●$t $m ➜ $o"
 		gh.post{gs.add(v)}
 	}
 	@Composable fun Record(){if(gn||gs.isEmpty())RX()else RO()}
@@ -148,15 +153,15 @@ object Fyan{
 					onDrag={ch,o->ch.consume();if(gy+o.y>=0f)gy+=o.y}
 				)
 		}){
-			Box(modifier=Modifier.fillMaxWidth().clip(RoundedCornerShape(topStart=2.dp,topEnd=2.dp))
-			.border(1.dp,Fyan.cc.bd,RoundedCornerShape(topStart=2.dp,topEnd=2.dp)).background(Fyan.cc.m).offset(y=(-1.2).dp)){
+			Box(modifier=Modifier.fillMaxWidth().clip(RoundedCornerShape(topStart=4.dp,topEnd=4.dp))
+			.border(0.5.dp,Fyan.cc.bd,RoundedCornerShape(topStart=4.dp,topEnd=4.dp)).background(Fyan.cc.m).offset(y=-4.dp)){
 				Column(modifier=Modifier.fillMaxWidth().padding(4.dp)){
 					Box(modifier=Modifier.fillMaxWidth(),contentAlignment=Alignment.Center){
 						Box(modifier=Modifier.fillMaxWidth(0.25f).height(4.dp).clip(RoundedCornerShape(2.dp))
-						.background(Fyan.cc.bg).clickable(enabled=tv){gn=true;gy=0f})
+						.background(Fyan.cc.bg).padding(bottom=2.dp)clickable(enabled=tv){gn=true;gy=0f})
 					}
 					Row(modifier=Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically){
-						BasicText("日志 · ${gs.size}条",style=Fyan.ff.ps.copy(color=Fyan.cc.c.copy(alpha=0.7f),fontFamily=FontFamily.Monospace))
+						BasicText("日志 · ${gs.size}条",style=Fyan.ff.px.copy(color=Fyan.cc.c.copy(alpha=0.7f),fontFamily=FontFamily.Monospace))
 						Box(modifier=Modifier.padding(3.dp).clickable{gc()}){BasicText("清空",style=Fyan.ff.ps.copy(color=Color(0xFFF44336)))}
 					}
 					LazyColumn(state=s,modifier=Modifier.fillMaxWidth()){
@@ -164,12 +169,12 @@ object Fyan{
 							val x=o.split("●",limit=2)
 							val z=x[0].lastIndexOf('.')
 							val id=if(z>0)x[0].substring(0,z)else x[0]
-							val cx=if(z>0)x[0].substring(z+1)else"#9E9E9E"
-							val c=try{Color(android.graphics.Color.parseColor(cx))}catch(_:Exception){Color(0xFF9E9E9E)}
+							val cx=if(z>0)x[0].substring(z+1)else"i"
+							val c=when(cx){"i"->Fyan.cc.info;"e"->Fyan.cc.error;"w"->Fyan.cc.warn;"s"->Fyan.cc.success;"d"->Fyan.cc.debug;else->Fyan.cc.c}
 							Box(modifier=Modifier.fillMaxWidth().height(0.5.dp).background(Fyan.cc.bd))
 							Row(modifier=Modifier.fillMaxWidth(),verticalAlignment=Alignment.Top,horizontalArrangement=Arrangement.SpaceBetween){
-								BasicText(x.getOrElse(1){"...."},modifier=Modifier.weight(1f).padding(end=4.dp),style=Fyan.ff.ps.copy(color=c,lineHeight=1.2.em,fontFamily=FontFamily.Monospace))
-								Box(modifier=Modifier.size(16.dp).clickable{gx(id)},contentAlignment=Alignment.Center){
+								BasicText(x.getOrElse(1){"...."},modifier=Modifier.weight(1f).padding(end=4.dp),style=Fyan.ff.ps.copy(color=c,lineHeight=1.1.em,fontFamily=FontFamily.Monospace))
+								Box(modifier=Modifier.size(14.dp).clickable{gx(id)},contentAlignment=Alignment.Center){
 									BasicText("✕",style=Fyan.ff.ps.copy(color=Fyan.cc.c.copy(alpha=0.7f)))
 								}
 							}

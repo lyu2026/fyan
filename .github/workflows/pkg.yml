@@ -82,7 +82,7 @@ jobs:
           K_PSWD: ${{ secrets.K_PSWD }}
         run: |
           echo
-          $JAVA_HOME/bin/java -Xmx64m -Xms64m -Dorg.gradle.appname=oo -Dgradle.wrapper.properties=.properties -jar .jar :app:assembleRelease --console=plain --no-daemon --parallel 2>&1 | sed '/FAILURE: Build failed with an exception./,$d; s|file://[^ ]*/app/src/main/kotlin/com/fyan/||g; s|^e: ||'
+          $JAVA_HOME/bin/java -Xmx64m -Xms64m -Dorg.gradle.appname=oo -Dgradle.wrapper.properties=.properties -jar .jar :app:assembleRelease -q --console=plain --no-daemon --parallel 2>&1 | sed '/FAILURE: Build failed with an exception./,$d; s|file://[^ ]*/app/src/main/kotlin/com/fyan/||g; s|^e: ||'
           exit ${PIPESTATUS[0]}
 
       - name: 提取产物

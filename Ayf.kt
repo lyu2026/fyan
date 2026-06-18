@@ -60,13 +60,14 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 
 	Column(modifier=Modifier.fillMaxSize().background(Fyan.cc.bg)){
 		Row(modifier=Modifier.fillMaxWidth().height(38.dp).background(Fyan.cc.cg).horizontalScroll(rememberScrollState()),verticalAlignment=Alignment.CenterVertically){
-			s.forEach{o->Box(modifier=Modifier.fillMaxHeight().background(if(o.first==c)Fyan.cc.fc.copy(alpha=0.15f)else Color.Transparent).padding(horizontal=16.dp).clickable{
+			s.forEach{o->Box(modifier=Modifier.fillMaxHeight().background(if(o.first==c)Fyan.cc.fc.copy(alpha=0.15f)else Color.Transparent).clickable{
 				Fyan.log("爱壹帆","点击TAB: "+o.first,'u')
 				sc.launch{Fyan.cs("ayf_tab",o.first)
 			}},contentAlignment=Alignment.Center){
-				BasicText(o.second,style=Fyan.ff.h4.copy(color=if(o.first==c)Fyan.cc.fc else Fyan.cc.c.copy(alpha=0.7f),fontWeight=if(o.first==c)FontWeight.Bold else FontWeight.Normal))
+				BasicText("  ${o.second}  ",style=Fyan.ff.h4.copy(color=if(o.first==c)Fyan.cc.fc else Fyan.cc.c.copy(alpha=0.7f),fontWeight=if(o.first==c)FontWeight.Bold else FontWeight.Normal))
 			}}
 		}
+		Box(modifier=Modifier.fillMaxWidth().height(0.5.dp).background(Fyan.cc.bd))
 		Box(modifier=Modifier.fillMaxWidth().weight(1f)){
 			key(c){when(c){"history"->AyfHistory();else->AyfList(id=c)}}
 		}
@@ -88,13 +89,13 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 	Fyan.log("路由","进入爱壹帆历史记录页")
 
 	Column(modifier=Modifier.fillMaxSize().background(Fyan.cc.bg)){
-		Row(modifier=Modifier.fillMaxWidth().height(30.dp).padding(horizontal=8.dp),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.SpaceBetween){
+		Row(modifier=Modifier.fillMaxWidth().height(30.dp).padding(horizontal=4.dp),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.SpaceBetween){
 			BasicText("记录清单",style=Fyan.ff.pb.copy(color=Fyan.cc.c))
 			Box(modifier=Modifier.size(28.dp).clickable{cc=true},contentAlignment=Alignment.Center){BasicText("🗑",style=Fyan.ff.h4.copy(color=Fyan.cc.c))}
 		}
 		if(vs.isEmpty())Box(modifier=Modifier.fillMaxSize(),contentAlignment=Alignment.Center){
 			BasicText("暂无观看记录",style=Fyan.ff.p.copy(color=Fyan.cc.c.copy(alpha=0.4f)))
-		}else LazyVerticalGrid(modifier=Modifier.fillMaxWidth().weight(1f),columns=GridCells.Fixed(cn),contentPadding=PaddingValues(2.dp),verticalArrangement=Arrangement.spacedBy(2.dp),horizontalArrangement=Arrangement.spacedBy(2.dp)){
+		}else LazyVerticalGrid(modifier=Modifier.fillMaxWidth().weight(1f),columns=GridCells.Fixed(cn),contentPadding=PaddingValues(4.dp),verticalArrangement=Arrangement.spacedBy(3.dp),horizontalArrangement=Arrangement.spacedBy(3.dp)){
 			items(vs,{it["id"]!!}){o->
 				Column(modifier=Modifier.clip(RoundedCornerShape(2.dp)).background(Fyan.cc.cg).pointerInput(o["id"]!!){
 					detectTapGestures(onTap={Fyan.goto("ayf_info/"+o["id"])},onLongPress={id=o["id"]})
@@ -114,8 +115,8 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 		Column(modifier=Modifier.fillMaxWidth().padding(32.dp).clip(RoundedCornerShape(3.dp)).background(Fyan.cc.cg).padding(20.dp),verticalArrangement=Arrangement.spacedBy(16.dp)){
 			BasicText("清空历史记录？",style=Fyan.ff.h4.copy(color=Fyan.cc.c))
 			Row(modifier=Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.End){
-				BasicText("取消",modifier=Modifier.clickable{Fyan.log("爱壹帆","取消清空历史记录");cc=false}.padding(8.dp),style=Fyan.ff.p.copy(color=Fyan.cc.c))
-				BasicText("确定",modifier=Modifier.clickable{Fyan.log("爱壹帆","执行清空历史记录");sc.launch{Fyan.cs("ayf_history","")};cc=false}.padding(8.dp),style=Fyan.ff.p.copy(color=Fyan.cc.fc))
+				BasicText("取消",modifier=Modifier.clickable{Fyan.log("爱壹帆","取消清空历史记录",'s');cc=false}.padding(8.dp),style=Fyan.ff.p.copy(color=Fyan.cc.c))
+				BasicText("确定",modifier=Modifier.clickable{Fyan.log("爱壹帆","执行清空历史记录",'w');sc.launch{Fyan.cs("ayf_history","")};cc=false}.padding(8.dp),style=Fyan.ff.p.copy(color=Fyan.cc.fc))
 			}
 		}
 	}
@@ -123,10 +124,10 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 		Column(modifier=Modifier.fillMaxWidth().padding(32.dp).clip(RoundedCornerShape(3.dp)).background(Fyan.cc.cg).padding(20.dp),verticalArrangement=Arrangement.spacedBy(16.dp)){
 			BasicText("删除此记录？",style=Fyan.ff.h4.copy(color=Fyan.cc.c))
 			Row(modifier=Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.End){
-				BasicText("取消",modifier=Modifier.clickable{Fyan.log("爱壹帆","取消删除历史记录，编号: $id");id=null}.padding(8.dp),style=Fyan.ff.p.copy(color=Fyan.cc.c))
+				BasicText("取消",modifier=Modifier.clickable{Fyan.log("爱壹帆","取消删除历史记录，编号: $id",'e');id=null}.padding(8.dp),style=Fyan.ff.p.copy(color=Fyan.cc.c))
 				BasicText("确定",modifier=Modifier.clickable{
 					val o=rs.lines().filter{it.isNotBlank()&&!it.startsWith("${id!!} ")}.joinToString("\n")
-					Fyan.log("爱壹帆","执行删除历史记录，编号: $id")
+					Fyan.log("爱壹帆","执行删除历史记录，编号: $id",'d')
 					sc.launch{Fyan.cs("ayf_history",o)};id=null
 				}.padding(8.dp),style=Fyan.ff.p.copy(color=Fyan.cc.fc))
 			}
@@ -150,7 +151,7 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 
 	suspend fun fv(u:String):List<Map<String,String>> = withContext(Dispatchers.IO){
 		runCatching<List<Map<String,String>>>{
-			Fyan.log("爱壹帆","获取筛选视频列表，链接: $u")
+			Fyan.log("爱壹帆","获取筛选视频列表，链接: $u",'d')
 			val j=JSONObject(SF(u)).optJSONObject("data")?:return@runCatching emptyList()
 			val s=j.optJSONArray("list")?:return@runCatching emptyList()
 			buildList{
@@ -165,7 +166,7 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 	LaunchedEffect(id){
 		fs=withContext(Dispatchers.IO){
 			runCatching<List<List<Pair<String,String>>>>{
-				Fyan.log("爱壹帆","获取筛选数据，TAB: $id")
+				Fyan.log("爱壹帆","获取筛选数据，TAB: $id",'s')
 				if(id=="news")listOf(listOf("国际" to "国际","国内" to "国内","华人资讯" to "华人资讯","财经" to "财经","军事" to "军事"))
 				else{
 					val j=JSONObject(SF("https://api.iyf.tv/api/list/getfiltertagsdata?SecondaryCode=$id")).optJSONObject("data")?:return@runCatching emptyList()
@@ -196,11 +197,12 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 						val at=fi==fc[i]
 						Box(modifier=Modifier.fillMaxHeight().background(if(at)Fyan.cc.fc.copy(alpha=0.15f)else Color.Transparent).clickable{
 							fc[i]=fi;sc.launch{X=true;vs=fv(au());X=false}
-						}.padding(horizontal=12.dp),contentAlignment=Alignment.Center){
+						},contentAlignment=Alignment.Center){
 							BasicText("  $fn  ",style=Fyan.ff.ps.copy(color=if(at)Fyan.cc.fc else Fyan.cc.c.copy(alpha=0.7f),fontWeight=if(at)FontWeight.W600 else FontWeight.W400))
 						}
 					}
 				}
+				Box(modifier=Modifier.fillMaxWidth().height(0.5.dp).background(Fyan.cc.bd))
 			}
 		}
 		Box(modifier=Modifier.fillMaxWidth().weight(1f)){
@@ -211,10 +213,10 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 				vs.isEmpty()->Box(modifier=Modifier.fillMaxSize(),contentAlignment=Alignment.Center){
 					BasicText("暂无视频",style=Fyan.ff.p.copy(color=Fyan.cc.c.copy(alpha=0.4f)))
 				}
-				else->LazyVerticalGrid(columns=GridCells.Fixed(Fyan.gc),contentPadding=PaddingValues(2.dp),
-					verticalArrangement=Arrangement.spacedBy(2.dp),horizontalArrangement=Arrangement.spacedBy(2.dp)){
+				else->LazyVerticalGrid(columns=GridCells.Fixed(Fyan.gc),contentPadding=PaddingValues(4.dp),
+					verticalArrangement=Arrangement.spacedBy(3.dp),horizontalArrangement=Arrangement.spacedBy(3.dp)){
 					items(vs,{it["id"]!!}){o->
-						Column(modifier=Modifier.padding(2.dp).clip(RoundedCornerShape(2.dp)).background(Fyan.cc.cg).clickable{
+						Column(modifier=Modifier.clip(RoundedCornerShape(2.dp)).background(Fyan.cc.cg).clickable{
 							Fyan.log("爱壹帆","进入详情页，编号: "+o["id"])
 							if(id!="news")Fyan.goto("ayf_info/"+o["id"])
 						},horizontalAlignment=Alignment.CenterHorizontally){
@@ -292,6 +294,7 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 			}
 			BasicText((O?.get("title") as? String)?:"视频详情",modifier=Modifier.padding(horizontal=6.dp).weight(1f),maxLines=1,overflow=TextOverflow.Ellipsis,style=Fyan.ff.h4.copy(color=Fyan.cc.c))
 		}
+		Box(modifier=Modifier.fillMaxWidth().height(0.5.dp).background(Fyan.cc.bd))
 		when{
 			X->Box(modifier=Modifier.fillMaxSize(),contentAlignment=Alignment.Center){
 				BasicText("加载视频详情…",style=Fyan.ff.p.copy(color=Fyan.cc.c.copy(alpha=0.5f)))

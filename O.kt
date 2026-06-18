@@ -90,13 +90,13 @@ object Fyan{
 		val h3=TextStyle(fontSize=18.sp,fontWeight=FontWeight.Bold)
 		val h4=TextStyle(fontSize=16.sp,fontWeight=FontWeight.Bold)
 		val p=TextStyle(fontSize=14.sp,fontWeight=FontWeight.Normal)
-		val px=TextStyle(fontSize=8.sp,fontWeight=FontWeight.Normal)
 		val ps=TextStyle(fontSize=12.sp,fontWeight=FontWeight.Normal)
 		val pb=TextStyle(fontSize=16.sp,fontWeight=FontWeight.Normal)
+		val gr=TextStyle(fontSize=8.sp,lineHeight=1.1.em,fontWeight=FontWeight.Normal,fontFamily=FontFamily.Monospace)
 	}
 
 	class CC(o:Boolean){
-		val m=if(o)Color(0xAAFFFFFF)else Color(0xAA000000)
+		val m=if(o)Color(0xAA000000)else Color(0xAAFFFFFF)
 		val bg=if(o)Color(0xFF000000)else Color(0xFFFFFFFF)
 		val cg=if(o)Color(0xFF222222)else Color(0xFFDDDDDD)
 		val ag=if(o)Color(0xFF333333)else Color(0xFFEEEEEE)
@@ -142,26 +142,26 @@ object Fyan{
 		gh.post{gs.add(v)}
 	}
 	@Composable fun Record(){if(gn||gs.isEmpty())RX()else RO()}
-	@Composable private fun RX(){Box(modifier=Modifier.fillMaxWidth(0.7f).height(5.dp).navigationBarsPadding().padding(bottom=2.dp).clip(RoundedCornerShape(2.dp)).background(Fyan.cc.cg).clickable{gn=false;gy=0f},contentAlignment=Alignment.Center){}}
+	@Composable private fun RX(){Box(modifier=Modifier.fillMaxWidth(0.7f).height(6.dp).navigationBarsPadding().padding(bottom=4.dp).clip(RoundedCornerShape(2.dp)).background(Fyan.cc.cg).clickable{gn=false;gy=0f},contentAlignment=Alignment.Center){}}
 	@Composable private fun RO(){
 		val s=rememberLazyListState()
 		LaunchedEffect(gs.size){if(gs.isNotEmpty())s.animateScrollToItem(gs.size-1)}
 		Box(modifier=Modifier.fillMaxWidth().heightIn(max=(Fyan.sh/3).dp).navigationBarsPadding()
-			.offset(y=gy.roundToInt().dp).pointerInput(Unit){
-				detectDragGestures(
-					onDragEnd={if(gy>40f){gn=true;gy=0f}else gy=0f},
-					onDrag={ch,o->ch.consume();if(gy+o.y>=0f)gy+=o.y}
-				)
+		.offset(y=gy.roundToInt().dp).pointerInput(Unit){
+			detectDragGestures(
+				onDragEnd={if(gy>40f){gn=true;gy=0f}else gy=0f},
+				onDrag={ch,o->ch.consume();if(gy+o.y>=0f)gy+=o.y}
+			)
 		}){
 			Box(modifier=Modifier.fillMaxWidth().clip(RoundedCornerShape(topStart=4.dp,topEnd=4.dp))
-			.border(0.5.dp,Fyan.cc.bd,RoundedCornerShape(topStart=4.dp,topEnd=4.dp)).background(Fyan.cc.m).offset(y=-4.dp)){
+			.border(0.5.dp,Fyan.cc.bd,RoundedCornerShape(topStart=4.dp,topEnd=4.dp)).background(Fyan.cc.m).offset(y=-1f)){
 				Column(modifier=Modifier.fillMaxWidth().padding(4.dp)){
 					Box(modifier=Modifier.fillMaxWidth(),contentAlignment=Alignment.Center){
 						Box(modifier=Modifier.fillMaxWidth(0.25f).height(4.dp).clip(RoundedCornerShape(2.dp))
-						.background(Fyan.cc.bg).padding(bottom=2.dp).clickable(enabled=tv){gn=true;gy=0f})
+						.background(Fyan.cc.ag).padding(top=2.dp).clickable(enabled=tv){gn=true;gy=0f})
 					}
 					Row(modifier=Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically){
-						BasicText("日志 · ${gs.size}条",style=Fyan.ff.px.copy(color=Fyan.cc.c.copy(alpha=0.7f),fontFamily=FontFamily.Monospace))
+						BasicText("日志 · ${gs.size}条",style=Fyan.ff.ps.copy(color=Fyan.cc.c))
 						Box(modifier=Modifier.padding(3.dp).clickable{gc()}){BasicText("清空",style=Fyan.ff.ps.copy(color=Color(0xFFF44336)))}
 					}
 					LazyColumn(state=s,modifier=Modifier.fillMaxWidth()){
@@ -173,9 +173,9 @@ object Fyan{
 							val c=when(cx){"i"->Fyan.cc.info;"e"->Fyan.cc.error;"w"->Fyan.cc.warn;"s"->Fyan.cc.success;"d"->Fyan.cc.debug;else->Fyan.cc.c}
 							Box(modifier=Modifier.fillMaxWidth().height(0.5.dp).background(Fyan.cc.bd))
 							Row(modifier=Modifier.fillMaxWidth(),verticalAlignment=Alignment.Top,horizontalArrangement=Arrangement.SpaceBetween){
-								BasicText(x.getOrElse(1){"...."},modifier=Modifier.weight(1f).padding(end=4.dp),style=Fyan.ff.ps.copy(color=c,lineHeight=1.1.em,fontFamily=FontFamily.Monospace))
+								BasicText(x.getOrElse(1){"...."},modifier=Modifier.weight(1f).padding(end=4.dp),style=Fyan.ff.gr.copy(color=c))
 								Box(modifier=Modifier.size(14.dp).clickable{gx(id)},contentAlignment=Alignment.Center){
-									BasicText("✕",style=Fyan.ff.ps.copy(color=Fyan.cc.c.copy(alpha=0.7f)))
+									BasicText("╳",style=Fyan.ff.ps.copy(color=Fyan.cc.c))
 								}
 							}
 						}

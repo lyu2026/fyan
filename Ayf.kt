@@ -89,7 +89,7 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 	Fyan.log("路由","进入爱壹帆历史记录页")
 
 	Column(modifier=Modifier.fillMaxSize().background(Fyan.cc.bg)){
-		Row(modifier=Modifier.fillMaxWidth().height(30.dp).padding(horizontal=4.dp),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.SpaceBetween){
+		Row(modifier=Modifier.fillMaxWidth().height(30.dp).padding(start=4.dp),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.SpaceBetween){
 			BasicText("记录清单",style=Fyan.ff.pb.copy(color=Fyan.cc.c))
 			Box(modifier=Modifier.size(28.dp).clickable{cc=true},contentAlignment=Alignment.Center){BasicText("🗑",style=Fyan.ff.h4.copy(color=Fyan.cc.c))}
 		}
@@ -113,7 +113,7 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 	}
 	if(cc)Dialog(onDismissRequest={cc=false}){
 		Column(modifier=Modifier.fillMaxWidth().padding(32.dp).clip(RoundedCornerShape(3.dp)).background(Fyan.cc.cg).padding(20.dp),verticalArrangement=Arrangement.spacedBy(16.dp)){
-			BasicText("清空历史记录？",style=Fyan.ff.h4.copy(color=Fyan.cc.c))
+			BasicText("清空历史记录？",style=Fyan.ff.h3.copy(color=Fyan.cc.c))
 			Row(modifier=Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.End){
 				BasicText("取消",modifier=Modifier.clickable{Fyan.log("爱壹帆","取消清空历史记录",'s');cc=false}.padding(8.dp),style=Fyan.ff.p.copy(color=Fyan.cc.c))
 				BasicText("确定",modifier=Modifier.clickable{Fyan.log("爱壹帆","执行清空历史记录",'w');sc.launch{Fyan.cs("ayf_history","")};cc=false}.padding(8.dp),style=Fyan.ff.p.copy(color=Fyan.cc.fc))
@@ -122,7 +122,7 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 	}
 	if(id!=null)Dialog(onDismissRequest={id=null}){
 		Column(modifier=Modifier.fillMaxWidth().padding(32.dp).clip(RoundedCornerShape(3.dp)).background(Fyan.cc.cg).padding(20.dp),verticalArrangement=Arrangement.spacedBy(16.dp)){
-			BasicText("删除此记录？",style=Fyan.ff.h4.copy(color=Fyan.cc.c))
+			BasicText("删除此记录？",style=Fyan.ff.h3.copy(color=Fyan.cc.c))
 			Row(modifier=Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.End){
 				BasicText("取消",modifier=Modifier.clickable{Fyan.log("爱壹帆","取消删除历史记录，编号: $id",'e');id=null}.padding(8.dp),style=Fyan.ff.p.copy(color=Fyan.cc.c))
 				BasicText("确定",modifier=Modifier.clickable{
@@ -288,11 +288,11 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 	@Suppress("UNCHECKED_CAST") val sl:List<Map<String,String>> = if(O!=null)O!!["s"] as List<Map<String,String>> else emptyList()
 
 	Column(modifier=Modifier.fillMaxSize().background(Fyan.cc.bg)){
-		Row(modifier=Modifier.fillMaxWidth().height(38.dp).padding(horizontal=2.dp).background(Fyan.cc.cg),verticalAlignment=Alignment.CenterVertically){
-			Box(modifier=Modifier.size(32.dp).clip(CircleShape).clickable{Fyan.nc.popBackStack()},contentAlignment=Alignment.Center){
+		Row(modifier=Modifier.fillMaxWidth().height(38.dp).background(Fyan.cc.cg),verticalAlignment=Alignment.CenterVertically){
+			Box(modifier=Modifier.size(32.dp).clip(CircleShape).padding(start=2.dp,end=6.dp).clickable{Fyan.nc.popBackStack()},contentAlignment=Alignment.Center){
 				Image(painter=painterResource(R.drawable.arrow_back),contentDescription=null,modifier=Modifier.size(20.dp),colorFilter=ColorFilter.tint(Fyan.cc.c))
 			}
-			BasicText((O?.get("title") as? String)?:"视频详情",modifier=Modifier.padding(horizontal=6.dp).weight(1f),maxLines=1,overflow=TextOverflow.Ellipsis,style=Fyan.ff.h4.copy(color=Fyan.cc.c))
+			BasicText((O?.get("title") as? String)?:"视频详情",modifier=Modifier.weight(1f),maxLines=1,overflow=TextOverflow.Ellipsis,style=Fyan.ff.h4.copy(color=Fyan.cc.c))
 		}
 		Box(modifier=Modifier.fillMaxWidth().height(0.5.dp).background(Fyan.cc.bd))
 		when{

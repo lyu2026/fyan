@@ -139,26 +139,33 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 		return "https://api.iyf.tv/api/$o&page=1&size=21"
 	}
 
-	suspend fun fv(u:String):List<Map<String,String>> = withContext(Dispatchers.IO){
-		runCatching{
+	// 修复：明确泛型类型 + 正确闭合 buildList/runCatching 括号
+	suspend fun fv(u:String):List<Map<String,String>>=withContext(Dispatchers.IO){
+		runCatching<List<Map<String,String>>>{
 			val j=JSONObject(SF(u)).optJSONObject("data")?:return@runCatching emptyList()
 			val s=j.optJSONArray("list")?:return@runCatching emptyList()
-			buildList{for(i in 0 until s.length()){val v=s.getJSONObject(i)
-				add(mapOf("id" to v.optString("mediaKey",""),"type" to v.optString("videoType","1"),"title" to v.optString("title",""),"cover" to v.optString("coverImgUrl",""),"score" to v.optString("score",""),"tip" to v.optString("updateStatus","")))}
+			buildList{
+				for(i in 0 until s.length()){
+					val v=s.getJSONObject(i)
+					add(mapOf("id" to v.optString("mediaKey",""),"type" to v.optString("videoType","1"),"title" to v.optString("title",""),"cover" to v.optString("coverImgUrl",""),"score" to v.optString("score",""),"tip" to v.optString("updateStatus","")))
+				}
+			}
 		}.getOrElse{emptyList()}
 	}
 
 	LaunchedEffect(id){
 		fs=withContext(Dispatchers.IO){
-			runCatching{
+			runCatching<List<List<Pair<String,String>>>>{
 				if(id=="news")listOf(listOf("国际" to "国际","国内" to "国内","华人资讯" to "华人资讯","财经" to "财经","军事" to "军事"))
 				else{
 					val j=JSONObject(SF("https://api.iyf.tv/api/list/getfiltertagsdata?SecondaryCode=$id")).optJSONObject("data")?:return@runCatching emptyList()
 					val s=j.optJSONArray("list")?:return@runCatching emptyList()
-					buildList{for(i in 0 until s.length()){
-						val z=s.getJSONObject(i).optJSONArray("list")?:continue
-						add(buildList{for(r in 0 until z.length()){val o=z.getJSONObject(r);add(o.optString("classifyId","0") to o.optString("classifyName",""))}})
-					}}
+					buildList{
+						for(i in 0 until s.length()){
+							val z=s.getJSONObject(i).optJSONArray("list")?:continue
+							add(buildList{for(r in 0 until z.length()){val o=z.getJSONObject(r);add(o.optString("classifyId","0") to o.optString("classifyName",""))}})
+						}
+					}
 				}
 			}.getOrElse{emptyList()}
 		}
@@ -224,7 +231,7 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 	LaunchedEffect(id){
 		X=true;ec=0;pr=false;uc=""
 		O=withContext(Dispatchers.IO){
-			runCatching{
+			runCatching<Map<String,Any>?>{
 				val j=JSONObject(SF("https://api.iyf.tv/api/video/videodetails?mediaKey=$id")).optJSONObject("data")?.optJSONObject("detailInfo")?:return@runCatching null
 				val x=j.optJSONArray("episodes")
 				val s=mutableListOf<Map<String,String>>()
@@ -243,7 +250,7 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 		pr=false;uc=""
 		@Suppress("UNCHECKED_CAST") val ei=(O!!["s"] as List<Map<String,String>>).getOrNull(ec)?.get("id")?:""
 		uc=withContext(Dispatchers.IO){
-			runCatching{
+			runCatching<String>{
 				val s=JSONObject(SF("https://api.iyf.tv/api/video/getplaydata?mediaKey=$id&videoId=$ei&videoType=${O!!["type"]}")).optJSONObject("data")?.optJSONArray("list")?:return@runCatching ""
 				var u=""
 				for(i in 0 until s.length()){val v=s.getJSONObject(i).optString("mediaUrl","");if(v.isNotEmpty()){u=v;break}};u
@@ -251,17 +258,13 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 		}
 	}
 
-	// 将 ExoPlayer 生命周期提升到 Composable 顶层，避免在条件/remember lambda 内调用 Composable
-	val player=remember(uc){
-		if(uc.isNotEmpty()){
-			ExoPlayer.Builder(Fyan.me).build().apply{
-				val f=if(uc.contains(".m3u8",true))HlsMediaSource.Factory(DefaultHttpDataSource.Factory())else ProgressiveMediaSource.Factory(DefaultHttpDataSource.Factory())
-				setMediaSource(f.createMediaSource(MediaItem.fromUri(Uri.parse(uc))));prepare();playWhenReady=true
-			}
+	val P:ExoPlayer?=remember(uc){
+		if(uc.isNotEmpty())ExoPlayer.Builder(Fyan.me).build().apply{
+			val f=if(uc.contains(".m3u8",true))HlsMediaSource.Factory(DefaultHttpDataSource.Factory())else ProgressiveMediaSource.Factory(DefaultHttpDataSource.Factory())
+			setMediaSource(f.createMediaSource(MediaItem.fromUri(Uri.parse(uc))));prepare();playWhenReady=true
 		}else null
 	}
-	// DisposableEffect 必须无条件调用，用 player 作 key，null 时也正常执行 onDispose（无需释放）
-	DisposableEffect(player){onDispose{player?.release()}}
+	DisposableEffect(P){onDispose{P?.release()}}
 
 	@Suppress("UNCHECKED_CAST") val sl:List<Map<String,String>>=if(O!=null)O!!["s"] as List<Map<String,String>> else emptyList()
 
@@ -270,7 +273,7 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 			Box(modifier=Modifier.size(32.dp).clip(CircleShape).clickable{Fyan.nc.popBackStack()},contentAlignment=Alignment.Center){
 				Image(painter=painterResource(R.drawable.arrow_back),contentDescription=null,modifier=Modifier.size(20.dp),colorFilter=ColorFilter.tint(Fyan.cc.c))
 			}
-			BasicText(O?.get("title")as?String?:"视频详情",modifier=Modifier.padding(horizontal=6.dp).weight(1f),maxLines=1,overflow=TextOverflow.Ellipsis,style=Fyan.ff.h4.copy(color=Fyan.cc.c))
+			BasicText((O?.get("title") as? String)?:"视频详情",modifier=Modifier.padding(horizontal=6.dp).weight(1f),maxLines=1,overflow=TextOverflow.Ellipsis,style=Fyan.ff.h4.copy(color=Fyan.cc.c))
 		}
 		when{
 			X->Box(modifier=Modifier.fillMaxSize(),contentAlignment=Alignment.Center){
@@ -291,7 +294,7 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 						else if(!pr)Box(modifier=Modifier.fillMaxSize().clickable{pr=true},contentAlignment=Alignment.Center){
 							AsyncImage(model=O!!["cover"],contentDescription=null,contentScale=ContentScale.Fit,modifier=Modifier.fillMaxSize())
 							Box(modifier=Modifier.size(56.dp).clip(CircleShape).background(Fyan.cc.m),contentAlignment=Alignment.Center){BasicText("▶",style=Fyan.ff.h2.copy(color=Color.White))}
-						}else AndroidView(factory={PlayerView(Fyan.me).apply{this.player=player;useController=true;requestFocus()}},modifier=Modifier.fillMaxSize())
+						}else AndroidView(factory={PlayerView(Fyan.me).apply{player=P;useController=true;requestFocus()}},modifier=Modifier.fillMaxSize())
 					}
 					if(sl.isNotEmpty())LazyRow(modifier=Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(8.dp),contentPadding=PaddingValues(10.dp,8.dp)){
 						items(sl.indices.toList()){k->
@@ -314,7 +317,7 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 						Box(modifier=Modifier.size(56.dp).clip(CircleShape).background(Fyan.cc.m),contentAlignment=Alignment.Center){BasicText("▶",style=Fyan.ff.h2.copy(color=Color.White))}
 					}else{
 						Box(modifier=Modifier.fillMaxSize().clickable{fs=true},contentAlignment=Alignment.Center){
-							AndroidView(factory={PlayerView(Fyan.me).apply{this.player=player;useController=false;requestFocus()}},modifier=Modifier.fillMaxSize())
+							AndroidView(factory={PlayerView(Fyan.me).apply{player=P;useController=false;requestFocus()}},modifier=Modifier.fillMaxSize())
 						}
 						if(fs)Dialog(onDismissRequest={fs=false},properties=DialogProperties(usePlatformDefaultWidth=false,dismissOnBackPress=true,dismissOnClickOutside=false)){
 							val ctx=LocalContext.current
@@ -323,7 +326,7 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 								onDispose{(ctx as? Activity)?.requestedOrientation=ActivityInfo.SCREEN_ORIENTATION_PORTRAIT}
 							}
 							Box(modifier=Modifier.fillMaxSize().background(Color.Black),contentAlignment=Alignment.Center){
-								AndroidView(factory={PlayerView(Fyan.me).apply{this.player=player;useController=true;requestFocus()}},modifier=Modifier.fillMaxSize())
+								AndroidView(factory={PlayerView(Fyan.me).apply{player=P;useController=true;requestFocus()}},modifier=Modifier.fillMaxSize())
 								Box(modifier=Modifier.align(Alignment.TopStart).padding(8.dp).size(32.dp).clip(CircleShape).background(Fyan.cc.m).clickable{fs=false},contentAlignment=Alignment.Center){
 									BasicText("✕",style=Fyan.ff.p.copy(color=Color.White))
 								}

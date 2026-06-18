@@ -19,7 +19,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -38,7 +37,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
@@ -58,123 +56,99 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.core.content.FileProvider
 import androidx.core.content.pm.PackageInfoCompat
-import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import java.io.File
 import java.util.UUID
 import kotlin.math.roundToInt
 
+object Fyan{ // 全局底层核心基座系统
+	lateinit var nc:NavHostController // 全局导航总控制器引用指针
+	lateinit var me:Context // 全局常驻应用唯一ApplicationContext
+	var tv=false // 电视TV设备标识硬件过滤器
+	var vs=0L // 安装包内部版本指纹
+	var vn="" // 安装包公开版本代号
 
-object Fyan{ // 全局数据
-	lateinit var nc:NavHostController // 全局导航控制器
-	lateinit var me:Context // 全局 applicationContext，避免内存泄漏
-	var tv=false // 是否为 TV 设备（uiMode 位掩码判断）
-	var vs=0L // 当前安装包的 versionCode（长整型）
-	var vn="" // 当前安装包的 versionName 字符串
-
-	// 初始化全局状态：上下文、TV 标识、版本信息
-	@Suppress("DEPRECATION") fun init(a:Context){
-		me=a.applicationContext
-		tv=(me.resources.configuration.uiMode and 15)==4 // uiMode & UI_MODE_TYPE_MASK == UI_MODE_TYPE_TELEVISION
-		val p=me.packageManager.getPackageInfo(me.packageName,0)
-		vs=PackageInfoCompat.getLongVersionCode(p) // 兼容 API 28 以下的 versionCode 获取
-		vn=p.versionName?:"0"
+	@Suppress("DEPRECATION") fun init(a:Context){ // 全局初始硬化装载过程
+		me=a.applicationContext // 截留上下文防止泄漏
+		tv=(me.resources.configuration.uiMode and 15)==4 // 提取系统位掩码确立TV硬件属性
+		val p=me.packageManager.getPackageInfo(me.packageName,0) // 获取应用包底档
+		vs=PackageInfoCompat.getLongVersionCode(p) // 解算长代码版本
+		vn=p.versionName?:"0" // 提取版本文书名称
 	}
 
-	// 导航跳转封装，统一入口
-	fun goto(o:String)=nc.navigate(o)
+	fun goto(o:String)=nc.navigate(o) // 全向轻量导航跃迁封装器
+	fun fetch(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.readText()} // 原生同步读写吞吐网络流
+	val sw:Int get()=me.resources.configuration.screenWidthDp // 屏幕实时工作宽度dp
+	val sh:Int get()=me.resources.configuration.screenHeightDp // 屏幕实时工作高度dp
+	val gc:Int get()=if(sw>=840)6 else if(sw>=600)4 else 3 // 多端自适应网格弹性系数分级器
 
-	// 同步网络请求：打开 URL 输入流，读取全部文本（IO 线程调用）
-	fun fetch(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.readText()}
-
-	// 当前屏幕宽度（dp），用于响应式布局判断
-	val sw:Int get()=me.resources.configuration.screenWidthDp
-	// 当前屏幕高度（dp），用于日志面板高度计算
-	val sh:Int get()=me.resources.configuration.screenHeightDp
-	// 网格列数：平板840dp以上6列，600dp以上4列，手机3列
-	val gc:Int get()=if(sw>=840)6 else if(sw>=600)4 else 3
-
-	object ff{ // 字体样式集合，统一管理全局文字规格
-		val h1=TextStyle(fontSize=24.sp,fontWeight=FontWeight.Bold) // 大标题
-		val h2=TextStyle(fontSize=20.sp,fontWeight=FontWeight.Bold) // 二级标题
-		val h3=TextStyle(fontSize=18.sp,fontWeight=FontWeight.Bold) // 三级标题（弹窗标题）
-		val h4=TextStyle(fontSize=16.sp,fontWeight=FontWeight.Bold) // 四级标题（导航栏）
-		val p=TextStyle(fontSize=14.sp,fontWeight=FontWeight.Normal) // 正文
-		val ps=TextStyle(fontSize=12.sp,fontWeight=FontWeight.Normal) // 小字（角标、简介）
-		val pb=TextStyle(fontSize=16.sp,fontWeight=FontWeight.Normal) // 正文加大（弹窗说明）
-		val gr=TextStyle(fontSize=10.sp,lineHeight=1.06.em,fontWeight=FontWeight.Normal,fontFamily=FontFamily.Monospace) // 日志等宽字体
+	object ff{ // 系统底层集中管理文字排版与样式集
+		val h1=TextStyle(fontSize=24.sp,fontWeight=FontWeight.Bold) // 顶级粗标题
+		val h2=TextStyle(fontSize=20.sp,fontWeight=FontWeight.Bold) // 次级次标题
+		val h3=TextStyle(fontSize=18.sp,fontWeight=FontWeight.Bold) // 菜单二级提示词
+		val h4=TextStyle(fontSize=16.sp,fontWeight=FontWeight.Bold) // 功能导航条短语
+		val p=TextStyle(fontSize=14.sp,fontWeight=FontWeight.Normal) // 全局基础正文排版
+		val ps=TextStyle(fontSize=12.sp,fontWeight=FontWeight.Normal) // 次要注解微型字样
+		val pb=TextStyle(fontSize=16.sp,fontWeight=FontWeight.Normal) // 加大正文行距字样
+		val gr=TextStyle(fontSize=10.sp,lineHeight=1.06.em,fontWeight=FontWeight.Normal,fontFamily=FontFamily.Monospace) // 控制台等宽代码字体
 	}
 
-	class CC(o:Boolean){ // 主题色彩系统，根据深色/浅色模式动态切换
-		val w=Color.White // 白色
-		val fc=if(o)Color(0xFF5C8EBE)else Color(0xFF90CAF9) // 获焦背景（亮蓝调，TV极易识别且不刺眼）
-		val ps=if(o)Color(0xFF6A6A6A)else Color(0xFF9E9E9E) // 轻触反馈（稳重深/中灰，下压感明确）
-		val m=if(o)Color(0xDD000000)else Color(0xDDFFFFFF) // 半透明遮罩（日志面板背景）
-		val bg=if(o)Color(0xFF000000)else Color(0xFFFFFFFF) // 页面底色
-		val cg=if(o)Color(0xFF222222)else Color(0xFFDDDDDD) // 卡片/容器背景
-		val ag=if(o)Color(0xFF333333)else Color(0xFFCCCCCC) // 次级容器（封面占位/按钮）
-		val c=if(o)Color(0xFFFFFFFF)else Color(0xFF000000) // 主文字色
-		val bd=if(o)Color(0xFF444444)else Color(0xFFBBBBBB) // 分割线/边框色
-		val x=if(o)Color(0xFF555555)else Color(0xFFCCCCCC) // 未选中集数按钮背景
-		val info=if(o)Color(0xFF2196F3)else Color(0xFF1565C0) // 日志：信息级别
-		val error=if(o)Color(0xFFF44336)else Color(0xFFF44336) // 日志：错误级别
-		val warn=if(o)Color(0xFFFF9800)else Color(0xFFFF9800) // 日志：警告级别
-		val debug=if(o)Color(0xFFCE93D8)else Color(0xFF6A1B9A) // 日志：调试级别
-		val success=if(o)Color(0xFF4CAF50)else Color(0xFF2E7D32) // 日志：成功级别
-		val primary=if(o)Color(0xFF66AFFF)else Color(0xFF0066FF) // 主题强调色（选中/按钮）
+	class CC(o:Boolean){ // 精准反向色彩调配及自适应板
+		val w=Color.White // 全光纯白色
+		val fc=if(o)Color(0xFF5C8EBE)else Color(0xFF90CAF9) // 电视端遥控聚焦高亮方案
+		val ps=if(o)Color(0xFF6A6A6A)else Color(0xFF9E9E9E) // 系统触摸波纹下压反馈色
+		val m=if(o)Color(0xDD000000)else Color(0xDDFFFFFF) // 控制台遮罩雾面基色
+		val bg=if(o)Color(0xFF000000)else Color(0xFFFFFFFF) // 画布视窗根骨底色
+		val cg=if(o)Color(0xFF222222)else Color(0xFFDDDDDD) // 中度承载卡片骨架色
+		val ag=if(o)Color(0xFF333333)else Color(0xFFCCCCCC) // 未加载图素占位填充灰
+		val c=if(o)Color(0xFFFFFFFF)else Color(0xFF000000) // 主反差字体色
+		val bd=if(o)Color(0xFF444444)else Color(0xFFBBBBBB) // 细窄边缘线条色
+		val x=if(o)Color(0xFF555555)else Color(0xFFCCCCCC) // 集数默认背景色
+		val info=if(o)Color(0xFF2196F3)else Color(0xFF1565C0) // 常规信息指示蓝
+		val error=if(o)Color(0xFFF44336)else Color(0xFFF44336) // 警示故障红
+		val warn=if(o)Color(0xFFFF9800)else Color(0xFFFF9800) // 阻断预警橙
+		val debug=if(o)Color(0xFFCE93D8)else Color(0xFF6A1B9A) // 跟踪调用高密紫
+		val success=if(o)Color(0xFF4CAF50)else Color(0xFF2E7D32) // 健康安全绿
+		val primary=if(o)Color(0xFF66AFFF)else Color(0xFF0066FF) // 品牌唯一主视觉色
 	}
-	private val cd=CC(true);private val cl=CC(false)
-	// Composable 内获取当前主题色，直接映射返回对应单例，零对象分配
-	val cc:CC @Composable get()=if(isSystemInDarkTheme())cd else cl
+	private val cd=CC(true);private val cl=CC(false) // 提前锁死生成亮暗两极常驻单例
+	val cc:CC @Composable get()=if(isSystemInDarkTheme())cd else cl // 挂载响应重组无开销返回极性单例对象
 
-	// 自定义高性能交互指示器节点，适配 2026 最新版 BOM 架构，消除弃用报错
-	private class Idn(private val s:InteractionSource,private val f:Color,private val p:Color):Modifier.Node(),DrawModifierNode{
-		private var jf=false;private var jp=false
-		override fun onAttach(){
+	private class Idn(private val s:InteractionSource,private val f:Color,private val p:Color):Modifier.Node(),DrawModifierNode{ // 多维焦点跟踪绘图加速器
+		private var jf=false;private var jp=false // 高频物理状态锁
+		override fun onAttach(){ // 组件树成功锚接事件
 			super.onAttach()
-			coroutineScope.launch{
-				var fc=0;var pc=0
-				s.interactions.collect{i->
+			coroutineScope.launch{ // 启动单向流管道监听
+				var fc=0;var pc=0 // 缓存内部局部计数器
+				s.interactions.collect{i-> // 管道高密收集
 					when(i){
 						is FocusInteraction.Focus->fc++
 						is FocusInteraction.Unfocus->fc--
 						is PressInteraction.Press->pc++
 						is PressInteraction.Release,is PressInteraction.Cancel->pc--
 					}
-					val nf=fc>0;val np=pc>0
-					if(jf!=nf||jp!=np){jf=nf;jp=np;invalidateDraw()}
+					val nf=fc>0;val np=pc>0 // 计算复合状态
+					if(jf!=nf||jp!=np){jf=nf;jp=np;invalidateDraw()} // 发生裂变向图形驱动申请重刷画布区
 				}
 			}
 		}
-		override fun ContentDrawScope.draw(){
-			if(jp)drawRect(p)else if(jf)drawRect(f)
-			drawContent()
-		}
+		override fun ContentDrawScope.draw(){if(jp)drawRect(p)else if(jf)drawRect(f);drawContent()} // 图形渲染引擎最终输出覆盖层
 	}
-	// 新版指示器节点工厂
-	class Idf(private val f:Color,private val p:Color):IndicationNodeFactory{
-		override fun create(s:InteractionSource):DelegatableNode=Idn(s,f,p)
-		override fun equals(other:Any?):Boolean=other is Idf&&f==other.f&&p==other.p
-		override fun hashCode():Int=31*f.hashCode()+p.hashCode()
+	class Idf(private val f:Color,private val p:Color):IndicationNodeFactory{ // 适配现代BOM总线的无遗留微变工厂
+		override fun create(s:InteractionSource):DelegatableNode=Idn(s,f,p) // 动态吐出加速单元
+		override fun equals(other:Any?):Boolean=other is Idf&&f==other.f&&p==other.p // 高效同质等效性校正
+		override fun hashCode():Int=31*f.hashCode()+p.hashCode() // 唯一散列冲突规避
 	}
 
-	// DataStore 扩展属性，每个 Context 单例 DataStore 实例
-	private val Context.ds by preferencesDataStore("fyan")
-	// 根据值类型自动推断 Preferences.Key 类型，避免手动指定
-	@Suppress("UNCHECKED_CAST") private fun <T> String.cype(v:T)=(when(v){
+	private val Context.ds by preferencesDataStore("fyan") // 建立进程级全局共享唯一本地落盘数据库
+	@Suppress("UNCHECKED_CAST") private fun <T> String.cype(v:T)=(when(v){ // 本地强类型自适应键指派映射器
 		is ByteArray->byteArrayPreferencesKey(this)
 		is Boolean->booleanPreferencesKey(this)
 		is Set<*>->stringSetPreferencesKey(this)
@@ -185,210 +159,109 @@ object Fyan{ // 全局数据
 		is Int->intPreferencesKey(this)
 		else->null
 	}as?Preferences.Key<T>)
-	// 读取持久化键值，返回 Flow（支持 collectAsState 响应式）
-	fun <T> cg(k:String,d:T)=me.ds.data.map{p->k.cype(d)?.let{p[it]}?:d}
-	// 写入持久化键值（挂起函数，需在协程中调用）
-	suspend fun <T> cs(k:String,v:T)=me.ds.edit{p->k.cype(v)?.let{p[it]=v}}
-	// 删除指定持久化键（按 key name 匹配）
-	suspend fun cx(k:String)=me.ds.edit{p->p.asMap().keys.firstOrNull{it.name==k}?.let{p.remove(it)}}
-	// 同步读取一次当前值（非 Flow，用于初始化场景）
-	suspend fun <T> co(k:String,d:T)=cg(k,d).first()
+	fun <T> cg(k:String,d:T)=me.ds.data.map{p->k.cype(d)?.let{p[it]}?:d} // 零死锁异步无缝跟踪数据响应流
+	suspend fun <T> cs(k:String,v:T)=me.ds.edit{p->k.cype(v)?.let{p[it]=v}} // 原子化挂起式覆写持久化函数
+	suspend fun cx(k:String)=me.ds.edit{p->p.asMap().keys.firstOrNull{it.name==k}?.let{p.remove(it)}} // 行匹配式全清或移除目标键方法
+	suspend fun <T> co(k:String,d:T)=cg(k,d).first() // 刚性同步截取单次当前值常驻快照
 
-	// 日志条目列表（可观察状态，驱动 UI 刷新）
-	private val gs=mutableStateListOf<String>()
-	// 日志面板是否折叠
-	private var gn by mutableStateOf(false)
-	// 日志面板当前拖拽偏移量（向下拖拽折叠）
-	private var gy by mutableStateOf(0f)
-	// 主线程 Handler，确保日志添加操作在主线程执行
-	private val gh=Handler(Looper.getMainLooper())
-	// 清空所有日志
-	private fun gc()=gs.clear()
-	// 删除指定 UUID 前缀开头的日志条目（单条删除）
-	private fun gx(i:String)=gs.removeAll{it.startsWith(i)}
-	// 添加一条日志：m=模块名，o=内容，c=级别字符（i/e/w/s/d）
-	fun log(m:String,o:String,c:Char='i'){
-		val t=java.text.SimpleDateFormat("HH:mm:ss",java.util.Locale.getDefault()).format(java.util.Date())
-		// 格式：{UUID}.{级别}●{时间} {模块} ➜ {内容}
-		val v=UUID.randomUUID().toString().replace("-","")+".${c}●$t $m ➜ $o"
-		gh.post{gs.add(v)}
+	private val gs=mutableStateListOf<String>() // 控制台全局内存常驻高频刷新缓冲区
+	private var gn by mutableStateOf(false) // 交互面板折叠开关
+	private var gy by mutableStateOf(0f) // 面板纯像素位移物理距离跟踪器
+	private val gh=Handler(Looper.getMainLooper()) // 指向最高优先级主线程循环管道
+	private fun gc()=gs.clear() // 极速擦除内存缓冲区
+	private fun gx(i:String)=gs.removeAll{it.startsWith(i)} // 利用流水ID精准灭活过滤日志行
+	fun log(m:String,o:String,c:Char='i'){ // 集中式高性能入队审计器
+		val t=java.text.SimpleDateFormat("HH:mm:ss",java.util.Locale.getDefault()).format(java.util.Date()) // 测算毫秒钟表文书格式
+		val v=UUID.randomUUID().toString().replace("-","")+".${c}●$t $m ➜ $o" // 高压固化结构
+		gh.post{gs.add(v)} // 压入调度队列尾部
 	}
-	// 日志面板入口：折叠时显示细横条，展开时显示完整面板
-	@Composable fun Record(){if(gn||gs.isEmpty())RX()else RO()}
-	// 折叠态：显示可点击的细横条，点击恢复展开
-	@Composable private fun RX(){Box(modifier=Modifier.fillMaxWidth(0.7f).height(6.dp).padding(bottom=2.dp).clip(RoundedCornerShape(2.dp)).background(Fyan.cc.cg).clickable{gn=false;gy=0f},contentAlignment=Alignment.Center){}}
-	// 展开态：完整日志面板，支持下拉折叠手势
-	@Composable private fun RO(){
-		val s=rememberLazyListState()
-		val bc=Fyan.cc.bd
-		// 新日志入队时自动滚动到底部
-		LaunchedEffect(gs.size){if(gs.isNotEmpty())s.animateScrollToItem(gs.size-1)}
-		Box(modifier=Modifier.fillMaxWidth().heightIn(max=(Fyan.sh/3).dp).navigationBarsPadding()
-		// 支持下拉折叠：拖拽超过 40dp 触发折叠，松手自动复位
-		.offset(y=gy.roundToInt().dp).pointerInput(Unit){
-			detectDragGestures(
-				onDragEnd={if(gy>40f){gn=true;gy=0f}else gy=0f},
-				onDrag={ch,o->ch.consume();if(gy+o.y>=0f)gy+=o.y}
-			)
+	@Composable fun Record(){if(gn||gs.isEmpty())RX()else RO()} // 视图顶层多态调度主干分流热区
+	@Composable private fun RX(){ // 压缩手势复位条组件
+		val c=Fyan.cc
+		Box(modifier=Modifier.fillMaxWidth(0.7f).height(6.dp).padding(bottom=2.dp).clip(RoundedCornerShape(2.dp)).background(c.cg).clickable{gn=false;gy=0f},contentAlignment=Alignment.Center){} // 复原轻触响应区
+	}
+	@Composable private fun RO(){ // 全尺寸信息量大控制台面板结构
+		val s=rememberLazyListState() // 锁定滚动追踪器
+		val c=Fyan.cc;val f=Fyan.ff // 双路顶级单例注入快照
+		val dy=androidx.compose.ui.platform.LocalDensity.current.density // 测算屏幕真实的物理栅格化密度系数
+		LaunchedEffect(gs.size){if(gs.isNotEmpty())s.animateScrollToItem(gs.size-1)} // 尾部自对齐追随滚动逻辑
+		Box(modifier=Modifier.fillMaxWidth().heightIn(max=(Fyan.sh/3).dp).navigationBarsPadding().offset{androidx.compose.ui.unit.IntOffset(0,gy.roundToInt())}.pointerInput(Unit){ // 控制台悬浮基础垫片。优化：offset变身高效Lambda彻底瓦解触控过程引发的重组
+			detectDragGestures(onDragEnd={if(gy>40*dy){gn=true;gy=0f}else gy=0f},onDrag={ch,o->ch.consume();if(gy+o.y>=0f)gy+=o.y}) // 测算像素偏移量及复位隐藏边界逻辑
 		}){
-			Box(modifier=Modifier.fillMaxWidth().clip(RoundedCornerShape(topStart=4.dp,topEnd=4.dp))
-			.background(Fyan.cc.m).drawWithContent{
-				drawContent()
-				val (w,r)=0.5.dp.toPx() to 4.dp.toPx()
-				// 绘制顶部圆角边框线（仅上边+左边+右边，底部不绘制）
-				drawPath(
-					path=Path().apply{
-						moveTo(0f,size.height)
-						lineTo(0f,r)
-						arcTo(Rect(0f,0f,r*2,r*2),180f,90f,false)
-						lineTo(size.width-r,0f)
-						arcTo(Rect(size.width-r*2,0f,size.width,r*2),270f,90f,false)
-						lineTo(size.width,size.height)
-					},color=bc,
-					style=Stroke(w,cap=StrokeCap.Round,join=StrokeJoin.Round)
-				)
+			Box(modifier=Modifier.fillMaxWidth().clip(RoundedCornerShape(topStart=4.dp,topEnd=4.dp)).background(c.m).drawWithContent{ // 雾面底层容器板
+				drawContent() // 绘制原生布局文本
+				val (w,r)=0.5.dp.toPx() to 4.dp.toPx() // 算绘边线半径参数
+				drawPath(path=Path().apply{moveTo(0f,size.height);lineTo(0f,r);arcTo(Rect(0f,0f,r*2,r*2),180f,90f,false);lineTo(size.width-r,0f);arcTo(Rect(size.width-r*2,0f,size.width,r*2),270f,90f,false);lineTo(size.width,size.height)},color=c.bd,style=Stroke(w,cap=StrokeCap.Round,join=StrokeJoin.Round)) // 手绘合围精致外边线
 			}){
-				Column(modifier=Modifier.fillMaxWidth().padding(4.dp)){
-					// 顶部拖拽指示条（TV 模式下可点击折叠）
-					Box(modifier=Modifier.fillMaxWidth(),contentAlignment=Alignment.Center){
-						Box(modifier=Modifier.fillMaxWidth(0.25f).height(4.dp).clip(RoundedCornerShape(2.dp))
-						.background(Fyan.cc.ag).padding(top=2.dp).clickable(enabled=tv){gn=true;gy=0f})
-					}
-					// 标题行：日志计数 + 清空按钮
-					Row(modifier=Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically){
-						BasicText("日志 · ${gs.size}条",style=Fyan.ff.ps.copy(color=Fyan.cc.c))
-						Box(modifier=Modifier.clickable{gc()}){BasicText("清空",style=Fyan.ff.ps.copy(color=Color(0xFFF44336)))}
-					}
-					// 日志条目列表
-					LazyColumn(state=s,modifier=Modifier.fillMaxWidth().padding(bottom=6.dp)){
-						items(gs){o->
-							// 解析日志条目：UUID部分 | 级别 | 内容
-							val x=o.split("●",limit=2)
-							val z=x[0].lastIndexOf('.')
-							val id=if(z>0)x[0].substring(0,z)else x[0] // UUID（用于单条删除）
-							val cx=if(z>0)x[0].substring(z+1)else"i" // 级别字符
-							// 根据级别字符映射对应颜色
-							val c=when(cx){"i"->Fyan.cc.info;"e"->Fyan.cc.error;"w"->Fyan.cc.warn;"s"->Fyan.cc.success;"d"->Fyan.cc.debug;else->Fyan.cc.c}
-							Box(modifier=Modifier.fillMaxWidth().height(0.5.dp).background(Fyan.cc.bd))
-							Row(modifier=Modifier.fillMaxWidth(),verticalAlignment=Alignment.Top,horizontalArrangement=Arrangement.SpaceBetween){
-								BasicText(x.getOrElse(1){"...."},modifier=Modifier.weight(1f).padding(end=4.dp),style=Fyan.ff.gr.copy(color=c))
-								// 点击 ╳ 删除该条日志（通过 UUID 前缀精确匹配）
-								Box(modifier=Modifier.size(14.dp).clickable{gx(id)},contentAlignment=Alignment.Center){
-									BasicText("╳",style=Fyan.ff.ps.copy(color=Fyan.cc.c))
-								}
-							}
+				Column(modifier=Modifier.fillMaxWidth().padding(4.dp)){ // 内容纵向紧凑板
+					Box(modifier=Modifier.fillMaxWidth(),contentAlignment=Alignment.Center){Box(modifier=Modifier.fillMaxWidth(0.25f).height(4.dp).clip(RoundedCornerShape(2.dp)).background(c.ag).padding(top=2.dp).clickable(enabled=tv){gn=true;gy=0f})} // 拖拽手势指示条
+					Row(modifier=Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically){BasicText("日志 · ${gs.size}条",style=f.ps.copy(color=c.c));Box(modifier=Modifier.clickable{gc()}){BasicText("清空",style=f.ps.copy(color=Color(0xFFF44336)))}} // 仪表统计及擦除开关
+					LazyColumn(state=s,modifier=Modifier.fillMaxWidth().padding(bottom=6.dp)){ // 控制台输出滚轨
+						items(gs){o-> // 高密度迭代单条日志流
+							val x=o.split("●",limit=2);val z=x[0].lastIndexOf('.') // 解析格式化字段
+							val id=if(z>0)x[0].substring(0,z)else x[0];val cx=if(z>0)x[0].substring(z+1)else"i" // 提纯流水特征
+							val clr=when(cx){"i"->c.info;"e"->c.error;"w"->c.warn;"s"->c.success;"d"->c.debug;else->c.c} // 级别字色自适应映射
+							Box(modifier=Modifier.fillMaxWidth().height(0.5.dp).background(c.bd)) // 极细单条分割杠
+							Row(modifier=Modifier.fillMaxWidth(),verticalAlignment=Alignment.Top,horizontalArrangement=Arrangement.SpaceBetween){BasicText(x.getOrElse(1){"...."},modifier=Modifier.weight(1f).padding(end=4.dp),style=f.gr.copy(color=clr));Box(modifier=Modifier.size(14.dp).clickable{gx(id)},contentAlignment=Alignment.Center){BasicText("╳",style=f.ps.copy(color=c.c))}} // 单行详细日志与独立手动删行锚点
 						}
 					}
 				}
 			}
 		}
+	}
+
+	var br:BroadcastReceiver?=null // 后台静默升级句柄引用
+	fun up(v:String,u:String){ // 升级安装发布底层总线
+		val r=DownloadManager.Request(Uri.parse(u)).apply{setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE);setTitle("应用更新");setDescription("后台下载中...");setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);setMimeType("application/vnd.android.package-archive");setDestinationInExternalFilesDir(Fyan.me,"Download","fyan_$v.apk")} // 指派升级包配置
+		val m=Fyan.me.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager // 系统原生文件引擎
+		val id=m.enqueue(r) // 排队推入底层任务链
+		Toast.makeText(Fyan.me,"检测到新版，已开启后台静默下载",Toast.LENGTH_SHORT).show() // 用户气泡弱反馈提示
+		br?.let{Fyan.me.unregisterReceiver(it)} // 销毁废旧拦截实体
+		br=object:BroadcastReceiver(){ // 重新挂载硬件收发管路
+			override fun onReceive(c:Context,i:Intent){ // 下载全面完成硬件通知接收
+				if(i.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID,-1L)!=id)return // 精密防串身份码校正
+				val f=File(Fyan.me.getExternalFilesDir("Download"),"fyan_$v.apk") // 获取物理包
+				if(!f.exists())return // 落盘完整性判定
+				val uri=if(Build.VERSION.SDK_INT>=24)FileProvider.getUriForFile(Fyan.me,"${Fyan.me.packageName}.fileprovider",f)else Uri.fromFile(f) // 沙盒穿透机制提取高内聚URI指纹
+				Fyan.me.startActivity(Intent(Intent.ACTION_VIEW).apply{setDataAndType(uri,"application/vnd.android.package-archive");addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)}) // 全向轰开原生系统的APK应用安装向导
+			}
+		}
+		Fyan.me.registerReceiver(br,IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE)) // 绑定中断广播接收
 	}
 }
 
 
 
 
-class O:ComponentActivity(){
-	// 下载完成广播接收器，用于监听 APK 下载结束触发安装
-	private var br:BroadcastReceiver?=null
-
-	override fun onCreate(savedInstanceState:Bundle?){
-		super.onCreate(savedInstanceState)
-		Fyan.init(this) // 初始化全局上下文及版本信息
-		setContent{
-			val c=Fyan.cc
-			// 全局注入极简交互背景色工厂，感知主题自动刷新
-			CompositionLocalProvider(LocalIndication provides remember(c){Fyan.Idf(c.fc,c.ps)}){
-				Fyan.nc=rememberNavController() // 创建并保存全局导航控制器
-				var exit by remember{mutableStateOf(false)} // 控制退出确认弹窗显示
-				// 拦截返回键：首次按返回弹出退出确认，再次取消
-				BackHandler(enabled=!exit){exit=true}
-				// 退出确认弹窗
-				if(exit)Dialog(onDismissRequest={exit=false}){
-					Column(modifier=Modifier.fillMaxWidth().padding(24.dp).clip(RoundedCornerShape(12.dp)).background(Fyan.cc.cg).border(1.dp,Fyan.cc.bd,RoundedCornerShape(12.dp)).padding(24.dp),
-						verticalArrangement=Arrangement.spacedBy(12.dp),horizontalAlignment=Alignment.CenterHorizontally){
-						BasicText("系统提醒",style=Fyan.ff.h3.copy(color=Fyan.cc.c))
-						BasicText("确定杀死应用并退出吗？",style=Fyan.ff.pb.copy(color=Fyan.cc.c,textAlign=TextAlign.Center))
-						Row(modifier=Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(12.dp)){
-							// 取消按钮：关闭弹窗
-							Box(modifier=Modifier.weight(1f).height(40.dp).clip(RoundedCornerShape(6.dp)).background(Fyan.cc.ag).clickable{exit=false},contentAlignment=Alignment.Center){BasicText("取消",style=Fyan.ff.p.copy(color=Fyan.cc.c))}
-							// 确定按钮：结束所有 Activity 后延迟 100ms 杀死进程
-							Box(modifier=Modifier.weight(1f).height(40.dp).clip(RoundedCornerShape(6.dp)).background(Fyan.cc.primary).clickable{
-								finishAffinity()
-								Handler(Looper.getMainLooper()).postDelayed({Process.killProcess(Process.myPid())},100)
-							},contentAlignment=Alignment.Center){BasicText("确定",style=Fyan.ff.p.copy(color=Fyan.cc.cg))}
+class O:ComponentActivity(){ // 应用顶层唯一承载物理窗口容器
+	override fun onCreate(s:Bundle?){ // 窗体物理激活初创起点
+		super.onCreate(s) // 移交基类装载
+		Fyan.init(this) // 全局公共架构初始化
+		setContent{ // 切入声明式编排树
+			val c=Fyan.cc;val f=Fyan.ff // 双重单例快照就地捕获
+			CompositionLocalProvider(LocalIndication provides remember(c){Fyan.Idf(c.fc,c.ps)}){ // 全局水波纹高亮拦截器
+				Fyan.nc=rememberNavController() // 初始化并绑定全局路由环
+				var ex by remember{mutableStateOf(false)} // 拦截退出程序标志交互开关
+				BackHandler(enabled=!ex){ex=true} // 首次按返回抛出二次确认
+				if(ex)Dialog(onDismissRequest={ex=false}){ // 销毁整个App主线程的确认警示弹窗
+					Column(modifier=Modifier.fillMaxWidth().padding(24.dp).clip(RoundedCornerShape(12.dp)).background(c.cg).border(1.dp,c.bd,RoundedCornerShape(12.dp)).padding(24.dp),verticalArrangement=Arrangement.spacedBy(12.dp),horizontalAlignment=Alignment.CenterHorizontally){ // 弹窗磨砂面板底座
+						BasicText("系统提醒",style=f.h2.copy(color=c.c)) // 退出警示字头
+						BasicText("确定退出应用程序吗？",style=f.p.copy(color=c.c.copy(alpha=0.6f))) // 细化描述说明
+						Row(modifier=Modifier.fillMaxWidth().padding(top=8.dp),horizontalArrangement=Arrangement.spacedBy(12.dp)){ // 确认执行行
+							Box(modifier=Modifier.weight(1f).height(36.dp).clip(RoundedCornerShape(6.dp)).background(c.ag).clickable{ex=false},contentAlignment=Alignment.Center){BasicText("取消",style=f.p.copy(color=c.c))} // 撤回取消消退
+							Box(modifier=Modifier.weight(1f).height(36.dp).clip(RoundedCornerShape(6.dp)).background(c.primary).clickable{Process.killProcess(Process.myPid())},contentAlignment=Alignment.Center){BasicText("确定",style=f.p.copy(color=Color.White))} // 执意退出则发送强硬自毁信号清洗底层物理进程
 						}
 					}
 				}
-				// 根布局：全屏背景 + 系统栏内边距 + 日志面板固定在底部
-				Box(modifier=Modifier.fillMaxSize().background(Fyan.cc.bg).systemBarsPadding(),contentAlignment=Alignment.BottomCenter){
-					// 路由导航宿主，startDestination 为爱壹帆首页
-					NavHost(navController=Fyan.nc,startDestination="ayf_home"){
-						composable("ayf_home"){AyfHome()}
-						composable("ayf_history"){AyfHistory()}
-						composable("ayf_list/{id}"){x->AyfList(id=x.arguments?.getString("id")?:"")}
-						composable("ayf_info/{id}"){x->AyfInfo(id=x.arguments?.getString("id")?:"")}
+				Box(modifier=Modifier.fillMaxSize().background(c.bg)){ // 声明式页面基础布局主舞台
+					NavHost(navController=Fyan.nc,startDestination="ayf_home"){ // 导航状态机
+						composable("ayf_home"){AyfHome()} // 指配首页目的地
+						composable("ayf_info/{id}"){b->AyfInfo(b.arguments?.getString("id")?:"")} // 指配详情页目的地
 					}
-					Fyan.Record() // 日志悬浮面板（叠加在导航内容之上）
+					Box(modifier=Modifier.align(Alignment.BottomCenter)){Fyan.Record()} // 在屏幕底部常驻浮置审计控制台面板组件
 				}
-				// 应用启动后异步检查版本更新
-				LaunchedEffect(Unit){Fyan.log("系统","检查更新");check()}
 			}
 		}
 	}
-
-	override fun onDestroy(){
-		super.onDestroy()
-		// 解注册下载广播，防止内存泄漏
-		br?.let{unregisterReceiver(it)}
-	}
-
-	// 检查 GitHub Releases 最新版本，与当前版本号（数字部分）对比
-	private fun check(){
-		lifecycleScope.launch(Dispatchers.IO){
-			runCatching{
-				// 请求 releases/latest 后跟随重定向，从最终 URL 中提取版本号
-				val r=OkHttpClient().newCall(Request.Builder().url("https://github.com/lyu2026/fyan/releases/latest").build()).execute()
-				val v=r.request.url.toString().substringAfterLast("/")
-				// 提取纯数字部分进行大小比较，避免 "v2024.01.01" 格式干扰
-				val nv=v.filter(Char::isDigit).toLongOrNull()?:0L
-				val cv=Fyan.vn.filter(Char::isDigit).toLongOrNull()?:0L
-				if(nv>cv)withContext(Dispatchers.Main){Fyan.log("系统","下载新版本($v)包");upgrade(v)}
-			}
-		}
-	}
-
-	// 使用 DownloadManager 静默后台下载新版 APK
-	private fun upgrade(v:String){
-		val r=DownloadManager.Request(Uri.parse("https://github.com/lyu2026/fyan/releases/download/$v/fyan.apk")).apply{
-			setTitle("Fyan → $v")
-			setDescription("后台下载中...")
-			setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED) // 完成后通知栏提示
-			setMimeType("application/vnd.android.package-archive")
-			setDestinationInExternalFilesDir(Fyan.me,"Download","fyan_$v.apk") // 存入应用私有外部下载目录
-		}
-		val m=Fyan.me.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-		val id=m.enqueue(r) // 提交下载任务，获取任务 ID
-		Toast.makeText(Fyan.me,"检测到新版，已开启后台静默下载",Toast.LENGTH_SHORT).show()
-		// 先解注册旧的接收器，防止重复注册
-		br?.let{unregisterReceiver(it)}
-		br=object:BroadcastReceiver(){
-			override fun onReceive(c:Context,i:Intent){
-				// 过滤非本次下载任务的广播
-				if(i.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID,-1L)!=id)return
-				val f=File(Fyan.me.getExternalFilesDir("Download"),"fyan_$v.apk")
-				if(!f.exists())return // 文件不存在则忽略（下载失败场景）
-				// API 24+ 使用 FileProvider 共享文件 URI，低版本直接使用 file:// URI
-				val u=if(Build.VERSION.SDK_INT>=24)FileProvider.getUriForFile(Fyan.me,"${Fyan.me.packageName}.fileprovider",f)else Uri.fromFile(f)
-				// 启动系统安装器安装 APK
-				Fyan.me.startActivity(Intent(Intent.ACTION_VIEW).apply{
-					setDataAndType(u,"application/vnd.android.package-archive")
-					addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
-				})
-			}
-		}
-		// API 33+ 需显式声明 RECEIVER_EXPORTED 标志
-		if(Build.VERSION.SDK_INT>=33)registerReceiver(br,IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE),Context.RECEIVER_EXPORTED)
-		else registerReceiver(br,IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
-	}
+	override fun onDestroy(){super.onDestroy();Fyan.br?.let{unregisterReceiver(it);Fyan.br=null}} // 当物理销毁事件触发时，刚性解绑接收器，杜绝可能产生的上下文悬挂内存泄漏
 }

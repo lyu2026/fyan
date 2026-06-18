@@ -32,7 +32,7 @@ jobs:
             fi
           done
 
-  goso:
+  cogo:
     runs-on: ubuntu-latest
     steps:
       - name: 拉取代码

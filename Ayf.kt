@@ -62,12 +62,12 @@ import org.json.JSONObject
 	Column(modifier=Modifier.fillMaxSize().background(Fyan.cc.bg)){
 		// 横向可滚动 Tab 栏
 		Row(modifier=Modifier.fillMaxWidth().height(38.dp).background(Fyan.cc.cg).horizontalScroll(rememberScrollState()),verticalAlignment=Alignment.CenterVertically){
-			s.forEach{o->Box(modifier=Modifier.fillMaxHeight().background(if(o.first==c)Fyan.cc.fc.copy(alpha=0.15f)else Color.Transparent).clickable{
+			s.forEach{o->Box(modifier=Modifier.fillMaxHeight().background(if(o.first==c)Fyan.cc.primary.copy(alpha=0.15f)else Color.Transparent).clickable{
 				Fyan.log("爱壹帆","点击TAB: "+o.first,'u')
 				// 持久化选中状态，重启后恢复
 				sc.launch{Fyan.cs("ayf_tab",o.first)
 			}},contentAlignment=Alignment.Center){
-				BasicText("  ${o.second}  ",style=Fyan.ff.h4.copy(color=if(o.first==c)Fyan.cc.fc else Fyan.cc.c.copy(alpha=0.7f),fontWeight=if(o.first==c)FontWeight.Bold else FontWeight.Normal))
+				BasicText("  ${o.second}  ",style=Fyan.ff.h4.copy(color=if(o.first==c)Fyan.cc.primary else Fyan.cc.c.copy(alpha=0.7f),fontWeight=if(o.first==c)FontWeight.Bold else FontWeight.Normal))
 			}}
 		}
 		Box(modifier=Modifier.fillMaxWidth().height(0.5.dp).background(Fyan.cc.bd))
@@ -127,7 +127,7 @@ import org.json.JSONObject
 			BasicText("清空历史记录？",style=Fyan.ff.h3.copy(color=Fyan.cc.c))
 			Row(modifier=Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.End){
 				BasicText("取消",modifier=Modifier.clickable{Fyan.log("爱壹帆","取消清空历史记录",'s');cc=false}.padding(8.dp),style=Fyan.ff.p.copy(color=Fyan.cc.c))
-				BasicText("确定",modifier=Modifier.clickable{Fyan.log("爱壹帆","执行清空历史记录",'w');sc.launch{Fyan.cs("ayf_history","")};cc=false}.padding(8.dp),style=Fyan.ff.p.copy(color=Fyan.cc.fc))
+				BasicText("确定",modifier=Modifier.clickable{Fyan.log("爱壹帆","执行清空历史记录",'w');sc.launch{Fyan.cs("ayf_history","")};cc=false}.padding(8.dp),style=Fyan.ff.p.copy(color=Fyan.cc.primary))
 			}
 		}
 	}
@@ -142,7 +142,7 @@ import org.json.JSONObject
 					val o=rs.lines().filter{it.isNotBlank()&&!it.startsWith("${id!!} ")}.joinToString("\n")
 					Fyan.log("爱壹帆","执行删除历史记录，编号: $id",'d')
 					sc.launch{Fyan.cs("ayf_history",o)};id=null
-				}.padding(8.dp),style=Fyan.ff.p.copy(color=Fyan.cc.fc))
+				}.padding(8.dp),style=Fyan.ff.p.copy(color=Fyan.cc.primary))
 			}
 		}
 	}
@@ -241,11 +241,11 @@ import org.json.JSONObject
 				Row(modifier=Modifier.fillMaxWidth().height(20.dp).horizontalScroll(rememberScrollState()),verticalAlignment=Alignment.CenterVertically){
 					g.forEach{(fi,fn)->
 						val at=fi==fc[i] // 是否为当前行选中项
-						Box(modifier=Modifier.fillMaxHeight().background(if(at)Fyan.cc.fc.copy(alpha=0.15f)else Color.Transparent).clickable{
+						Box(modifier=Modifier.fillMaxHeight().background(if(at)Fyan.cc.primary.copy(alpha=0.15f)else Color.Transparent).clickable{
 							// 切换筛选项：重置到第1页，清空列表重新加载
 							fc[i]=fi;sc.launch{X=true;pg=1;hm=true;vs=fv(au(1));X=false}
 						},contentAlignment=Alignment.Center){
-							BasicText("  $fn  ",style=Fyan.ff.ps.copy(color=if(at)Fyan.cc.fc else Fyan.cc.c.copy(alpha=0.7f),fontWeight=if(at)FontWeight.W600 else FontWeight.W400))
+							BasicText("  $fn  ",style=Fyan.ff.ps.copy(color=if(at)Fyan.cc.primary else Fyan.cc.c.copy(alpha=0.7f),fontWeight=if(at)FontWeight.W600 else FontWeight.W400))
 						}
 					}
 				}
@@ -375,8 +375,8 @@ import org.json.JSONObject
 			O==null->Box(modifier=Modifier.fillMaxSize(),contentAlignment=Alignment.Center){
 				Column(horizontalAlignment=Alignment.CenterHorizontally){
 					BasicText("◑ 加载失败",style=Fyan.ff.p.copy(color=Fyan.cc.c.copy(alpha=0.5f)))
-					Box(modifier=Modifier.padding(top=8.dp).clip(RoundedCornerShape(4.dp)).background(Fyan.cc.hv).clickable{X=true}.padding(horizontal=16.dp,vertical=6.dp),contentAlignment=Alignment.Center){
-						BasicText("重试",style=Fyan.ff.p.copy(color=Fyan.cc.fc))
+					Box(modifier=Modifier.padding(top=8.dp).clip(RoundedCornerShape(4.dp)).background(Fyan.cc.ag).clickable{X=true}.padding(horizontal=16.dp,vertical=6.dp),contentAlignment=Alignment.Center){
+						BasicText("重试",style=Fyan.ff.p.copy(color=Fyan.cc.primary))
 					}
 				}
 			}
@@ -394,7 +394,7 @@ import org.json.JSONObject
 					// TV 模式下集数选择使用横向 LazyRow
 					if(sl.isNotEmpty())LazyRow(modifier=Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(8.dp),contentPadding=PaddingValues(10.dp,8.dp)){
 						items(sl.indices.toList()){k->
-							Box(modifier=Modifier.width(50.dp).height(24.dp).clip(RoundedCornerShape(2.dp)).background(if(k==ec)Fyan.cc.fc else Fyan.cc.x).clickable{ec=k},contentAlignment=Alignment.Center){
+							Box(modifier=Modifier.width(50.dp).height(24.dp).clip(RoundedCornerShape(2.dp)).background(if(k==ec)Fyan.cc.primary else Fyan.cc.x).clickable{ec=k},contentAlignment=Alignment.Center){
 								BasicText(sl[k]["title"]!!,style=Fyan.ff.ps.copy(color=if(k==ec)Color.White else Fyan.cc.c,fontWeight=if(k==ec)FontWeight.W600 else FontWeight.W400))
 							}
 						}
@@ -449,7 +449,7 @@ import org.json.JSONObject
 							Row(horizontalArrangement=Arrangement.spacedBy(6.dp)){
 								repeat(5){c->
 									val i=r*5+c
-									if(i<sl.size)Box(modifier=Modifier.weight(1f).height(24.dp).clip(RoundedCornerShape(2.dp)).background(if(i==ec)Fyan.cc.fc else Fyan.cc.x).clickable{ec=i},contentAlignment=Alignment.Center){
+									if(i<sl.size)Box(modifier=Modifier.weight(1f).height(24.dp).clip(RoundedCornerShape(2.dp)).background(if(i==ec)Fyan.cc.primary else Fyan.cc.x).clickable{ec=i},contentAlignment=Alignment.Center){
 										BasicText(sl[i]["title"]!!,style=Fyan.ff.ps.copy(color=if(i==ec)Color.White else Fyan.cc.c,fontWeight=if(i==ec)FontWeight.W600 else FontWeight.W400))
 									}else Box(modifier=Modifier.weight(1f))
 								}

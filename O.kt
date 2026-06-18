@@ -161,7 +161,7 @@ object Fyan{
 			Box(modifier=Modifier.fillMaxWidth().clip(RoundedCornerShape(topStart=4.dp,topEnd=4.dp))
 			.background(Fyan.cc.m).drawWithContent{
 				drawContent()
-				val (w,r)=0.5.dp.toPx() to 4.dp.toPx()
+				val (w,r,c)=0.5.dp.toPx() to 4.dp.toPx() to Fyan.cc.bd
 				drawPath(
 					path=Path().apply{
 						moveTo(0f,size.height);lineTo(0f,r)
@@ -170,8 +170,7 @@ object Fyan{
 						arcTo(Rect(size.width-r*2,0f,size.width,r*2),90f,-90f,false)
 						lineTo(size.width,size.height)
 					},
-					color=CC(isSystemInDarkTheme()).bd,
-					style=Stroke(w,cap=StrokeCap.Round,join=StrokeJoin.Round)
+					color=c,style=Stroke(w,cap=StrokeCap.Round,join=StrokeJoin.Round)
 				)
 			}){
 				Column(modifier=Modifier.fillMaxWidth().padding(4.dp)){

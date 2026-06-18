@@ -150,6 +150,7 @@ object Fyan{
 	@Composable private fun RX(){Box(modifier=Modifier.fillMaxWidth(0.7f).height(6.dp).navigationBarsPadding().padding(bottom=4.dp).clip(RoundedCornerShape(2.dp)).background(Fyan.cc.cg).clickable{gn=false;gy=0f},contentAlignment=Alignment.Center){}}
 	@Composable private fun RO(){
 		val s=rememberLazyListState()
+		val bc=Fyan.cc.bd
 		LaunchedEffect(gs.size){if(gs.isNotEmpty())s.animateScrollToItem(gs.size-1)}
 		Box(modifier=Modifier.fillMaxWidth().heightIn(max=(Fyan.sh/3).dp).navigationBarsPadding()
 		.offset(y=gy.roundToInt().dp).pointerInput(Unit){
@@ -161,7 +162,7 @@ object Fyan{
 			Box(modifier=Modifier.fillMaxWidth().clip(RoundedCornerShape(topStart=4.dp,topEnd=4.dp))
 			.background(Fyan.cc.m).drawWithContent{
 				drawContent()
-				val (w,r,c)=0.5.dp.toPx() to 4.dp.toPx() to Fyan.cc.bd
+				val (w,r)=0.5.dp.toPx() to 4.dp.toPx()
 				drawPath(
 					path=Path().apply{
 						moveTo(0f,size.height);lineTo(0f,r)
@@ -170,7 +171,7 @@ object Fyan{
 						arcTo(Rect(size.width-r*2,0f,size.width,r*2),90f,-90f,false)
 						lineTo(size.width,size.height)
 					},
-					color=c,style=Stroke(w,cap=StrokeCap.Round,join=StrokeJoin.Round)
+					color=bc,style=Stroke(w,cap=StrokeCap.Round,join=StrokeJoin.Round)
 				)
 			}){
 				Column(modifier=Modifier.fillMaxWidth().padding(4.dp)){

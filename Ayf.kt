@@ -300,17 +300,17 @@ import org.json.JSONObject
 @Composable fun AyfInfo(id:String){ // 爱壹帆详情播放
 	var O by remember{mutableStateOf<Map<String,Any>?>(null)} // 视频详情数据
 	var X by remember{mutableStateOf(true)} // 详情加载中标志
-	var ec by remember{mutableIntStateOf(0)} // 当前选中集数索引
+	var ec by remember{mutableIntStateOf(-1)} // 当前选中集数索引
+	var ep by remember{mutableLongStateOf(0L)} // 当前选中集数的播放位置
 	var uc by remember{mutableStateOf("")} // 当前集播放 URL
 	var pr by remember{mutableStateOf(false)} // 是否已点击播放（显示播放器）
 	var fs by remember{mutableStateOf(false)} // 是否全屏播放弹窗
-	val hs by Fyan.cg("ayf_history","").collectAsState("") // 当前历史记录字符串
 	val sc=rememberCoroutineScope()
 	Fyan.log("路由","进入爱壹帆视频详情页")
 
 	// 进入详情页：拉取视频详情数据，写入历史记录
 	LaunchedEffect(id){
-		X=true;ec=0;pr=false;uc=""
+		X=true;pr=false;uc=""
 		O=withContext(Dispatchers.IO){
 			runCatching<Map<String,Any>?>{
 				val j=JSONObject(Fyan.fetch("https://api.iyf.tv/api/video/videodetails?mediaKey=$id")).optJSONObject("data")?.optJSONObject("detailInfo")?:return@runCatching null
@@ -322,18 +322,33 @@ import org.json.JSONObject
 			}.getOrElse{null}
 		}
 		X=false
-		// 写入历史记录：新条目置顶，去重同 id 旧条目
 		if(O!=null){
-			sc.launch{Fyan.cs("ayf_history",(listOf("$id ${O!!["type"]} ${O!!["title"]} ${O!!["cover"]} 0 0")+hs.lines().filter{it.isNotEmpty()&&!it.startsWith("$id ")}).joinToString("\n"))}
+			val h=Fyan.co("ayf_history","")
+			val x=h.lines().firstOrNull{it.startsWith("$id ")}
+			// 写入历史记录：新条目置顶，去重同 id 旧条目
+			if(x.isNullOrBlank()){
+				ec=0;ep=0L
+				Fyan.cs("ayf_history",(listOf("$id ${O!!["type"]} ${O!!["title"]} ${O!!["cover"]} 0 0")+h.lines().filter{it.isNotEmpty()}).joinToString("\n"))
+			}else{
+				val s=x.trim().split(Regex("\\s+"),6)
+				ec=s.getOrElse(4){"0"}.toIntOrNull()?:0
+				ep=s.getOrElse(5){"0"}.toLongOrNull()?:0L
+			}
 		}
 	}
 
 	// 切换集数：重置播放状态，拉取新集播放链接
 	LaunchedEffect(ec){
-		if(O==null)return@LaunchedEffect
+		if(O==null||ec==-1)return@LaunchedEffect
 		pr=false;uc=""
+		val h=Fyan.co("ayf_history","")
+		val x=h.lines().firstOrNull{it.startsWith("$id ")}
+		if(x.isNullOrBlank())ep=0L else{
+			val s=x.trim().split(Regex("\\s+"),6)
+			if(s.getOrElse(4){"0"}.toIntOrNull()?:0==ec)ep=s.getOrElse(5){"0"}.toLongOrNull()?:0L else ep=0L
+		}
 		@Suppress("UNCHECKED_CAST") val ei=(O!!["s"] as List<Map<String,String>>).getOrNull(ec)?.get("id")?:""
-		uc=withContext(Dispatchers.IO){
+		val url=withContext(Dispatchers.IO){
 			runCatching<String>{
 				// 请求播放数据接口，取第一个非空 mediaUrl
 				val s=JSONObject(Fyan.fetch("https://api.iyf.tv/api/video/getplaydata?mediaKey=$id&videoId=$ei&videoType=${O!!["type"]}")).optJSONObject("data")?.optJSONArray("list")?:return@runCatching ""
@@ -341,29 +356,56 @@ import org.json.JSONObject
 				for(i in 0 until s.length()){val v=s.getJSONObject(i).optString("mediaUrl","");if(v.isNotEmpty()){u=v;break}};u
 			}.getOrElse{""}
 		}
+		uc=url // 确保 ep 就绪后再赋值触发播放器创建，时序完美闭环
+		Fyan.cs("ayf_history",(listOf("$id ${O!!["type"]} ${O!!["title"]} ${O!!["cover"]} ${ec} ${ep}")+h.lines().filter{it.isNotEmpty()&&!it.startsWith("${id} ")}).joinToString("\n"))
 	}
 
-	// 根据 URL 创建播放器：HLS（.m3u8）使用 HlsMediaSource，其余使用 ProgressiveMediaSource
-	val P:ExoPlayer?=remember(uc){
-		if(uc.isNotEmpty())ExoPlayer.Builder(Fyan.me).build().apply{
+	// 根据 URL 创建播放器实例（纯粹创建，隔离副作用）
+	val P:ExoPlayer?=remember(uc){if(uc.isNotEmpty())ExoPlayer.Builder(Fyan.me).build() else null}
+
+	// 统一管控换源、历史寻道控制，杜绝状态竞争
+	LaunchedEffect(P,uc){
+		P?.apply{
 			val f=if(uc.contains(".m3u8",true))HlsMediaSource.Factory(DefaultHttpDataSource.Factory())else ProgressiveMediaSource.Factory(DefaultHttpDataSource.Factory())
-			setMediaSource(f.createMediaSource(MediaItem.fromUri(Uri.parse(uc))));prepare();playWhenReady=true
-		}else null
+			setMediaSource(f.createMediaSource(MediaItem.fromUri(Uri.parse(uc))));if(ep>0L)seekTo(ep);prepare();playWhenReady=true
+		}
 	}
-	// 组件销毁时释放播放器资源，防止内存泄漏
-	DisposableEffect(P){onDispose{P?.release()}}
+
+	// 播放时定时轮询同步进度至 ep
+	LaunchedEffect(P){
+		while(true){
+			if(P?.isPlaying==true)ep=P.currentPosition
+			kotlinx.coroutines.delay(1000)
+		}
+	}
+
+	// 组件销毁或重置换源时的现场清理与终极持久化
+	DisposableEffect(P){
+		onDispose{
+			if(P!=null&&O!=null){
+				val cp=P.currentPosition
+				val t=O!!["type"];val tl=O!!["title"];val cv=O!!["cover"]
+				kotlinx.coroutines.CoroutineScope(Dispatchers.IO).launch{
+					// 直接在后台协程中拉取最新历史，彻底干掉全页面的 State 监听
+					val h=Fyan.co("ayf_history","")
+					val s=listOf("$id $t $tl $cv $ec $cp")+h.lines().filter{it.isNotEmpty()&&!it.startsWith("$id ")}
+					Fyan.cs("ayf_history",s.joinToString("\n"))
+				}
+			}
+			P?.release()
+		}
+	}
 
 	@Suppress("UNCHECKED_CAST") val sl:List<Map<String,String>> = if(O!=null)O!!["s"] as List<Map<String,String>> else emptyList()
 
 	Column(modifier=Modifier.fillMaxSize().background(Fyan.cc.bg)){
 		// 顶部导航栏：返回箭头 + 视频标题
 		Row(modifier=Modifier.fillMaxWidth().height(38.dp).background(Fyan.cc.cg),verticalAlignment=Alignment.CenterVertically){
-			Box(modifier=Modifier.size(32.dp).clip(CircleShape).padding(start=2.dp,end=6.dp).clickable{Fyan.nc.popBackStack()},contentAlignment=Alignment.Center){
+			Box(modifier=Modifier.size(32.dp).clip(CircleShape).padding(3.dp).clickable{Fyan.nc.popBackStack()},contentAlignment=Alignment.Center){
 				Image(painter=painterResource(R.drawable.arrow_back),contentDescription=null,modifier=Modifier.size(20.dp),colorFilter=ColorFilter.tint(Fyan.cc.c))
 			}
-			BasicText((O?.get("title") as? String)?:"视频详情",modifier=Modifier.weight(1f),maxLines=1,overflow=TextOverflow.Ellipsis,style=Fyan.ff.h4.copy(color=Fyan.cc.c))
+			BasicText((O?.get("title") as? String)?:"视频详情",modifier=Modifier.weight(1f).padding(start=3.dp),maxLines=1,overflow=TextOverflow.Ellipsis,style=Fyan.ff.h4.copy(color=Fyan.cc.c))
 		}
-		Box(modifier=Modifier.fillMaxWidth().height(0.5.dp).background(Fyan.cc.bd))
 		when{
 			// 加载态
 			X->Box(modifier=Modifier.fillMaxSize(),contentAlignment=Alignment.Center){

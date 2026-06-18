@@ -154,7 +154,21 @@ object Fyan{
 			)
 		}){
 			Box(modifier=Modifier.fillMaxWidth().clip(RoundedCornerShape(topStart=4.dp,topEnd=4.dp))
-			.border(0.5.dp,Fyan.cc.bd,RoundedCornerShape(topStart=4.dp,topEnd=4.dp)).background(Fyan.cc.m).offset(y=-1f)){
+			.background(Fyan.cc.m).drawWithContent{
+				drawContent()
+				val (w,r)=0.5.dp.toPx() to 4.dp.toPx()
+				drawPath(
+					Path().apply{
+						moveTo(0f,size.height);lineTo(0f,r)
+						arcTo(Rect(0f,0f,r*2,r*2),180f,-90f,false)
+						lineTo(size.width-r,0f)
+						arcTo(Rect(size.width-r*2,0f,size.width,r*2),90f,-90f,false)
+						lineTo(size.width,size.height)
+					},
+					Fyan.cc.bd,
+					Stroke(w,cap=StrokeCap.Round,join=StrokeJoin.Round)
+				)
+			}){
 				Column(modifier=Modifier.fillMaxWidth().padding(4.dp)){
 					Box(modifier=Modifier.fillMaxWidth(),contentAlignment=Alignment.Center){
 						Box(modifier=Modifier.fillMaxWidth(0.25f).height(4.dp).clip(RoundedCornerShape(2.dp))

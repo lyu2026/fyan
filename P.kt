@@ -139,7 +139,7 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 		return "https://api.iyf.tv/api/$o&page=1&size=21"
 	}
 
-	suspend fun fv(u:String):List<Map<String,String>>=withContext(Dispatchers.IO){
+	suspend fun fv(u:String):List<Map<String,String>> = withContext(Dispatchers.IO){
 		runCatching<List<Map<String,String>>>{
 			val j=JSONObject(SF(u)).optJSONObject("data")?:return@runCatching emptyList()
 			val s=j.optJSONArray("list")?:return@runCatching emptyList()

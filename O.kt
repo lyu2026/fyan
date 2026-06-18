@@ -158,7 +158,7 @@ object Fyan{
 				Column(modifier=Modifier.fillMaxWidth().padding(4.dp)){
 					Box(modifier=Modifier.fillMaxWidth(),contentAlignment=Alignment.Center){
 						Box(modifier=Modifier.fillMaxWidth(0.25f).height(4.dp).clip(RoundedCornerShape(2.dp))
-						.background(Fyan.cc.bg).padding(bottom=2.dp)clickable(enabled=tv){gn=true;gy=0f})
+						.background(Fyan.cc.bg).padding(bottom=2.dp).clickable(enabled=tv){gn=true;gy=0f})
 					}
 					Row(modifier=Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically){
 						BasicText("日志 · ${gs.size}条",style=Fyan.ff.px.copy(color=Fyan.cc.c.copy(alpha=0.7f),fontFamily=FontFamily.Monospace))

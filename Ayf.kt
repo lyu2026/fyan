@@ -54,7 +54,7 @@ import org.json.JSONObject
 
 @Composable fun AyfHome(){ // 爱壹帆首页
 	// Tab 定义：路由 id -> 显示名称
-	val s=listOf("history" to "历史记录","movie" to "电影","drama" to "剧集","anime" to "动漫","variety" to "综艺","documentary" to "纪录片","news" to "新闻")
+	val s=listOf("history" to "历史记录","movie" to "电影","drama" to "剧集","anime" to "动漫","variety" to "综艺","documentary" to "纪录片")
 	// 从 DataStore 持久化读取上次选中的 Tab，默认历史记录
 	val c by Fyan.cg("ayf_tab","history").collectAsState(initial="history")
 	val sc=rememberCoroutineScope()
@@ -164,8 +164,7 @@ import org.json.JSONObject
 	// 构造当前筛选条件对应的 API 请求 URL（第1页）
 	fun au(p:Int=1):String{
 		var o=fc.entries.sortedBy{it.key}.joinToString(","){it.value}
-		o=if(id=="news")"home/getrelativevideosbysub?titleid=$id&Tags=$o"else"list/getconditionfilterdata?titleid=$id&ids=$o"
-		return "https://api.iyf.tv/api/$o&page=$p&size=21"
+		return "https://api.iyf.tv/api/list/getconditionfilterdata?titleid=$id&ids=$o&page=$p&size=21"
 	}
 
 	// 拉取指定页视频列表，返回条目 Map 列表
@@ -188,20 +187,17 @@ import org.json.JSONObject
 		fs=withContext(Dispatchers.IO){
 			runCatching<List<List<Pair<String,String>>>>{
 				Fyan.log("爱壹帆","获取筛选数据，TAB: $id",'s')
-				if(id=="news")listOf(listOf("国际" to "国际","国内" to "国内","华人资讯" to "华人资讯","财经" to "财经","军事" to "军事"))
-				else{
-					val j=JSONObject(Fyan.fetch("https://api.iyf.tv/api/list/getfiltertagsdata?SecondaryCode=$id")).optJSONObject("data")?:return@runCatching emptyList()
-					val s=j.optJSONArray("list")?:return@runCatching emptyList()
-					buildList{
-						for(i in 0 until s.length()){
-							val z=s.getJSONObject(i).optJSONArray("list")?:continue
-							add(buildList{
-								for(r in 0 until z.length()){
-									val o=z.getJSONObject(r)
-									add(o.optString("classifyId","0") to o.optString("classifyName",""))
-								}
-							})
-						}
+				val j=JSONObject(Fyan.fetch("https://api.iyf.tv/api/list/getfiltertagsdata?SecondaryCode=$id")).optJSONObject("data")?:return@runCatching emptyList()
+				val s=j.optJSONArray("list")?:return@runCatching emptyList()
+				buildList{
+					for(i in 0 until s.length()){
+						val z=s.getJSONObject(i).optJSONArray("list")?:continue
+						add(buildList{
+							for(r in 0 until z.length()){
+								val o=z.getJSONObject(r)
+								add(o.optString("classifyId","0") to o.optString("classifyName",""))
+							}
+						})
 					}
 				}
 			}.getOrElse{emptyList()}
@@ -269,8 +265,7 @@ import org.json.JSONObject
 						// 视频卡片：封面 + 评分/更新状态角标 + 标题
 						Column(modifier=Modifier.clip(RoundedCornerShape(2.dp)).background(Fyan.cc.cg).clickable{
 							Fyan.log("爱壹帆","进入详情页，编号: "+o["id"])
-							// 新闻类不进详情页
-							if(id!="news")Fyan.goto("ayf_info/"+o["id"])
+							Fyan.goto("ayf_info/"+o["id"])
 						},horizontalAlignment=Alignment.CenterHorizontally){
 							Box(modifier=Modifier.fillMaxWidth().aspectRatio(0.7f).background(Fyan.cc.ag)){
 								AsyncImage(model=o["cover"],contentDescription=null,modifier=Modifier.fillMaxSize(),contentScale=ContentScale.Crop)
@@ -293,7 +288,7 @@ import org.json.JSONObject
 					// 已到底部提示
 					if(!hm&&vs.isNotEmpty())item(span={androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan)}){
 						Box(modifier=Modifier.fillMaxWidth().padding(8.dp),contentAlignment=Alignment.Center){
-							BasicText("◉ 已加载全部",style=Fyan.ff.ps.copy(color=Fyan.cc.c.copy(alpha=0.3f)))
+							BasicText("꧁ 已加载全部 ꧂",style=Fyan.ff.ps.copy(color=Fyan.cc.c.copy(alpha=0.3f)))
 						}
 					}
 				}

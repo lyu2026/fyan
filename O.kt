@@ -120,8 +120,8 @@ object Fyan{ // 全局数据
 
 	class CC(o:Boolean){ // 主题色彩系统，根据深色/浅色模式动态切换
 		val w=Color.White // 白色
-		val fc=if(o)Color(0xFF384B60)else Color(0xFFE3F2FD) // 获焦背景（微蓝调，TV极易识别且不刺眼）
-		val ps=if(o)Color(0xFF444444)else Color(0xFFCCCCCC) // 轻触反馈（稳重深/浅灰，下压感明确）
+		val fc=if(o)Color(0xFF5C8EBE)else Color(0xFF90CAF9) // 获焦背景（亮蓝调，TV极易识别且不刺眼）
+		val ps=if(o)Color(0xFF6A6A6A)else Color(0xFF9E9E9E) // 轻触反馈（稳重深/中灰，下压感明确）
 		val m=if(o)Color(0xDD000000)else Color(0xDDFFFFFF) // 半透明遮罩（日志面板背景）
 		val bg=if(o)Color(0xFF000000)else Color(0xFFFFFFFF) // 页面底色
 		val cg=if(o)Color(0xFF222222)else Color(0xFFDDDDDD) // 卡片/容器背景

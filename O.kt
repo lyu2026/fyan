@@ -27,12 +27,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
-import androidx.compose.foundation.Indication
-import androidx.compose.foundation.IndicationInstance
+import androidx.compose.foundation.IndicationNodeFactory
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.interaction.InteractionSource
-import androidx.compose.foundation.interaction.collectIsFocusedAsState
-import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.interaction.FocusInteraction
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,6 +45,9 @@ import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.node.DelegatableNode
+import androidx.compose.ui.node.DrawModifierNode
+import androidx.compose.ui.node.invalidateDraw
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -64,6 +66,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -136,19 +139,35 @@ object Fyan{ // 全局数据
 	// Composable 内获取当前主题色，跟随系统深色模式实时响应
 	val cc:CC @Composable get()=CC(isSystemInDarkTheme())
 
-	// 全局交互指示器：利用内置高阶状态监听，免去繁琐的 Node 与协程流收集
-	object Idf:Indication{
-		@Composable override fun rememberUpdatedInstance(s:InteractionSource):IndicationInstance{
-			val p by s.collectIsPressedAsState()
-			val f by s.collectIsFocusedAsState()
-			val c=Fyan.cc
-			return remember(s,p,f,c){object:IndicationInstance{
-				override fun ContentDrawScope.drawIndication(){
-					if(p)drawRect(c.ps)else if(f)drawRect(c.fc)
-					drawContent()
+	// 自定义高性能交互指示器节点，适配 2026 最新版 BOM 架构，消除弃用报错
+	private class Idn(private val s:InteractionSource,private val f:Color,private val p:Color):Modifier.Node(),DrawModifierNode{
+		private var jf=false;private var jp=false
+		override fun onAttach(){
+			super.onAttach()
+			coroutineScope.launch{
+				var fc=0;var pc=0
+				s.interactions.collect{i->
+					when(i){
+						is FocusInteraction.Focus->fc++
+						is FocusInteraction.Unfocus->fc--
+						is PressInteraction.Press->pc++
+						is PressInteraction.Release,is PressInteraction.Cancel->pc--
+					}
+					val nf=fc>0;val np=pc>0
+					if(jf!=nf||jp!=np){jf=nf;jp=np;invalidateDraw()}
 				}
-			}}
+			}
 		}
+		override fun ContentDrawScope.draw(){
+			if(jp)drawRect(p)else if(jf)drawRect(f)
+			drawContent()
+		}
+	}
+	// 新版指示器节点工厂
+	class Idf(private val f:Color,private val p:Color):IndicationNodeFactory{
+		override fun create(s:InteractionSource):DelegatableNode=Idn(s,f,p)
+		override fun equals(other:Any?):Boolean=other is Idf&&f==other.f&&p==other.p
+		override fun hashCode():Int=31*f.hashCode()+p.hashCode()
 	}
 
 	// DataStore 扩展属性，每个 Context 单例 DataStore 实例
@@ -276,8 +295,9 @@ class O:ComponentActivity(){
 		super.onCreate(savedInstanceState)
 		Fyan.init(this) // 初始化全局上下文及版本信息
 		setContent{
-			// 全局注入极简交互背景色
-			CompositionLocalProvider(LocalIndication provides Fyan.Idf){
+			val c=Fyan.cc
+			// 全局注入极简交互背景色工厂，感知主题自动刷新
+			CompositionLocalProvider(LocalIndication provides remember(c){Fyan.Idf(c.fc,c.ps)}){
 				Fyan.nc=rememberNavController() // 创建并保存全局导航控制器
 				var exit by remember{mutableStateOf(false)} // 控制退出确认弹窗显示
 				// 拦截返回键：首次按返回弹出退出确认，再次取消

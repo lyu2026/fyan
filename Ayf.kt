@@ -123,7 +123,7 @@ import org.json.JSONObject
 	}
 	// 清空全部历史确认弹窗
 	if(cc)Dialog(onDismissRequest={cc=false}){
-		Column(modifier=Modifier.fillMaxWidth().padding(32.dp).clip(RoundedCornerShape(3.dp)).background(Fyan.cc.cg).padding(20.dp),verticalArrangement=Arrangement.spacedBy(16.dp)){
+		Column(modifier=Modifier.fillMaxWidth().padding(32.dp).clip(RoundedCornerShape(3.dp)).background(Fyan.cc.cg).border(1.dp,Fyan.cc.bd,RoundedCornerShape(3.dp)).padding(20.dp),verticalArrangement=Arrangement.spacedBy(16.dp)){
 			BasicText("清空历史记录？",style=Fyan.ff.h3.copy(color=Fyan.cc.c))
 			Row(modifier=Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.End){
 				BasicText("取消",modifier=Modifier.clickable{Fyan.log("爱壹帆","取消清空历史记录",'s');cc=false}.padding(8.dp),style=Fyan.ff.p.copy(color=Fyan.cc.c))
@@ -133,7 +133,7 @@ import org.json.JSONObject
 	}
 	// 单条删除确认弹窗（id 不为 null 时显示）
 	if(id!=null)Dialog(onDismissRequest={id=null}){
-		Column(modifier=Modifier.fillMaxWidth().padding(32.dp).clip(RoundedCornerShape(3.dp)).background(Fyan.cc.cg).padding(20.dp),verticalArrangement=Arrangement.spacedBy(16.dp)){
+		Column(modifier=Modifier.fillMaxWidth().padding(32.dp).clip(RoundedCornerShape(3.dp)).background(Fyan.cc.cg).border(1.dp,Fyan.cc.bd,RoundedCornerShape(3.dp)).padding(20.dp),verticalArrangement=Arrangement.spacedBy(16.dp)){
 			BasicText("删除此记录？",style=Fyan.ff.h3.copy(color=Fyan.cc.c))
 			Row(modifier=Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.End){
 				BasicText("取消",modifier=Modifier.clickable{Fyan.log("爱壹帆","取消删除历史记录，编号: $id",'e');id=null}.padding(8.dp),style=Fyan.ff.p.copy(color=Fyan.cc.c))

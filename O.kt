@@ -62,7 +62,7 @@ import java.io.File
 import java.util.UUID
 import kotlin.math.roundToInt
 
-val HC=OkHttpClient()
+
 
 object Fyan{
 	lateinit var nc:NavHostController
@@ -89,41 +89,34 @@ object Fyan{
 		val h2=TextStyle(fontSize=20.sp,fontWeight=FontWeight.Bold)
 		val h3=TextStyle(fontSize=18.sp,fontWeight=FontWeight.Bold)
 		val h4=TextStyle(fontSize=16.sp,fontWeight=FontWeight.Bold)
-		val hi1=TextStyle(fontSize=24.sp,fontWeight=FontWeight.Bold,fontStyle=FontStyle.Italic)
-		val hi2=TextStyle(fontSize=20.sp,fontWeight=FontWeight.Bold,fontStyle=FontStyle.Italic)
-		val hi3=TextStyle(fontSize=18.sp,fontWeight=FontWeight.Bold,fontStyle=FontStyle.Italic)
-		val hi4=TextStyle(fontSize=16.sp,fontWeight=FontWeight.Bold,fontStyle=FontStyle.Italic)
 		val p=TextStyle(fontSize=14.sp,fontWeight=FontWeight.Normal)
-		val pi=TextStyle(fontSize=14.sp,fontWeight=FontWeight.Normal,fontStyle=FontStyle.Italic)
-		val p12=TextStyle(fontSize=12.sp,fontWeight=FontWeight.Normal)
-		val pi12=TextStyle(fontSize=12.sp,fontWeight=FontWeight.Normal,fontStyle=FontStyle.Italic)
-		val p16=TextStyle(fontSize=16.sp,fontWeight=FontWeight.Normal)
-		val pi16=TextStyle(fontSize=16.sp,fontWeight=FontWeight.Normal,fontStyle=FontStyle.Italic)
+		val ps=TextStyle(fontSize=12.sp,fontWeight=FontWeight.Normal)
+		val pb=TextStyle(fontSize=16.sp,fontWeight=FontWeight.Normal)
 	}
 
-	class CC(d:Boolean){
-		val m=if(d)Color(0x99000000)else Color(0x66000000)
-		val bg=if(d)Color(0xFF111111)else Color(0xFFF5F5F5)
-		val cg=if(d)Color(0xFF222222)else Color(0xFFFFFFFF)
-		val ag=if(d)Color(0xFF333333)else Color(0xFFEEEEEE)
-		val c=if(d)Color(0xFFDDDDDD)else Color(0xFF222222)
-		val bd=if(d)Color(0xFF444444)else Color(0xFFDDDDDD)
-		val fc=if(d)Color(0xFF66AFFF)else Color(0xFF0066FF)
-		val hv=if(d)Color(0xFF444444)else Color(0xFFE0E0E0)
-		val x=if(d)Color(0xFF555555)else Color(0xFFCCCCCC)
+	class CC(o:Boolean){
+		val m=if(o)Color(0x99000000)else Color(0x66000000)
+		val bg=if(o)Color(0xFF111111)else Color(0xFFF5F5F5)
+		val cg=if(o)Color(0xFF222222)else Color(0xFFFFFFFF)
+		val ag=if(o)Color(0xFF333333)else Color(0xFFEEEEEE)
+		val c=if(o)Color(0xFFDDDDDD)else Color(0xFF222222)
+		val bd=if(o)Color(0xFF444444)else Color(0xFFDDDDDD)
+		val fc=if(o)Color(0xFF66AFFF)else Color(0xFF0066FF)
+		val hv=if(o)Color(0xFF444444)else Color(0xFFE0E0E0)
+		val x=if(o)Color(0xFF555555)else Color(0xFFCCCCCC)
 	}
 	val cc:CC @Composable get()=CC(isSystemInDarkTheme())
 
 	private val Context.ds by preferencesDataStore("fyan")
 	@Suppress("UNCHECKED_CAST") private fun <T> String.cype(v:T)=(when(v){
-		is Boolean->booleanPreferencesKey(this)
-		is String->stringPreferencesKey(this)
-		is Int->intPreferencesKey(this)
-		is Long->longPreferencesKey(this)
-		is Float->floatPreferencesKey(this)
-		is Double->doublePreferencesKey(this)
 		is ByteArray->byteArrayPreferencesKey(this)
+		is Boolean->booleanPreferencesKey(this)
 		is Set<*>->stringSetPreferencesKey(this)
+		is Double->doublePreferencesKey(this)
+		is String->stringPreferencesKey(this)
+		is Float->floatPreferencesKey(this)
+		is Long->longPreferencesKey(this)
+		is Int->intPreferencesKey(this)
 		else->null
 	}as?Preferences.Key<T>)
 	fun <T> cg(k:String,d:T)=me.ds.data.map{p->k.cype(d)?.let{p[it]}?:d}
@@ -131,55 +124,53 @@ object Fyan{
 	suspend fun cx(k:String)=me.ds.edit{p->p.asMap().keys.firstOrNull{it.name==k}?.let{p.remove(it)}}
 	suspend fun <T> co(k:String,d:T)=cg(k,d).first()
 
-	private val logs=mutableStateListOf<String>()
-	private var logf by mutableStateOf(false)
-	private var logy by mutableStateOf(0f)
-	private val MH=Handler(Looper.getMainLooper())
-	private fun logc()=logs.clear()
-	private fun logx(i:String)=logs.removeAll{it.startsWith(i)}
+	private val gs=mutableStateListOf<String>()
+	private var gn by mutableStateOf(false)
+	private var gy by mutableStateOf(0f)
+	private val gh=Handler(Looper.getMainLooper())
+	private fun gc()=gs.clear()
+	private fun gx(i:String)=gs.removeAll{it.startsWith(i)}
 	fun log(m:String,o:String,c:Char='i'){
 		val t=java.text.SimpleDateFormat("HH:mm:ss",java.util.Locale.getDefault()).format(java.util.Date())
 		val x=when(c){'i'->"#2196F3";'u'->"#9C27B0";'e'->"#F44336";'s'->"#00BCD4";'n'->"#4CAF50";'w'->"#FF9800";else->"#9E9E9E"}
 		val v=UUID.randomUUID().toString().replace("-","")+".$x●$t $m ➜ $o"
-		MH.post{logs.add(v)}
+		gh.post{gs.add(v)}
 	}
-	@Composable fun Record(){if(logf)RecordX()else RecordO()}
-	@Composable private fun RecordX(){
-		Box(modifier=Modifier.fillMaxWidth(0.7f).height(6.dp).navigationBarsPadding().background(Fyan.cc.m).clickable{logf=false;logy=0f},contentAlignment=Alignment.Center){}
-	}
-	@Composable private fun RecordO(){
-		val ls=rememberLazyListState()
-		LaunchedEffect(logs.size){if(logs.isNotEmpty())ls.animateScrollToItem(logs.size-1)}
+	@Composable fun Record(){if(gn||gs.isEmpty())RX()else RO()}
+	@Composable private fun RX(){Box(modifier=Modifier.fillMaxWidth(0.7f).height(5.dp).navigationBarsPadding().padding(bottom=2.dp).clip(RoundedCornerShape(2.dp)).background(Fyan.cc.cg).clickable{gn=false;gy=0f},contentAlignment=Alignment.Center){}}
+	@Composable private fun RO(){
+		val s=rememberLazyListState()
+		LaunchedEffect(gs.size){if(gs.isNotEmpty())s.animateScrollToItem(gs.size-1)}
 		Box(modifier=Modifier.fillMaxWidth().heightIn(max=(Fyan.sh/3).dp).navigationBarsPadding()
-			.offset(y=logy.roundToInt().dp)
-			.pointerInput(Unit){detectDragGestures(
-				onDragEnd={if(logy>100f){logf=true;logy=0f}else logy=0f},
-				onDrag={ch,d->ch.consume();if(logy+d.y>=0f)logy+=d.y}
-			)}){
-			Box(modifier=Modifier.fillMaxWidth().clip(RoundedCornerShape(topStart=6.dp,topEnd=6.dp))
-				.border(1.dp,Fyan.cc.bd,RoundedCornerShape(topStart=6.dp,topEnd=6.dp))
-				.background(Color(0xE0222222))){
-				Column(modifier=Modifier.fillMaxWidth().padding(horizontal=12.dp,vertical=8.dp)){
+			.offset(y=gy.roundToInt().dp).pointerInput(Unit){
+				detectDragGestures(
+					onDragEnd={if(gy>40f){gn=true;gy=0f}else gy=0f},
+					onDrag={ch,o->ch.consume();if(gy+o.y>=0f)gy+=o.y}
+				)
+		}){
+			Box(modifier=Modifier.fillMaxWidth().clip(RoundedCornerShape(topStart=2.dp,topEnd=2.dp))
+			.border(1.dp,Fyan.cc.bd,RoundedCornerShape(topStart=2.dp,topEnd=2.dp)).background(Fyan.cc.m).offset(y=(-1.2).dp)){
+				Column(modifier=Modifier.fillMaxWidth().padding(4.dp)){
 					Box(modifier=Modifier.fillMaxWidth(),contentAlignment=Alignment.Center){
-						Box(modifier=Modifier.fillMaxWidth(0.25f).height(3.dp).clip(RoundedCornerShape(2.dp))
-							.background(Fyan.cc.m).clickable(enabled=tv){logf=true;logy=0f})
+						Box(modifier=Modifier.fillMaxWidth(0.25f).height(4.dp).clip(RoundedCornerShape(2.dp))
+						.background(Fyan.cc.bg).clickable(enabled=tv){gn=true;gy=0f})
 					}
-					Row(modifier=Modifier.fillMaxWidth().padding(vertical=8.dp),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically){
-						BasicText("日志 · ${logs.size}条",style=Fyan.ff.p12.copy(color=Fyan.cc.c.copy(alpha=0.6f),fontFamily=FontFamily.Monospace))
-						Box(modifier=Modifier.padding(8.dp).clickable{logc()}){BasicText("清空",style=Fyan.ff.p12.copy(color=Color(0xFFF44336)))}
+					Row(modifier=Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically){
+						BasicText("日志 · ${gs.size}条",style=Fyan.ff.ps.copy(color=Fyan.cc.c.copy(alpha=0.7f),fontFamily=FontFamily.Monospace))
+						Box(modifier=Modifier.padding(3.dp).clickable{gc()}){BasicText("清空",style=Fyan.ff.ps.copy(color=Color(0xFFF44336)))}
 					}
-					LazyColumn(state=ls,modifier=Modifier.fillMaxWidth()){
-						items(logs){ey->
-							val pt=ey.split("●",limit=2)
-							val dt=pt[0].lastIndexOf('.')
-							val id=if(dt>0)pt[0].substring(0,dt)else pt[0]
-							val hx=if(dt>0)pt[0].substring(dt+1)else"#9E9E9E"
-							val ec=try{Color(android.graphics.Color.parseColor(hx))}catch(_:Exception){Color(0xFF9E9E9E)}
+					LazyColumn(state=s,modifier=Modifier.fillMaxWidth()){
+						items(gs){o->
+							val x=o.split("●",limit=2)
+							val z=x[0].lastIndexOf('.')
+							val id=if(z>0)x[0].substring(0,z)else x[0]
+							val cx=if(z>0)x[0].substring(z+1)else"#9E9E9E"
+							val c=try{Color(android.graphics.Color.parseColor(cx))}catch(_:Exception){Color(0xFF9E9E9E)}
 							Box(modifier=Modifier.fillMaxWidth().height(0.5.dp).background(Fyan.cc.bd))
 							Row(modifier=Modifier.fillMaxWidth(),verticalAlignment=Alignment.Top,horizontalArrangement=Arrangement.SpaceBetween){
-								BasicText(pt.getOrElse(1){""},modifier=Modifier.weight(1f).padding(end=4.dp),style=Fyan.ff.p12.copy(color=ec,lineHeight=1.4.em,fontFamily=FontFamily.Monospace))
-								Box(modifier=Modifier.size(18.dp).clickable{logx(id)},contentAlignment=Alignment.Center){
-									BasicText("✕",style=Fyan.ff.p12.copy(color=Fyan.cc.c.copy(alpha=0.4f)))
+								BasicText(x.getOrElse(1){"...."},modifier=Modifier.weight(1f).padding(end=4.dp),style=Fyan.ff.ps.copy(color=c,lineHeight=1.2.em,fontFamily=FontFamily.Monospace))
+								Box(modifier=Modifier.size(16.dp).clickable{gx(id)},contentAlignment=Alignment.Center){
+									BasicText("✕",style=Fyan.ff.ps.copy(color=Fyan.cc.c.copy(alpha=0.7f)))
 								}
 							}
 						}
@@ -189,6 +180,9 @@ object Fyan{
 		}
 	}
 }
+
+
+
 
 class O:ComponentActivity(){
 	private var br:BroadcastReceiver?=null
@@ -203,8 +197,8 @@ class O:ComponentActivity(){
 			if(exit)Dialog(onDismissRequest={exit=false}){
 				Column(modifier=Modifier.fillMaxWidth().padding(24.dp).clip(RoundedCornerShape(12.dp)).background(Fyan.cc.cg).border(1.dp,Fyan.cc.bd,RoundedCornerShape(12.dp)).padding(24.dp),
 					verticalArrangement=Arrangement.spacedBy(12.dp),horizontalAlignment=Alignment.CenterHorizontally){
-					BasicText("提示",style=Fyan.ff.h3.copy(color=Fyan.cc.c))
-					BasicText("确定杀死应用并退出吗？",style=Fyan.ff.p16.copy(color=Fyan.cc.c,textAlign=TextAlign.Center))
+					BasicText("系统提醒",style=Fyan.ff.h3.copy(color=Fyan.cc.c))
+					BasicText("确定杀死应用并退出吗？",style=Fyan.ff.pb.copy(color=Fyan.cc.c,textAlign=TextAlign.Center))
 					Row(modifier=Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(12.dp)){
 						Box(modifier=Modifier.weight(1f).height(40.dp).clip(RoundedCornerShape(6.dp)).background(Fyan.cc.ag).clickable{exit=false},contentAlignment=Alignment.Center){BasicText("取消",style=Fyan.ff.p.copy(color=Fyan.cc.c))}
 						Box(modifier=Modifier.weight(1f).height(40.dp).clip(RoundedCornerShape(6.dp)).background(Fyan.cc.fc).clickable{
@@ -215,15 +209,15 @@ class O:ComponentActivity(){
 				}
 			}
 			Box(modifier=Modifier.fillMaxSize().background(Fyan.cc.bg).systemBarsPadding(),contentAlignment=Alignment.BottomCenter){
-				NavHost(navController=Fyan.nc,startDestination="home"){
-					composable("home"){AyfHome()}
-					composable("ayf_history"){AyfHistory()}
-					composable("ayf_list/{id}"){x->AyfList(id=x.arguments?.getString("id")?:"")}
-					composable("ayf_info/{id}"){x->AyfInfo(id=x.arguments?.getString("id")?:"")}
+				NavHost(navController=Fyan.nc,startDestination="ayf_home"){
+					composable("ayf_home"){Fyan.log("路由","进入爱壹帆首页");AyfHome()}
+					composable("ayf_history"){Fyan.log("路由","进入爱壹帆历史记录页");AyfHistory()}
+					composable("ayf_list/{id}"){x->{Fyan.log("路由","进入爱壹帆筛选列表页");AyfList(id=x.arguments?.getString("id")?:"")}}
+					composable("ayf_info/{id}"){x->{Fyan.log("路由","进入爱壹帆视频详情页");AyfInfo(id=x.arguments?.getString("id")?:"")}}
 				}
 				Fyan.Record()
 			}
-			LaunchedEffect(Unit){check()}
+			LaunchedEffect(Unit){Fyan.log("系统","检查更新");check()}
 		}
 	}
 
@@ -235,11 +229,11 @@ class O:ComponentActivity(){
 	private fun check(){
 		lifecycleScope.launch(Dispatchers.IO){
 			runCatching{
-				val r=HC.newCall(Request.Builder().url("https://github.com/lyu2026/fyan/releases/latest").build()).execute()
+				val r=OkHttpClient().newCall(Request.Builder().url("https://github.com/lyu2026/fyan/releases/latest").build()).execute()
 				val v=r.request.url.toString().substringAfterLast("/")
 				val nv=v.filter(Char::isDigit).toLongOrNull()?:0L
 				val cv=Fyan.vn.filter(Char::isDigit).toLongOrNull()?:0L
-				if(nv>cv)withContext(Dispatchers.Main){upgrade(v)}
+				if(nv>cv)withContext(Dispatchers.Main){Fyan.log("系统","下载新版本($v)包");upgrade(v)}
 			}
 		}
 	}

@@ -58,7 +58,10 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 	val sc=rememberCoroutineScope()
 	Column(modifier=Modifier.fillMaxSize().background(Fyan.cc.bg)){
 		Row(modifier=Modifier.fillMaxWidth().height(38.dp).background(Fyan.cc.cg).horizontalScroll(rememberScrollState()),verticalAlignment=Alignment.CenterVertically){
-			s.forEach{o->Box(modifier=Modifier.fillMaxHeight().background(if(o.first==c)Fyan.cc.fc.copy(alpha=0.15f)else Color.Transparent).padding(horizontal=16.dp).clickable{sc.launch{Fyan.cs("ayf_tab",o.first)}},contentAlignment=Alignment.Center){
+			s.forEach{o->Box(modifier=Modifier.fillMaxHeight().background(if(o.first==c)Fyan.cc.fc.copy(alpha=0.15f)else Color.Transparent).padding(horizontal=16.dp).clickable{
+				Fyan.log("爱壹帆","点击TAB: "+o.first,'u')
+				sc.launch{Fyan.cs("ayf_tab",o.first)
+			}},contentAlignment=Alignment.Center){
 				BasicText(o.second,style=Fyan.ff.h4.copy(color=if(o.first==c)Fyan.cc.fc else Fyan.cc.c.copy(alpha=0.7f),fontWeight=if(o.first==c)FontWeight.Bold else FontWeight.Normal))
 			}}
 		}
@@ -82,7 +85,7 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 	}
 	Column(modifier=Modifier.fillMaxSize().background(Fyan.cc.bg)){
 		Row(modifier=Modifier.fillMaxWidth().height(30.dp).padding(horizontal=8.dp),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.SpaceBetween){
-			BasicText("记录清单",style=Fyan.ff.h3.copy(color=Fyan.cc.c))
+			BasicText("记录清单",style=Fyan.ff.pb.copy(color=Fyan.cc.c))
 			Box(modifier=Modifier.size(28.dp).clickable{cc=true},contentAlignment=Alignment.Center){BasicText("🗑",style=Fyan.ff.h4.copy(color=Fyan.cc.c))}
 		}
 		if(vs.isEmpty())Box(modifier=Modifier.fillMaxSize(),contentAlignment=Alignment.Center){
@@ -95,10 +98,10 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 					Box(modifier=Modifier.fillMaxWidth().aspectRatio(0.7f).background(Fyan.cc.ag),contentAlignment=Alignment.BottomCenter){
 						AsyncImage(model=o["cover"],contentDescription=null,modifier=Modifier.fillMaxSize(),contentScale=ContentScale.Crop)
 						if(o["ec"]!="0")Box(modifier=Modifier.padding(4.dp).background(Fyan.cc.m,RoundedCornerShape(1.dp)).padding(horizontal=4.dp,vertical=2.dp)){
-							BasicText("第${o["ec"]}集",style=Fyan.ff.p12.copy(color=Color.White))
+							BasicText("第${o["ec"]}集",style=Fyan.ff.ps.copy(color=Color.White))
 						}
 					}
-					BasicText(o["title"]!!,modifier=Modifier.padding(4.dp),maxLines=1,overflow=TextOverflow.Ellipsis,style=Fyan.ff.p12.copy(color=Fyan.cc.c,textAlign=TextAlign.Center))
+					BasicText(o["title"]!!,modifier=Modifier.padding(4.dp),maxLines=1,overflow=TextOverflow.Ellipsis,style=Fyan.ff.ps.copy(color=Fyan.cc.c,textAlign=TextAlign.Center))
 				}
 			}
 		}
@@ -107,8 +110,8 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 		Column(modifier=Modifier.fillMaxWidth().padding(32.dp).clip(RoundedCornerShape(3.dp)).background(Fyan.cc.cg).padding(20.dp),verticalArrangement=Arrangement.spacedBy(16.dp)){
 			BasicText("清空历史记录？",style=Fyan.ff.h4.copy(color=Fyan.cc.c))
 			Row(modifier=Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.End){
-				BasicText("取消",modifier=Modifier.clickable{cc=false}.padding(8.dp),style=Fyan.ff.p.copy(color=Fyan.cc.c))
-				BasicText("确定",modifier=Modifier.clickable{sc.launch{Fyan.cs("ayf_history","")};cc=false}.padding(8.dp),style=Fyan.ff.p.copy(color=Fyan.cc.fc))
+				BasicText("取消",modifier=Modifier.clickable{Fyan.log("爱壹帆","取消清空历史记录");cc=false}.padding(8.dp),style=Fyan.ff.p.copy(color=Fyan.cc.c))
+				BasicText("确定",modifier=Modifier.clickable{Fyan.log("爱壹帆","执行清空历史记录");sc.launch{Fyan.cs("ayf_history","")};cc=false}.padding(8.dp),style=Fyan.ff.p.copy(color=Fyan.cc.fc))
 			}
 		}
 	}
@@ -116,9 +119,10 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 		Column(modifier=Modifier.fillMaxWidth().padding(32.dp).clip(RoundedCornerShape(3.dp)).background(Fyan.cc.cg).padding(20.dp),verticalArrangement=Arrangement.spacedBy(16.dp)){
 			BasicText("删除此记录？",style=Fyan.ff.h4.copy(color=Fyan.cc.c))
 			Row(modifier=Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.End){
-				BasicText("取消",modifier=Modifier.clickable{id=null}.padding(8.dp),style=Fyan.ff.p.copy(color=Fyan.cc.c))
+				BasicText("取消",modifier=Modifier.clickable{Fyan.log("爱壹帆","取消删除历史记录，编号: $id");id=null}.padding(8.dp),style=Fyan.ff.p.copy(color=Fyan.cc.c))
 				BasicText("确定",modifier=Modifier.clickable{
 					val o=rs.lines().filter{it.isNotBlank()&&!it.startsWith("${id!!} ")}.joinToString("\n")
+					Fyan.log("爱壹帆","执行删除历史记录，编号: $id")
 					sc.launch{Fyan.cs("ayf_history",o)};id=null
 				}.padding(8.dp),style=Fyan.ff.p.copy(color=Fyan.cc.fc))
 			}
@@ -141,6 +145,7 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 
 	suspend fun fv(u:String):List<Map<String,String>> = withContext(Dispatchers.IO){
 		runCatching<List<Map<String,String>>>{
+			Fyan.log("爱壹帆","获取筛选视频列表，链接: $u")
 			val j=JSONObject(SF(u)).optJSONObject("data")?:return@runCatching emptyList()
 			val s=j.optJSONArray("list")?:return@runCatching emptyList()
 			buildList{
@@ -155,6 +160,7 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 	LaunchedEffect(id){
 		fs=withContext(Dispatchers.IO){
 			runCatching<List<List<Pair<String,String>>>>{
+				Fyan.log("爱壹帆","获取筛选数据，TAB: $id")
 				if(id=="news")listOf(listOf("国际" to "国际","国内" to "国内","华人资讯" to "华人资讯","财经" to "财经","军事" to "军事"))
 				else{
 					val j=JSONObject(SF("https://api.iyf.tv/api/list/getfiltertagsdata?SecondaryCode=$id")).optJSONObject("data")?:return@runCatching emptyList()
@@ -180,13 +186,13 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 	Column(modifier=Modifier.fillMaxSize().background(Fyan.cc.bg)){
 		if(fs.isNotEmpty())Column(modifier=Modifier.fillMaxWidth().background(Fyan.cc.cg)){
 			fs.forEachIndexed{i,g->
-				Row(modifier=Modifier.fillMaxWidth().height(24.dp).horizontalScroll(rememberScrollState()),verticalAlignment=Alignment.CenterVertically){
+				Row(modifier=Modifier.fillMaxWidth().height(20.dp).horizontalScroll(rememberScrollState()),verticalAlignment=Alignment.CenterVertically){
 					g.forEach{(fi,fn)->
 						val at=fi==fc[i]
 						Box(modifier=Modifier.fillMaxHeight().background(if(at)Fyan.cc.fc.copy(alpha=0.15f)else Color.Transparent).clickable{
 							fc[i]=fi;sc.launch{X=true;vs=fv(au());X=false}
 						}.padding(horizontal=12.dp),contentAlignment=Alignment.Center){
-							BasicText("  $fn  ",style=Fyan.ff.p12.copy(color=if(at)Fyan.cc.fc else Fyan.cc.c.copy(alpha=0.7f),fontWeight=if(at)FontWeight.W600 else FontWeight.W400))
+							BasicText("  $fn  ",style=Fyan.ff.ps.copy(color=if(at)Fyan.cc.fc else Fyan.cc.c.copy(alpha=0.7f),fontWeight=if(at)FontWeight.W600 else FontWeight.W400))
 						}
 					}
 				}
@@ -204,16 +210,17 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 					verticalArrangement=Arrangement.spacedBy(2.dp),horizontalArrangement=Arrangement.spacedBy(2.dp)){
 					items(vs,{it["id"]!!}){o->
 						Column(modifier=Modifier.padding(2.dp).clip(RoundedCornerShape(2.dp)).background(Fyan.cc.cg).clickable{
+							Fyan.log("爱壹帆","进入详情页，编号: "+o["id"])
 							if(id!="news")Fyan.goto("ayf_info/"+o["id"])
 						},horizontalAlignment=Alignment.CenterHorizontally){
 							Box(modifier=Modifier.fillMaxWidth().aspectRatio(0.7f).background(Fyan.cc.ag),contentAlignment=Alignment.BottomCenter){
 								AsyncImage(model=o["cover"],contentDescription=null,modifier=Modifier.fillMaxSize(),contentScale=ContentScale.Crop)
 								val bd=listOfNotNull(o["score"]?.takeIf{it.isNotEmpty()},o["tip"]?.takeIf{it.isNotEmpty()}).joinToString(" · ")
 								if(bd.isNotEmpty())Box(modifier=Modifier.padding(2.dp).background(Fyan.cc.m,RoundedCornerShape(1.dp)).padding(4.dp,2.dp)){
-									BasicText(bd,style=Fyan.ff.p12.copy(color=Color.White))
+									BasicText(bd,style=Fyan.ff.ps.copy(color=Color.White))
 								}
 							}
-							BasicText(o["title"]!!,modifier=Modifier.padding(4.dp),maxLines=1,overflow=TextOverflow.Ellipsis,style=Fyan.ff.p12.copy(color=Fyan.cc.c,textAlign=TextAlign.Center))
+							BasicText(o["title"]!!,modifier=Modifier.padding(4.dp),maxLines=1,overflow=TextOverflow.Ellipsis,style=Fyan.ff.ps.copy(color=Fyan.cc.c,textAlign=TextAlign.Center))
 						}
 					}
 				}
@@ -294,7 +301,7 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 			Fyan.tv->Row(modifier=Modifier.fillMaxSize()){
 				Column(modifier=Modifier.fillMaxHeight().weight(3f)){
 					Box(modifier=Modifier.fillMaxWidth().aspectRatio(16f/9f).background(Color.Black),contentAlignment=Alignment.Center){
-						if(uc.isEmpty())BasicText("加载中...",style=Fyan.ff.p12.copy(color=Fyan.cc.c.copy(alpha=0.5f)))
+						if(uc.isEmpty())BasicText("加载中...",style=Fyan.ff.ps.copy(color=Fyan.cc.c.copy(alpha=0.5f)))
 						else if(!pr)Box(modifier=Modifier.fillMaxSize().clickable{pr=true},contentAlignment=Alignment.Center){
 							AsyncImage(model=O!!["cover"],contentDescription=null,contentScale=ContentScale.Fit,modifier=Modifier.fillMaxSize())
 							Box(modifier=Modifier.size(56.dp).clip(CircleShape).background(Fyan.cc.m),contentAlignment=Alignment.Center){BasicText("▶",style=Fyan.ff.h2.copy(color=Color.White))}
@@ -303,19 +310,19 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 					if(sl.isNotEmpty())LazyRow(modifier=Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(8.dp),contentPadding=PaddingValues(10.dp,8.dp)){
 						items(sl.indices.toList()){k->
 							Box(modifier=Modifier.width(50.dp).height(24.dp).clip(RoundedCornerShape(2.dp)).background(if(k==ec)Fyan.cc.fc else Fyan.cc.x).clickable{ec=k},contentAlignment=Alignment.Center){
-								BasicText(sl[k]["title"]!!,style=Fyan.ff.p12.copy(color=if(k==ec)Color.White else Fyan.cc.c,fontWeight=if(k==ec)FontWeight.W600 else FontWeight.W400))
+								BasicText(sl[k]["title"]!!,style=Fyan.ff.ps.copy(color=if(k==ec)Color.White else Fyan.cc.c,fontWeight=if(k==ec)FontWeight.W600 else FontWeight.W400))
 							}
 						}
 					}
 				}
 				Column(modifier=Modifier.fillMaxHeight().padding(16.dp,12.dp).weight(1f).verticalScroll(rememberScrollState())){
-					BasicText("视频简介",style=Fyan.ff.p12.copy(color=Fyan.cc.c.copy(alpha=0.5f)))
+					BasicText("视频简介",style=Fyan.ff.ps.copy(color=Fyan.cc.c.copy(alpha=0.5f)))
 					BasicText(O!!["brief"] as String,modifier=Modifier.padding(top=6.dp),style=Fyan.ff.p.copy(color=Fyan.cc.c))
 				}
 			}
 			else->Column(modifier=Modifier.fillMaxSize().verticalScroll(rememberScrollState())){
 				Box(modifier=Modifier.fillMaxWidth().aspectRatio(16f/9f).background(Color.Black),contentAlignment=Alignment.Center){
-					if(uc.isEmpty())BasicText("加载中...",style=Fyan.ff.p12.copy(color=Fyan.cc.c.copy(alpha=0.5f)))
+					if(uc.isEmpty())BasicText("加载中...",style=Fyan.ff.ps.copy(color=Fyan.cc.c.copy(alpha=0.5f)))
 					else if(!pr)Box(modifier=Modifier.fillMaxSize().clickable{pr=true},contentAlignment=Alignment.Center){
 						AsyncImage(model=O!!["cover"],contentDescription=null,contentScale=ContentScale.Fit,modifier=Modifier.fillMaxSize())
 						Box(modifier=Modifier.size(56.dp).clip(CircleShape).background(Fyan.cc.m),contentAlignment=Alignment.Center){BasicText("▶",style=Fyan.ff.h2.copy(color=Color.White))}
@@ -339,19 +346,19 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 					}
 				}
 				Column(modifier=Modifier.padding(14.dp,12.dp)){
-					BasicText("视频简介",style=Fyan.ff.p12.copy(color=Fyan.cc.c.copy(alpha=0.5f)))
+					BasicText("视频简介",style=Fyan.ff.ps.copy(color=Fyan.cc.c.copy(alpha=0.5f)))
 					BasicText(O!!["brief"] as String,modifier=Modifier.padding(top=4.dp),style=Fyan.ff.p.copy(color=Fyan.cc.c))
 				}
 				Box(modifier=Modifier.fillMaxWidth().height(0.5.dp).padding(horizontal=14.dp).background(Fyan.cc.bd))
 				if(sl.isNotEmpty())Column(modifier=Modifier.padding(12.dp,8.dp)){
-					BasicText("选集",style=Fyan.ff.p12.copy(color=Fyan.cc.c.copy(alpha=0.5f)))
+					BasicText("选集",style=Fyan.ff.ps.copy(color=Fyan.cc.c.copy(alpha=0.5f)))
 					Column(modifier=Modifier.padding(top=8.dp),verticalArrangement=Arrangement.spacedBy(6.dp)){
 						repeat((sl.size+4)/5){r->
 							Row(horizontalArrangement=Arrangement.spacedBy(6.dp)){
 								repeat(5){c->
 									val i=r*5+c
 									if(i<sl.size)Box(modifier=Modifier.weight(1f).height(24.dp).clip(RoundedCornerShape(2.dp)).background(if(i==ec)Fyan.cc.fc else Fyan.cc.x).clickable{ec=i},contentAlignment=Alignment.Center){
-										BasicText(sl[i]["title"]!!,style=Fyan.ff.p12.copy(color=if(i==ec)Color.White else Fyan.cc.c,fontWeight=if(i==ec)FontWeight.W600 else FontWeight.W400))
+										BasicText(sl[i]["title"]!!,style=Fyan.ff.ps.copy(color=if(i==ec)Color.White else Fyan.cc.c,fontWeight=if(i==ec)FontWeight.W600 else FontWeight.W400))
 									}else Box(modifier=Modifier.weight(1f))
 								}
 							}

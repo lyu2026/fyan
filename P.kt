@@ -139,7 +139,6 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 		return "https://api.iyf.tv/api/$o&page=1&size=21"
 	}
 
-	// 修复：明确泛型类型 + 正确闭合 buildList/runCatching 括号
 	suspend fun fv(u:String):List<Map<String,String>>=withContext(Dispatchers.IO){
 		runCatching<List<Map<String,String>>>{
 			val j=JSONObject(SF(u)).optJSONObject("data")?:return@runCatching emptyList()
@@ -163,7 +162,12 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 					buildList{
 						for(i in 0 until s.length()){
 							val z=s.getJSONObject(i).optJSONArray("list")?:continue
-							add(buildList{for(r in 0 until z.length()){val o=z.getJSONObject(r);add(o.optString("classifyId","0") to o.optString("classifyName",""))}})
+							add(buildList{
+								for(r in 0 until z.length()){
+									val o=z.getJSONObject(r)
+									add(o.optString("classifyId","0") to o.optString("classifyName",""))
+								}
+							})
 						}
 					}
 				}

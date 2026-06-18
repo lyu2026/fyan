@@ -10,6 +10,7 @@ permissions:
   actions: write
 
 jobs:
+  # 清理无效执行与构建发布并行运行，互不阻塞
   clear:
     runs-on: ubuntu-latest
     steps:
@@ -31,7 +32,7 @@ jobs:
             fi
           done
 
-  sozo:
+  goso:
     runs-on: ubuntu-latest
     steps:
       - name: 拉取代码
@@ -45,11 +46,12 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
+          cache: 'gradle'
 
       - name: 整理文档
         run: |
           echo
-          chmod +x ./.sh ; ./.sh
+          chmod +x ./.sh && ./.sh
 
       - name: 工具缓存
         id: cache
@@ -58,7 +60,7 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('.properties') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('.properties', 'app/build.gradle.kts', 'settings.gradle.kts') }}
 
       - name: 下载工具
         if: steps.cache.outputs.cache-hit != 'true'
@@ -76,13 +78,18 @@ jobs:
       - name: 执行构建
         env:
           GRADLE_OPTS: "-Xmx4g -XX:MaxMetaspaceSize=1024m -XX:+UseG1GC"
+          GRADLE_BUILD_CACHE_ENABLED: "true"
           KS_PATH: "${{ github.workspace }}/fyan.keystore"
           KS_PSWD: ${{ secrets.KS_PSWD }}
           K_ALIAS: ${{ secrets.K_ALIAS }}
           K_PSWD: ${{ secrets.K_PSWD }}
         run: |
           echo
-          $JAVA_HOME/bin/java -Xmx64m -Xms64m -Dorg.gradle.appname=oo -Dgradle.wrapper.properties=.properties -jar .jar :app:assembleRelease -q --console=plain --no-daemon --parallel 2>&1 | sed '/FAILURE: Build failed with an exception./,$d; s|file://[^ ]*/app/src/main/kotlin/com/fyan/||g; s|^e: ||'
+          $JAVA_HOME/bin/java -Xmx64m -Xms64m -Dorg.gradle.appname=oo -Dgradle.wrapper.properties=.properties -jar .jar \
+            :app:assembleRelease \
+            -q --console=plain --no-daemon --parallel \
+            --build-cache \
+            2>&1 | sed '/FAILURE: Build failed with an exception./,$d; s|file://[^ ]*/app/src/main/kotlin/com/fyan/||g; s|^e: ||'
           exit ${PIPESTATUS[0]}
 
       - name: 提取产物

@@ -167,7 +167,7 @@ import org.json.JSONObject
 							modifier=Modifier.padding(4.dp)
 								.background(cc.m,RoundedCornerShape(1.dp))
 								.padding(horizontal=4.dp,vertical=2.dp)
-						){BasicText("第${(o["ec"].toIntOrNull()?:0)+1}集",style=ff.ps.copy(color=Color.White))}
+						){BasicText("第"+((o["ec"]?.toIntOrNull()?:0)+1)+"集",style=ff.ps.copy(color=Color.White))}
 					}
 					BasicText( // 标题
 						o["title"]!!,

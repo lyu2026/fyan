@@ -385,7 +385,7 @@ import org.json.JSONObject
 						if(uc.isEmpty())BasicText("◉ 加载中...",style=Fyan.ff.ps.copy(color=Fyan.cc.c.copy(alpha=0.5f)))
 						else if(!pr)Box(modifier=Modifier.fillMaxSize().clickable{pr=true},contentAlignment=Alignment.Center){
 							// 点击封面播放
-							AsyncImage(model=O!!["cover"]+"?width=500&height=283&scale=both&mode=crop&anchor=topcenter&format=jpg",contentDescription=null,contentScale=ContentScale.Fit,modifier=Modifier.fillMaxSize())
+							AsyncImage(model=O!!["cover"].toString()+"?width=500&height=283&scale=both&mode=crop&anchor=topcenter&format=jpg",contentDescription=null,contentScale=ContentScale.Fit,modifier=Modifier.fillMaxSize())
 							Box(modifier=Modifier.size(56.dp).clip(CircleShape).background(Fyan.cc.m),contentAlignment=Alignment.Center){BasicText("▶",style=Fyan.ff.h2.copy(color=Color.White))}
 						}else AndroidView(factory={PlayerView(Fyan.me).apply{player=P;useController=true;requestFocus()}},modifier=Modifier.fillMaxSize())
 					}

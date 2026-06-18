@@ -274,11 +274,11 @@ import org.json.JSONObject
 						},horizontalAlignment=Alignment.CenterHorizontally){
 							Box(modifier=Modifier.fillMaxWidth().aspectRatio(0.7f).background(Fyan.cc.ag)){
 								AsyncImage(model=o["cover"],contentDescription=null,modifier=Modifier.fillMaxSize(),contentScale=ContentScale.Crop)
-								if(!o["score"].isNullOrEmpty())Box(modifier=Modifier.align(Alignment.TopStart).padding(2.dp).background(Fyan.cc.m,RoundedCornerShape(2.dp)).padding(2.dp)){
-									BasicText(o["score"],style=Fyan.ff.ps.copy(color=Fyan.cc.c))
+								if(!o["score"].isNullOrEmpty())Box(modifier=Modifier.align(Alignment.TopStart).padding(2.dp).background(Fyan.cc.m,RoundedCornerShape(4.dp)).padding(2.dp)){
+									BasicText(o["score"]!!,style=Fyan.ff.ps.copy(color=Fyan.cc.c))
 								}
 								if(!o["tip"].isNullOrEmpty())Box(modifier=Modifier.align(Alignment.BottomCenter).padding(4.dp,2.dp).background(Fyan.cc.m,RoundedCornerShape(2.dp)).padding(2.dp)){
-									BasicText(o["tip"],style=Fyan.ff.ps.copy(color=Fyan.cc.c))
+									BasicText(o["tip"]!!,style=Fyan.ff.ps.copy(color=Fyan.cc.c))
 								}
 							}
 							BasicText(o["title"]!!,modifier=Modifier.padding(4.dp),maxLines=1,overflow=TextOverflow.Ellipsis,style=Fyan.ff.ps.copy(color=Fyan.cc.c,textAlign=TextAlign.Center))
@@ -390,7 +390,7 @@ import org.json.JSONObject
 						if(uc.isEmpty())BasicText("◉ 加载中...",style=Fyan.ff.ps.copy(color=Fyan.cc.c.copy(alpha=0.5f)))
 						else if(!pr)Box(modifier=Modifier.fillMaxSize().clickable{pr=true},contentAlignment=Alignment.Center){
 							// 点击封面播放
-							AsyncImage(model=O!!["cover"],contentDescription=null,contentScale=ContentScale.Fit,modifier=Modifier.fillMaxSize())
+							AsyncImage(model=O!!["cover"]+"?width=500&height=283&scale=both&mode=crop&anchor=topcenter&format=jpg",contentDescription=null,contentScale=ContentScale.Fit,modifier=Modifier.fillMaxSize())
 							Box(modifier=Modifier.size(56.dp).clip(CircleShape).background(Fyan.cc.m),contentAlignment=Alignment.Center){BasicText("▶",style=Fyan.ff.h2.copy(color=Color.White))}
 						}else AndroidView(factory={PlayerView(Fyan.me).apply{player=P;useController=true;requestFocus()}},modifier=Modifier.fillMaxSize())
 					}

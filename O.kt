@@ -97,7 +97,7 @@ object Fyan{
 		val p=TextStyle(fontSize=14.sp,fontWeight=FontWeight.Normal)
 		val ps=TextStyle(fontSize=12.sp,fontWeight=FontWeight.Normal)
 		val pb=TextStyle(fontSize=16.sp,fontWeight=FontWeight.Normal)
-		val gr=TextStyle(fontSize=8.sp,lineHeight=1.1.em,fontWeight=FontWeight.Normal,fontFamily=FontFamily.Monospace)
+		val gr=TextStyle(fontSize=10.sp,lineHeight=1.06.em,fontWeight=FontWeight.Normal,fontFamily=FontFamily.Monospace)
 	}
 
 	class CC(o:Boolean){
@@ -165,13 +165,12 @@ object Fyan{
 				val (w,r)=0.5.dp.toPx() to 4.dp.toPx()
 				drawPath(
 					path=Path().apply{
-						moveTo(0f,r)
-						arcTo(Rect(0f,0f,r*2,r*2),180f,-90f,false)
-						lineTo(size.width-r,0f)
-						arcTo(Rect(size.width-r*2,0f,size.width,r*2),90f,-90f,false)
-						lineTo(size.width,size.height)
 						moveTo(0f,size.height)
 						lineTo(0f,r)
+						arcTo(Rect(0f,0f,r*2,r*2),180f,90f,false)
+						lineTo(size.width-r,0f)
+						arcTo(Rect(size.width-r*2,0f,size.width,r*2),270f,90f,false)
+						lineTo(size.width,size.height)
 					},color=bc,
 					style=Stroke(w,cap=StrokeCap.Round,join=StrokeJoin.Round)
 				)

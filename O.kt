@@ -116,6 +116,7 @@ object Fyan{
 		val debug=if(o)Color(0xFFCE93D8)else Color(0xFF6A1B9A)
 		val success=if(o)Color(0xFF4CAF50)else Color(0xFF2E7D32)
 	}
+	val cz:CC get()=CC(isSystemInDarkTheme())
 	val cc:CC @Composable get()=CC(isSystemInDarkTheme())
 
 	private val Context.ds by preferencesDataStore("fyan")
@@ -170,7 +171,7 @@ object Fyan{
 						arcTo(Rect(size.width-r*2,0f,size.width,r*2),90f,-90f,false)
 						lineTo(size.width,size.height)
 					},
-					color=Fyan.cc.bd,
+					color=Fyan.cz.bd,
 					style=Stroke(w,cap=StrokeCap.Round,join=StrokeJoin.Round)
 				)
 			}){

@@ -165,7 +165,7 @@ import org.json.JSONObject
 						)
 						if(o["ec"]!="")Box( // 提示信息
 							modifier=Modifier.padding(4.dp)
-								.background(cc.m,RoundedCornerShape(1.dp))
+								.background(cc.m,RoundedCornerShape(3.dp))
 								.padding(horizontal=4.dp,vertical=2.dp)
 						){BasicText("第"+((o["ec"]?.toIntOrNull()?:0)+1)+"集",style=ff.ps.copy(color=Color.White))}
 					}
@@ -389,12 +389,13 @@ import org.json.JSONObject
 									contentScale=ContentScale.Crop
 								)
 								if(!o["score"].isNullOrEmpty())Box( // 评分
-									modifier=Modifier.align(Alignment.TopStart).padding(2.dp,6.dp)
+									modifier=Modifier.align(Alignment.TopStart).padding(4.dp)
 										.background(cc.m,RoundedCornerShape(10.dp)).padding(2.dp)
 								){BasicText(o["score"]!!,style=ff.ps.copy(color=cc.c))}
 								if(!o["tip"].isNullOrEmpty())Box( // 提示
-									modifier=Modifier.align(Alignment.BottomCenter).padding(2.dp,6.dp)
-										.background(cc.m,RoundedCornerShape(6.dp)).padding(2.dp)
+									modifier=Modifier.align(Alignment.BottomCenter).padding(4.dp)
+										.background(cc.m,RoundedCornerShape(3.dp))
+										.padding(horizontal=4.dp,vertical=2.dp)
 								){BasicText(o["tip"]!!,style=ff.ps.copy(color=cc.c))}
 							}
 							BasicText(o["title"]!!, // 标题

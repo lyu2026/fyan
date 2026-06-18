@@ -135,12 +135,13 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 
 	// 构造列表API请求URL（新闻/普通分类不同端点）
 	fun au():String{
-		val ids=fc.entries.sortedBy{it.key}.joinToString(","){it.value}
-		return"https://api.iyf.tv/api"+(if(id=="news")"/home/getrelativevideosbysub?titleid=$id&Tags=$ids"else"/list/getconditionfilterdata?titleid=$id&ids=$ids")+"&page=1&size=21"
+		var o=fc.entries.sortedBy{it.key}.joinToString(","){it.value}
+		o=if(id=="news")"home/getrelativevideosbysub?titleid=$id&Tags=$o"else"list/getconditionfilterdata?titleid=$id&ids=$o"
+		return "https://api.iyf.tv/api/$o&page=1&size=21"
 	}
 
 	// 解析视频列表JSON为统一Map格式（IO线程调用）
-	suspend fun fv(u:String):List<Map<String,String>>=withContext(Dispatchers.IO){
+	suspend fun fv(u:String):List<Map<String,String>> = withContext(Dispatchers.IO){
 		runCatching{
 			val j=JSONObject(SF(u)).optJSONObject("data")?:return@runCatching emptyList()
 			val s=j.optJSONArray("list")?:return@runCatching emptyList()

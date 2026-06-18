@@ -223,7 +223,7 @@ class O:ComponentActivity(){
 					composable("home"){AyfHome()} // 主页（含tab+内容区）
 					composable("ayf_history"){AyfHistory()} // 历史记录页（独立路由，供tab切换复用）
 					composable("ayf_list/{id}"){x->AyfList(id=x.arguments?.getString("id")?:"")} // 筛选列表页
-					composable("ayf_play/{id}"){x->AyfInfo(id=x.arguments?.getString("id")?:"")} // 视频详情页
+					composable("ayf_info/{id}"){x->AyfInfo(id=x.arguments?.getString("id")?:"")} // 视频详情页
 				}
 				Fyan.Record() // 悬浮于NavHost顶层的全局日志面板
 			}

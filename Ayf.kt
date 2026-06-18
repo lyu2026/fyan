@@ -56,6 +56,8 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 	val s=listOf("history" to "历史记录","movie" to "电影","drama" to "剧集","anime" to "动漫","variety" to "综艺","documentary" to "纪录片","news" to "新闻")
 	val c by Fyan.cg("ayf_tab","history").collectAsState(initial="history")
 	val sc=rememberCoroutineScope()
+	Fyan.log("路由","进入爱壹帆首页")
+
 	Column(modifier=Modifier.fillMaxSize().background(Fyan.cc.bg)){
 		Row(modifier=Modifier.fillMaxWidth().height(38.dp).background(Fyan.cc.cg).horizontalScroll(rememberScrollState()),verticalAlignment=Alignment.CenterVertically){
 			s.forEach{o->Box(modifier=Modifier.fillMaxHeight().background(if(o.first==c)Fyan.cc.fc.copy(alpha=0.15f)else Color.Transparent).padding(horizontal=16.dp).clickable{
@@ -83,6 +85,8 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 			if(x.size<6)null else mapOf("id" to x[0],"type" to x[1],"title" to x[2],"cover" to x[3],"ec" to x[4],"ps" to x[5])
 		}
 	}
+	Fyan.log("路由","进入爱壹帆历史记录页")
+
 	Column(modifier=Modifier.fillMaxSize().background(Fyan.cc.bg)){
 		Row(modifier=Modifier.fillMaxWidth().height(30.dp).padding(horizontal=8.dp),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.SpaceBetween){
 			BasicText("记录清单",style=Fyan.ff.pb.copy(color=Fyan.cc.c))
@@ -136,6 +140,7 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 	val fc=remember{mutableStateMapOf<Int,String>()}
 	var X by remember{mutableStateOf(true)}
 	val sc=rememberCoroutineScope()
+	Fyan.log("路由","进入爱壹帆筛选列表页")
 
 	fun au():String{
 		var o=fc.entries.sortedBy{it.key}.joinToString(","){it.value}
@@ -238,6 +243,7 @@ fun SF(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.rea
 	var fs by remember{mutableStateOf(false)}
 	val hs by Fyan.cg("ayf_history","").collectAsState("")
 	val sc=rememberCoroutineScope()
+	Fyan.log("路由","进入爱壹帆视频详情页")
 
 	LaunchedEffect(id){
 		X=true;ec=0;pr=false;uc=""

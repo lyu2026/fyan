@@ -210,10 +210,10 @@ class O:ComponentActivity(){
 			}
 			Box(modifier=Modifier.fillMaxSize().background(Fyan.cc.bg).systemBarsPadding(),contentAlignment=Alignment.BottomCenter){
 				NavHost(navController=Fyan.nc,startDestination="ayf_home"){
-					composable("ayf_home"){Fyan.log("路由","进入爱壹帆首页");AyfHome()}
-					composable("ayf_history"){Fyan.log("路由","进入爱壹帆历史记录页");AyfHistory()}
-					composable("ayf_list/{id}"){x->{Fyan.log("路由","进入爱壹帆筛选列表页");AyfList(id=x.arguments?.getString("id")?:"")}}
-					composable("ayf_info/{id}"){x->{Fyan.log("路由","进入爱壹帆视频详情页");AyfInfo(id=x.arguments?.getString("id")?:"")}}
+					composable("ayf_home"){AyfHome()}
+					composable("ayf_history"){AyfHistory()}
+					composable("ayf_list/{id}"){x->AyfList(id=x.arguments?.getString("id")?:"")}
+					composable("ayf_info/{id}"){x->AyfInfo(id=x.arguments?.getString("id")?:"")}
 				}
 				Fyan.Record()
 			}

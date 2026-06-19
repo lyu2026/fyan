@@ -507,8 +507,10 @@ import org.json.JSONObject
 			setMediaSource(f.createMediaSource(MediaItem.fromUri(Uri.parse(surl))))
 			if(ctime>0L)seekTo(ctime)
 			prepare()
-			playWhenReady=true
 		}
+	}
+	LaunchedEffect(player,playing){ // 动态同步封面点击与播放状态，防止后台盲放
+		player?.playWhenReady=playing
 	}
 	LaunchedEffect(player){ // 播放时定时轮询同步进度至 ctime
 		while(true){
@@ -523,7 +525,7 @@ import org.json.JSONObject
 				val type=oo!!["type"];val title=oo!!["title"];val cv=oo!!["cover"]
 				kotlinx.coroutines.CoroutineScope(Dispatchers.IO).launch{
 					val raws=Fyan.co("ayf_history","")
-					Fyan.cs("ayf_history",listOf(id+" "+type+" "+title+" "+cv+" "+sidx+" "+ctime)+raws.lines().filter{it.isNotEmpty()&&!it.startsWith("$id ")}.joinToString("\n"))
+					Fyan.cs("ayf_history",listOf(id+" "+type+" "+title+" "+cv+" "+sidx+" "+now)+raws.lines().filter{it.isNotEmpty()&&!it.startsWith("$id ")}.joinToString("\n"))
 				}
 			}
 			player?.release()

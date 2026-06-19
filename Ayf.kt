@@ -143,7 +143,7 @@ import org.json.JSONObject
 			verticalArrangement=Arrangement.spacedBy(3.dp),
 			horizontalArrangement=Arrangement.spacedBy(3.dp)
 		){
-			items(list,{it["id"]!!}){o->
+			items(list){o->
 				Column(
 					modifier=Modifier.clip(RoundedCornerShape(2.dp))
 						.background(cc.cg).pointerInput(o["id"]!!){
@@ -373,7 +373,7 @@ import org.json.JSONObject
 					verticalArrangement=Arrangement.spacedBy(3.dp),
 					horizontalArrangement=Arrangement.spacedBy(3.dp)
 				){
-					items(videos,{it["id"]!!}){o->
+					items(videos){o->
 						Column(
 							modifier=Modifier.clip(RoundedCornerShape(2.dp))
 								.background(cc.cg).clickable{
@@ -391,7 +391,7 @@ import org.json.JSONObject
 								if(!o["score"].isNullOrEmpty())Box( // 评分
 									modifier=Modifier.align(Alignment.TopStart).padding(4.dp)
 										.background(cc.m,RoundedCornerShape(10.dp)).padding(2.dp)
-								){BasicText(o["score"]!!,style=ff.ps.copy(color=cc.c))}
+								){BasicText(o["score"]!!,style=ff.ps.copy(color=cc.c,fontFamily=FontFamily.Monospace))}
 								if(!o["tip"].isNullOrEmpty())Box( // 提示
 									modifier=Modifier.align(Alignment.BottomCenter).padding(4.dp)
 										.background(cc.m,RoundedCornerShape(3.dp))
@@ -538,7 +538,7 @@ import org.json.JSONObject
 				verticalAlignment=Alignment.CenterVertically
 			){
 				Box( // 返回箭头
-					modifier=Modifier.size(26.dp).padding(3.dp).clip(CircleShape)
+					modifier=Modifier.size(26.dp).padding(6.dp).clip(CircleShape)
 						.clickable{Fyan.nc.popBackStack()},
 					contentAlignment=Alignment.Center
 				){
@@ -632,8 +632,12 @@ import org.json.JSONObject
 									contentAlignment=Alignment.Center
 								){
 									BasicText(parts[k]["title"]!!,
-										style=ff.ps.copy(color=if(k==sidx)cc.white else cc.c,
-										fontWeight=if(k==sidx)FontWeight.W600 else FontWeight.W400)
+										style=ff.px.copy(
+											lineHeight=1.1.em,
+											color=if(k==sidx)cc.white else cc.c,
+											fontWeight=if(k==sidx)FontWeight.W600 else FontWeight.W400
+										),
+										modifier=Modifier.fillMaxWidth().padding(2.dp)
 									)
 								}
 							}
@@ -713,8 +717,12 @@ import org.json.JSONObject
 											contentAlignment=Alignment.Center
 										){
 											BasicText(parts[i]["title"]!!,
-												style=ff.ps.copy(color=if(i==sidx)cc.white else cc.c,
-												fontWeight=if(i==sidx)FontWeight.W600 else FontWeight.W400)
+												style=ff.px.copy(
+													lineHeight=1.1.em,
+													color=if(i==sidx)cc.white else cc.c,
+													fontWeight=if(i==sidx)FontWeight.W600 else FontWeight.W400
+												),
+												modifier=Modifier.fillMaxWidth().padding(2.dp)
 											)
 										}else Box(modifier=Modifier.weight(1f))
 									}

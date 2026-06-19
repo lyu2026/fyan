@@ -119,6 +119,7 @@ object Fyan{ // 全局数据
 		val h3=TextStyle(fontSize=18.sp,fontWeight=FontWeight.Bold) // 三级标题（弹窗标题）
 		val h4=TextStyle(fontSize=16.sp,fontWeight=FontWeight.Bold) // 四级标题（导航栏）
 		val p=TextStyle(fontSize=14.sp,fontWeight=FontWeight.Normal) // 正文
+		val px=TextStyle(fontSize=10.sp,fontWeight=FontWeight.Normal) // 小字（角标、简介）
 		val ps=TextStyle(fontSize=12.sp,fontWeight=FontWeight.Normal) // 小字（角标、简介）
 		val pb=TextStyle(fontSize=16.sp,fontWeight=FontWeight.Normal) // 正文加大（弹窗说明）
 		val gr=TextStyle(fontSize=10.sp,lineHeight=1.06.em,fontWeight=FontWeight.Normal,fontFamily=FontFamily.Monospace) // 日志等宽字体

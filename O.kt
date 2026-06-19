@@ -102,6 +102,14 @@ object Fyan{ // 全局数据
 	// 导航跳转封装，统一入口
 	fun goto(o:String)=nc.navigate(o)
 
+	val sbar={o:Boolean-> // 状态栏切换器
+			val ic=WindowCompat.getInsetsController(window,window.decorView)
+			if(o)ic.show(WindowInsetsCompat.Type.statusBars())else{
+				ic.hide(WindowInsetsCompat.Type.statusBars())
+				ic.systemBarsBehavior=WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+			}
+		}
+
 	// 同步网络请求：打开 URL 输入流，读取全部文本（IO 线程调用）
 	fun fetch(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.readText()}
 
@@ -124,8 +132,9 @@ object Fyan{ // 全局数据
 	}
 
 	class CC(o:Boolean){ // 主题色彩系统，根据深色/浅色模式动态切换
-		val w=Color.White // 白色
-		val o=Color.Transparent // 透明
+		val white=Color.White // 白色
+		val black=Color.Black // 黑色
+		val trans=Color.Transparent // 透明
 		val fc=if(o)Color(0xFF5C8EBE)else Color(0xFF90CAF9) // 获焦背景（亮蓝调，TV极易识别且不刺眼）
 		val ps=if(o)Color(0xFF6A6A6A)else Color(0xFF9E9E9E) // 轻触反馈（稳重深/中灰，下压感明确）
 		val m=if(o)Color(0xDD000000)else Color(0xDDFFFFFF) // 半透明遮罩（日志面板背景）
@@ -226,7 +235,7 @@ object Fyan{ // 全局数据
 	// 展开态：完整日志面板，支持下拉折叠手势
 	@Composable private fun RO(){
 		val s=rememberLazyListState()
-		val bc=Fyan.cc.bd
+		val cc=Fyan.cc;val ff=Fyan.ff
 		// 新日志入队时自动滚动到底部
 		LaunchedEffect(gs.size){if(gs.isNotEmpty())s.animateScrollToItem(gs.size-1)}
 		Box(modifier=Modifier.fillMaxWidth().heightIn(max=(Fyan.sh/3).dp).navigationBarsPadding()
@@ -238,7 +247,7 @@ object Fyan{ // 全局数据
 			)
 		}){
 			Box(modifier=Modifier.fillMaxWidth().clip(RoundedCornerShape(topStart=4.dp,topEnd=4.dp))
-			.background(Fyan.cc.m).drawWithContent{
+			.background(cc.m).drawWithContent{
 				drawContent()
 				val (w,r)=0.5.dp.toPx() to 4.dp.toPx()
 				// 绘制顶部圆角边框线（仅上边+左边+右边，底部不绘制）
@@ -250,7 +259,7 @@ object Fyan{ // 全局数据
 						lineTo(size.width-r,0f)
 						arcTo(Rect(size.width-r*2,0f,size.width,r*2),270f,90f,false)
 						lineTo(size.width,size.height)
-					},color=bc,
+					},color=cc.bd,
 					style=Stroke(w,cap=StrokeCap.Round,join=StrokeJoin.Round)
 				)
 			}){
@@ -258,12 +267,12 @@ object Fyan{ // 全局数据
 					// 顶部拖拽指示条（TV 模式下可点击折叠）
 					Box(modifier=Modifier.fillMaxWidth(),contentAlignment=Alignment.Center){
 						Box(modifier=Modifier.fillMaxWidth(0.25f).height(4.dp).clip(RoundedCornerShape(2.dp))
-						.background(Fyan.cc.ag).padding(top=2.dp).clickable(enabled=tv){gn=true;gy=0f})
+						.background(cc.ag).padding(top=2.dp).clickable(enabled=tv){gn=true;gy=0f})
 					}
 					// 标题行：日志计数 + 清空按钮
 					Row(modifier=Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically){
-						BasicText("日志 · ${gs.size}条",style=Fyan.ff.ps.copy(color=Fyan.cc.c))
-						Box(modifier=Modifier.clickable{gc()}){BasicText("清空",style=Fyan.ff.ps.copy(color=Color(0xFFF44336)))}
+						BasicText("日志 · ${gs.size}条",style=ff.ps.copy(color=cc.c))
+						Box(modifier=Modifier.clickable{gc()}){BasicText("清空",style=ff.ps.copy(color=Color(0xFFF44336)))}
 					}
 					// 日志条目列表
 					LazyColumn(state=s,modifier=Modifier.fillMaxWidth().padding(bottom=6.dp)){
@@ -274,13 +283,13 @@ object Fyan{ // 全局数据
 							val id=if(z>0)x[0].substring(0,z)else x[0] // UUID（用于单条删除）
 							val cx=if(z>0)x[0].substring(z+1)else"i" // 级别字符
 							// 根据级别字符映射对应颜色
-							val c=when(cx){"i"->Fyan.cc.info;"e"->Fyan.cc.error;"w"->Fyan.cc.warn;"s"->Fyan.cc.success;"d"->Fyan.cc.debug;else->Fyan.cc.c}
-							Box(modifier=Modifier.fillMaxWidth().height(0.5.dp).background(Fyan.cc.bd))
+							val c=when(cx){"i"->cc.info;"e"->cc.error;"w"->cc.warn;"s"->cc.success;"d"->cc.debug;else->cc.c}
+							Box(modifier=Modifier.fillMaxWidth().height(0.5.dp).background(cc.bd))
 							Row(modifier=Modifier.fillMaxWidth(),verticalAlignment=Alignment.Top,horizontalArrangement=Arrangement.SpaceBetween){
-								BasicText(x.getOrElse(1){"...."},modifier=Modifier.weight(1f).padding(end=4.dp),style=Fyan.ff.gr.copy(color=c))
+								BasicText(x.getOrElse(1){"...."},modifier=Modifier.weight(1f).padding(end=4.dp),style=ff.gr.copy(color=c))
 								// 点击 ╳ 删除该条日志（通过 UUID 前缀精确匹配）
 								Box(modifier=Modifier.size(14.dp).clickable{gx(id)},contentAlignment=Alignment.Center){
-									BasicText("╳",style=Fyan.ff.ps.copy(color=Fyan.cc.c))
+									BasicText("╳",style=ff.ps.copy(color=cc.c))
 								}
 							}
 						}
@@ -302,40 +311,56 @@ class O:ComponentActivity(){
 		super.onCreate(savedInstanceState)
 		enableEdgeToEdge() // 开启边缘到边缘体验
 		Fyan.init(this) // 初始化全局上下文及版本信息
-		Fyan.sbar={o:Boolean-> // 状态栏切换器
-			val ic=WindowCompat.getInsetsController(window,window.decorView)
-			if(o)ic.show(WindowInsetsCompat.Type.statusBars())else{
-				ic.hide(WindowInsetsCompat.Type.statusBars())
-				ic.systemBarsBehavior=WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-			}
-		}
 		setContent{
-			val c=Fyan.cc
+			val cc=Fyan.cc
 			// 全局注入极简交互背景色工厂，感知主题自动刷新
-			CompositionLocalProvider(LocalIndication provides remember(c){Fyan.Idf(c.fc,c.ps)}){
+			CompositionLocalProvider(LocalIndication provides remember(cc.){Fyan.Idf(cc.fc,cc.ps)}){
 				Fyan.nc=rememberNavController() // 创建并保存全局导航控制器
 				var exit by remember{mutableStateOf(false)} // 控制退出确认弹窗显示
 				// 拦截返回键：首次按返回弹出退出确认，再次取消
 				BackHandler(enabled=!exit){exit=true}
+				val cc=Fyan.cc;ff=Fyan.ff
 				// 退出确认弹窗
 				if(exit)Dialog(onDismissRequest={exit=false}){
-					Column(modifier=Modifier.fillMaxWidth().padding(24.dp).clip(RoundedCornerShape(12.dp)).background(Fyan.cc.cg).border(1.dp,Fyan.cc.bd,RoundedCornerShape(12.dp)).padding(24.dp),
-						verticalArrangement=Arrangement.spacedBy(12.dp),horizontalAlignment=Alignment.CenterHorizontally){
-						BasicText("系统提醒",style=Fyan.ff.h3.copy(color=Fyan.cc.c))
-						BasicText("确定杀死应用并退出吗？",style=Fyan.ff.pb.copy(color=Fyan.cc.c,textAlign=TextAlign.Center))
-						Row(modifier=Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(12.dp)){
-							// 取消按钮：关闭弹窗
-							Box(modifier=Modifier.weight(1f).height(40.dp).clip(RoundedCornerShape(6.dp)).background(Fyan.cc.ag).clickable{exit=false},contentAlignment=Alignment.Center){BasicText("取消",style=Fyan.ff.p.copy(color=Fyan.cc.c))}
-							// 确定按钮：结束所有 Activity 后延迟 100ms 杀死进程
-							Box(modifier=Modifier.weight(1f).height(40.dp).clip(RoundedCornerShape(6.dp)).background(Fyan.cc.primary).clickable{
-								finishAffinity()
-								Handler(Looper.getMainLooper()).postDelayed({Process.killProcess(Process.myPid())},100)
-							},contentAlignment=Alignment.Center){BasicText("确定",style=Fyan.ff.p.copy(color=Fyan.cc.cg))}
+					Column(
+						modifier=Modifier.fillMaxWidth().padding(24.dp)
+							.clip(RoundedCornerShape(10.dp)).background(cc.cg)
+							.border(1.dp,cc.bd,RoundedCornerShape(10.dp))
+							.padding(24.dp),
+						verticalArrangement=Arrangement.spacedBy(12.dp),
+						horizontalAlignment=Alignment.CenterHorizontally
+					){
+						BasicText("系统提醒",style=ff.h3.copy(color=cc.c))
+						BasicText("确定杀死应用并退出吗？",style=ff.pb.copy(color=cc.c,textAlign=TextAlign.Center))
+						Row(
+							modifier=Modifier.fillMaxWidth(),
+							horizontalArrangement=Arrangement.spacedBy(12.dp)
+						){
+							Box( // 取消按钮：关闭弹窗
+								modifier=Modifier.weight(1f).height(40.dp)
+									.clip(RoundedCornerShape(6.dp))
+									.background(cc.ag)
+									.clickable{exit=false},
+								contentAlignment=Alignment.Center
+							){BasicText("取消",style=ff.p.copy(color=cc.c))}
+							Box( // 确定按钮：结束所有 Activity 后延迟 100ms 杀死进程
+								modifier=Modifier.weight(1f).height(40.dp)
+									.clip(RoundedCornerShape(6.dp))
+									.background(cc.primary)
+									.clickable{
+										finishAffinity()
+										Handler(Looper.getMainLooper()).postDelayed({Process.killProcess(Process.myPid())},100)
+									},
+								contentAlignment=Alignment.Center
+							){BasicText("确定",style=ff.p.copy(color=cc.cg))}
 						}
 					}
 				}
-				// 根布局：全屏背景 + 系统栏内边距 + 日志面板固定在底部
-				Box(modifier=Modifier.fillMaxSize().background(Fyan.cc.bg).systemBarsPadding(),contentAlignment=Alignment.BottomCenter){
+				Box( // 根布局：全屏背景 + 系统栏内边距 + 日志面板固定在底部
+					modifier=Modifier.fillMaxSize().background(cc.bg)
+						.systemBarsPadding(),
+					contentAlignment=Alignment.BottomCenter
+				){
 					// 路由导航宿主，startDestination 为爱壹帆首页
 					NavHost(navController=Fyan.nc,startDestination="ayf_home"){
 						composable("ayf_home"){AyfHome()}
@@ -346,7 +371,10 @@ class O:ComponentActivity(){
 					Fyan.Record() // 日志悬浮面板（叠加在导航内容之上）
 				}
 				// 应用启动后异步检查版本更新
-				LaunchedEffect(Unit){Fyan.log("系统","检查更新");check()}
+				LaunchedEffect(Unit){
+					Fyan.log("系统","检查更新")
+					check()
+				}
 			}
 		}
 	}

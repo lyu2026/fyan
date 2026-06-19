@@ -72,7 +72,7 @@ import org.json.JSONObject
 		){
 			tabs.forEach{o->Box(
 				modifier=Modifier.fillMaxHeight()
-					.background(if(o.first==curr)cc.primary.copy(alpha=0.15f)else cc.o)
+					.background(if(o.first==curr)cc.primary.copy(alpha=0.15f)else cc.trans)
 					.clickable{
 						Fyan.log("爱壹帆","点击TAB: "+o.first,'u')
 						cs.launch{Fyan.cs("ayf_tab",o.first)} // 修复原代码中未闭合的闭包语法缺陷
@@ -167,7 +167,7 @@ import org.json.JSONObject
 							modifier=Modifier.padding(4.dp)
 								.background(cc.m,RoundedCornerShape(3.dp))
 								.padding(horizontal=4.dp,vertical=2.dp)
-						){BasicText("第"+((o["ec"]?.toIntOrNull()?:0)+1)+"集",style=ff.ps.copy(color=Color.White))}
+						){BasicText("第"+((o["ec"]?.toIntOrNull()?:0)+1)+"集",style=ff.ps.copy(color=cc.white))}
 					}
 					BasicText( // 标题
 						o["title"]!!,
@@ -337,7 +337,7 @@ import org.json.JSONObject
 						val me=fi==curr[i] // 当前选中
 						Box(
 							modifier=Modifier.fillMaxHeight()
-								.background(if(me)cc.primary.copy(alpha=0.15f)else cc.o)
+								.background(if(me)cc.primary.copy(alpha=0.15f)else cc.trans)
 								.clickable{
 									curr[i]=fi;cs.launch{loading=true;page=1;more=true;videos=vget(purl(1));loading=false}
 								},
@@ -584,7 +584,7 @@ import org.json.JSONObject
 					Column(modifier=Modifier.fillMaxHeight().weight(3f)){
 						Box(
 							modifier=Modifier.fillMaxWidth().aspectRatio(16f/9f)
-								.background(Color.Black),
+								.background(cc.black),
 							contentAlignment=Alignment.Center
 						){
 							// 获取视频源，加载中
@@ -601,7 +601,7 @@ import org.json.JSONObject
 								Box( // 播放区域中心的播放按钮
 									modifier=Modifier.size(56.dp).clip(CircleShape).background(cc.m),
 									contentAlignment=Alignment.Center
-								){BasicText("▶",style=ff.h2.copy(color=Color.White))}
+								){BasicText("▶",style=ff.h2.copy(color=cc.white))}
 							}else Box( // 播放器正在播放，点击全屏
 								modifier=Modifier.fillMaxSize().clickable{fscreen=true},
 								contentAlignment=Alignment.Center
@@ -632,7 +632,7 @@ import org.json.JSONObject
 									contentAlignment=Alignment.Center
 								){
 									BasicText(parts[k]["title"]!!,
-										style=ff.ps.copy(color=if(k==sidx)Color.White else cc.c,
+										style=ff.ps.copy(color=if(k==sidx)cc.white else cc.c,
 										fontWeight=if(k==sidx)FontWeight.W600 else FontWeight.W400)
 									)
 								}
@@ -654,7 +654,7 @@ import org.json.JSONObject
 				){
 					Box( // 播放器区域
 						modifier=Modifier.fillMaxWidth().aspectRatio(16f/9f)
-							.background(Color.Black),
+							.background(cc.black),
 						contentAlignment=Alignment.Center
 					){
 						// 加载中
@@ -672,7 +672,7 @@ import org.json.JSONObject
 								modifier=Modifier.size(56.dp).clip(CircleShape)
 									.background(cc.m),
 								contentAlignment=Alignment.Center
-							){BasicText("▶",style=ff.h2.copy(color=Color.White))}
+							){BasicText("▶",style=ff.h2.copy(color=cc.white))}
 						}else Box( // 播放器正在播放，点击全屏
 							modifier=Modifier.fillMaxSize().clickable{fscreen=true},
 							contentAlignment=Alignment.Center
@@ -713,7 +713,7 @@ import org.json.JSONObject
 											contentAlignment=Alignment.Center
 										){
 											BasicText(parts[i]["title"]!!,
-												style=ff.ps.copy(color=if(i==sidx)Color.White else cc.c,
+												style=ff.ps.copy(color=if(i==sidx)cc.white else cc.c,
 												fontWeight=if(i==sidx)FontWeight.W600 else FontWeight.W400)
 											)
 										}else Box(modifier=Modifier.weight(1f))
@@ -729,7 +729,7 @@ import org.json.JSONObject
 		}
 
 		if(fscreen)Box( // 全局全屏覆盖层
-			modifier=Modifier.fillMaxSize().background(Color.Black),
+			modifier=Modifier.fillMaxSize().background(cc.black),
 			contentAlignment=Alignment.Center
 		){
 			if(!Fyan.tv)DisposableEffect(Unit){
@@ -758,7 +758,7 @@ import org.json.JSONObject
 						.padding(8.dp).size(32.dp).clip(CircleShape)
 						.background(cc.m).clickable{fscreen=false},
 					contentAlignment=Alignment.Center
-				){BasicText("✕",style=ff.p.copy(color=Color.White))}
+				){BasicText("╳",style=ff.p.copy(color=cc.white))}
 			}
 			BackHandler{fscreen=false}
 		}

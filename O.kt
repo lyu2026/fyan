@@ -86,6 +86,7 @@ import kotlin.math.roundToInt
 object Fyan{ // 全局数据
 	lateinit var nc:NavHostController // 全局导航控制器
 	lateinit var me:Context // 全局 applicationContext，避免内存泄漏
+	var sbar:((Boolean)->Unit)?=null // 状态栏切换器（由 Activity 动态注入）
 	var tv=false // 是否为 TV 设备（uiMode 位掩码判断）
 	var vs=0L // 当前安装包的 versionCode（长整型）
 	var vn="" // 当前安装包的 versionName 字符串
@@ -101,14 +102,6 @@ object Fyan{ // 全局数据
 
 	// 导航跳转封装，统一入口
 	fun goto(o:String)=nc.navigate(o)
-
-	val sbar={o:Boolean-> // 状态栏切换器
-			val ic=WindowCompat.getInsetsController(window,window.decorView)
-			if(o)ic.show(WindowInsetsCompat.Type.statusBars())else{
-				ic.hide(WindowInsetsCompat.Type.statusBars())
-				ic.systemBarsBehavior=WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-			}
-		}
 
 	// 同步网络请求：打开 URL 输入流，读取全部文本（IO 线程调用）
 	fun fetch(u:String):String=java.net.URL(u).openStream().bufferedReader().use{it.readText()}
@@ -311,6 +304,13 @@ class O:ComponentActivity(){
 		super.onCreate(savedInstanceState)
 		enableEdgeToEdge() // 开启边缘到边缘体验
 		Fyan.init(this) // 初始化全局上下文及版本信息
+		Fyan.sbar={o:Boolean-> // 状态栏切换器
+			val ic=WindowCompat.getInsetsController(window,window.decorView)
+			if(o)ic.show(WindowInsetsCompat.Type.statusBars())else{
+				ic.hide(WindowInsetsCompat.Type.statusBars())
+				ic.systemBarsBehavior=WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+			}
+		}
 		setContent{
 			val cc=Fyan.cc
 			// 全局注入极简交互背景色工厂，感知主题自动刷新

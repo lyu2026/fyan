@@ -533,14 +533,13 @@ import org.json.JSONObject
 
 	Box(modifier=Modifier.fillMaxSize()){
 		Column(modifier=Modifier.fillMaxSize().background(cc.bg)){
-			// 顶部导航栏：返回箭头 + 视频标题
-			Row(
+			Row( // 顶部导航栏
 				modifier=Modifier.fillMaxWidth().height(38.dp).background(cc.cg),
 				verticalAlignment=Alignment.CenterVertically
 			){
-				Box(
-					modifier=Modifier.size(26.dp).padding(3.dp)
-						.clip(CircleShape).clickable{Fyan.nc.popBackStack()},
+				Box( // 返回箭头
+					modifier=Modifier.size(26.dp).padding(3.dp).clip(CircleShape)
+						.clickable{Fyan.nc.popBackStack()},
 					contentAlignment=Alignment.Center
 				){
 					Image(
@@ -549,21 +548,27 @@ import org.json.JSONObject
 						colorFilter=ColorFilter.tint(cc.c)
 					)
 				}
-				BasicText(
-					(oo?.get("title") as? String)?:"视频详情",
+				// 视频标题
+				BasicText((oo?.get("title") as? String)?:"视频详情",
 					modifier=Modifier.weight(1f).padding(start=3.dp),
 					maxLines=1,overflow=TextOverflow.Ellipsis,
 					style=ff.h4.copy(color=cc.c)
 				)
 			}
 			when{
-				loading->Box(modifier=Modifier.fillMaxSize(),contentAlignment=Alignment.Center){
+				loading->Box( // 加载中
+					modifier=Modifier.fillMaxSize(),
+					contentAlignment=Alignment.Center
+				){
 					BasicText("◌ 加载视频详情…",style=ff.p.copy(color=cc.c.copy(alpha=0.5f)))
 				}
-				oo==null->Box(modifier=Modifier.fillMaxSize(),contentAlignment=Alignment.Center){
+				oo==null->Box( // 加载失败，数据异常
+					modifier=Modifier.fillMaxSize(),
+					contentAlignment=Alignment.Center
+				){
 					Column(horizontalAlignment=Alignment.CenterHorizontally){
 						BasicText("◑ 加载失败",style=ff.p.copy(color=cc.c.copy(alpha=0.5f)))
-						Box(
+						Box( // 重试按钮
 							modifier=Modifier.padding(top=8.dp)
 								.clip(RoundedCornerShape(4.dp)).background(cc.ag)
 								.clickable{loading=true}
@@ -572,94 +577,190 @@ import org.json.JSONObject
 						){BasicText("重试",style=ff.p.copy(color=cc.primary))}
 					}
 				}
-				// TV 横屏布局
-				Fyan.tv->Row(modifier=Modifier.fillMaxSize()){
+				Fyan.tv->Row( // TV 横屏布局
+					modifier=Modifier.fillMaxSize()
+				){
+					// 播放器占屏宽四分之三
 					Column(modifier=Modifier.fillMaxHeight().weight(3f)){
-						Box(modifier=Modifier.fillMaxWidth().aspectRatio(16f/9f).background(Color.Black),contentAlignment=Alignment.Center){
-							if(surl.isEmpty())BasicText("◉ 加载中...",style=ff.ps.copy(color=cc.c.copy(alpha=0.5f)))
-							else if(!playing)Box(modifier=Modifier.fillMaxSize().clickable{playing=true},contentAlignment=Alignment.Center){
-								AsyncImage(model=cover,contentDescription=null,contentScale=ContentScale.Fit,modifier=Modifier.fillMaxSize())
-								Box(modifier=Modifier.size(56.dp).clip(CircleShape).background(cc.m),contentAlignment=Alignment.Center){BasicText("▶",style=ff.h2.copy(color=Color.White))}
-							}else{
-								Box(modifier=Modifier.fillMaxSize().clickable{fscreen=true},contentAlignment=Alignment.Center){
-									AndroidView(factory={ctx->PlayerView(ctx).apply{useController=true}},update={it.player=if(fscreen)null else player;if(!fscreen)it.requestFocus()},modifier=Modifier.fillMaxSize())
-								}
+						Box(
+							modifier=Modifier.fillMaxWidth().aspectRatio(16f/9f)
+								.background(Color.Black),
+							contentAlignment=Alignment.Center
+						){
+							// 获取视频源，加载中
+							if(surl.isEmpty())BasicText("◌ 加载中...",style=ff.ps.copy(color=cc.c.copy(alpha=0.5f)))
+							else if(!playing)Box( // 播放器已初始，视频播放区域，点击播放
+								modifier=Modifier.fillMaxSize().clickable{playing=true},
+								contentAlignment=Alignment.Center
+							){
+								AsyncImage( // 视频横向海报图
+									model=cover,contentDescription=null,
+									contentScale=ContentScale.Fit,
+									modifier=Modifier.fillMaxSize()
+								)
+								Box( // 播放区域中心的播放按钮
+									modifier=Modifier.size(56.dp).clip(CircleShape).background(cc.m),
+									contentAlignment=Alignment.Center
+								){BasicText("▶",style=ff.h2.copy(color=Color.White))}
+							}else Box( // 播放器正在播放，点击全屏
+								modifier=Modifier.fillMaxSize().clickable{fscreen=true},
+								contentAlignment=Alignment.Center
+							){
+								AndroidView( // 播放器
+									factory={ctx->PlayerView(ctx).apply{useController=true}},
+									update={
+										// 全屏切换播放丝滑
+										it.player=if(fscreen)null else player
+										// 非全屏状态可获焦
+										if(!fscreen)it.requestFocus()
+									},
+									modifier=Modifier.fillMaxSize()
+								)
 							}
 						}
-						if(parts.isNotEmpty())LazyRow(modifier=Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(8.dp),contentPadding=PaddingValues(10.dp,8.dp)){
+						if(parts.isNotEmpty())LazyRow( // 视频集按钮栏
+							modifier=Modifier.fillMaxWidth(),
+							horizontalArrangement=Arrangement.spacedBy(8.dp),
+							contentPadding=PaddingValues(10.dp,8.dp)
+						){
 							items(parts.indices.toList()){k->
-								Box(modifier=Modifier.width(50.dp).height(24.dp).clip(RoundedCornerShape(2.dp)).background(if(k==sidx)cc.primary else cc.x).clickable{if(sidx!=k)sidx=k},contentAlignment=Alignment.Center){
-									BasicText(parts[k]["title"]!!,style=ff.ps.copy(color=if(k==sidx)Color.White else cc.c,fontWeight=if(k==sidx)FontWeight.W600 else FontWeight.W400))
+								Box( // 集按钮
+									modifier=Modifier.width(50.dp).height(24.dp)
+										.clip(RoundedCornerShape(2.dp))
+										.background(if(k==sidx)cc.primary else cc.x)
+										.clickable{if(sidx!=k)sidx=k},
+									contentAlignment=Alignment.Center
+								){
+									BasicText(parts[k]["title"]!!,
+										style=ff.ps.copy(color=if(k==sidx)Color.White else cc.c,
+										fontWeight=if(k==sidx)FontWeight.W600 else FontWeight.W400)
+									)
 								}
 							}
 						}
 					}
-					Column(modifier=Modifier.fillMaxHeight().padding(16.dp,12.dp).weight(1f).verticalScroll(rememberScrollState())){
+					Column( // 水平方向剩下区域为视频简介
+						modifier=Modifier.fillMaxHeight()
+							.padding(16.dp,12.dp).weight(1f)
+							.verticalScroll(rememberScrollState())
+					){
 						BasicText("视频简介",style=ff.ps.copy(color=cc.c.copy(alpha=0.5f)))
 						BasicText(oo!!["brief"] as String,modifier=Modifier.padding(top=6.dp),style=ff.p.copy(color=cc.c))
 					}
 				}
-				// 手机竖屏布局
-				else->Column(modifier=Modifier.fillMaxSize().verticalScroll(rememberScrollState())){
-					Box(modifier=Modifier.fillMaxWidth().aspectRatio(16f/9f).background(Color.Black),contentAlignment=Alignment.Center){
+				else->Column( // 手机竖屏布局
+					modifier=Modifier.fillMaxSize()
+						.verticalScroll(rememberScrollState())
+				){
+					Box( // 播放器区域
+						modifier=Modifier.fillMaxWidth().aspectRatio(16f/9f)
+							.background(Color.Black),
+						contentAlignment=Alignment.Center
+					){
+						// 加载中
 						if(surl.isEmpty())BasicText("◌ 加载中...",style=ff.ps.copy(color=cc.c.copy(alpha=0.5f)))
-						else if(!playing)Box(modifier=Modifier.fillMaxSize().clickable{playing=true},contentAlignment=Alignment.Center){
-							AsyncImage(model=cover,contentDescription=null,contentScale=ContentScale.Fit,modifier=Modifier.fillMaxSize())
-							Box(modifier=Modifier.size(56.dp).clip(CircleShape).background(cc.m),contentAlignment=Alignment.Center){BasicText("▶",style=ff.h2.copy(color=Color.White))}
-						}else Box(modifier=Modifier.fillMaxSize().clickable{fscreen=true},contentAlignment=Alignment.Center){
-							AndroidView(factory={ctx->PlayerView(ctx).apply{useController=false}},update={it.player=if(fscreen)null else player},modifier=Modifier.fillMaxSize())
+						else if(!playing)Box( // 播放器已初始，视频播放区域，点击播放
+							modifier=Modifier.fillMaxSize().clickable{playing=true},
+							contentAlignment=Alignment.Center
+						){
+							AsyncImage( // 视频横向海报图
+								model=cover,contentDescription=null,
+								contentScale=ContentScale.Fit,
+								modifier=Modifier.fillMaxSize()
+							)
+							Box( // 视频播放按钮
+								modifier=Modifier.size(56.dp).clip(CircleShape)
+									.background(cc.m),
+								contentAlignment=Alignment.Center
+							){BasicText("▶",style=ff.h2.copy(color=Color.White))}
+						}else Box( // 播放器正在播放，点击全屏
+							modifier=Modifier.fillMaxSize().clickable{fscreen=true},
+							contentAlignment=Alignment.Center
+						){
+							AndroidView( // 播放器
+								factory={ctx->PlayerView(ctx).apply{useController=false}},
+								update={it.player=if(fscreen)null else player},
+								modifier=Modifier.fillMaxSize()
+							)
 						}
 					}
+					// 视频简介
 					Column(modifier=Modifier.padding(14.dp,12.dp)){
 						BasicText("视频简介",style=ff.ps.copy(color=cc.c.copy(alpha=0.5f)))
-						BasicText(oo!!["brief"] as String,modifier=Modifier.padding(top=4.dp),style=ff.p.copy(color=cc.c))
+						BasicText(oo!!["brief"] as String,
+							modifier=Modifier.padding(top=4.dp),
+							style=ff.p.copy(color=cc.c)
+						)
 					}
+					// 分割线
 					Box(modifier=Modifier.fillMaxWidth().height(0.5.dp).padding(horizontal=14.dp).background(cc.bd))
+					// 视频集按钮栏
 					if(parts.isNotEmpty())Column(modifier=Modifier.padding(12.dp,8.dp)){
 						BasicText("选集",style=ff.ps.copy(color=cc.c.copy(alpha=0.5f)))
-						Column(modifier=Modifier.padding(top=8.dp),verticalArrangement=Arrangement.spacedBy(6.dp)){
+						Column(
+							modifier=Modifier.padding(top=8.dp),
+							verticalArrangement=Arrangement.spacedBy(6.dp)
+						){
 							repeat((parts.size+4)/5){r->
 								Row(horizontalArrangement=Arrangement.spacedBy(6.dp)){
 									repeat(5){cIdx->
 										val i=r*5+cIdx
-										if(i<parts.size)Box(modifier=Modifier.weight(1f).height(24.dp).clip(RoundedCornerShape(2.dp)).background(if(i==sidx)cc.primary else cc.x).clickable{if(sidx!=i)sidx=i},contentAlignment=Alignment.Center){
-											BasicText(parts[i]["title"]!!,style=ff.ps.copy(color=if(i==sidx)Color.White else cc.c,fontWeight=if(i==sidx)FontWeight.W600 else FontWeight.W400))
+										if(i<parts.size)Box(
+											modifier=Modifier.weight(1f).height(24.dp)
+												.clip(RoundedCornerShape(2.dp))
+												.background(if(i==sidx)cc.primary else cc.x)
+												.clickable{if(sidx!=i)sidx=i},
+											contentAlignment=Alignment.Center
+										){
+											BasicText(parts[i]["title"]!!,
+												style=ff.ps.copy(color=if(i==sidx)Color.White else cc.c,
+												fontWeight=if(i==sidx)FontWeight.W600 else FontWeight.W400)
+											)
 										}else Box(modifier=Modifier.weight(1f))
 									}
 								}
 							}
 						}
 					}
+					// 占位空白
 					Box(modifier=Modifier.height(24.dp))
 				}
 			}
 		}
 
-		// 全局全屏覆盖层：全面重组优化，统一使用原生顶级 Box，彻底剔除 Dialog window 造成的旋转重置及遮罩布局硬伤
-		if(fscreen){
-			Box(modifier=Modifier.fillMaxSize().background(Color.Black),contentAlignment=Alignment.Center){
-				if(!Fyan.tv){
-					// 手机设备：全屏时启动横屏重力感应锁定，退出时自动恢复原始竖屏状态
-					DisposableEffect(Unit){
-						activity?.requestedOrientation=ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-						onDispose{activity?.requestedOrientation=ActivityInfo.SCREEN_ORIENTATION_PORTRAIT}
-					}
+		if(fscreen)Box( // 全局全屏覆盖层
+			modifier=Modifier.fillMaxSize().background(Color.Black),
+			contentAlignment=Alignment.Center
+		){
+			if(!Fyan.tv)DisposableEffect(Unit){
+				Fyan.sbar?.invoke(false)
+				activity?.requestedOrientation=ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+				onDispose{
+					activity?.requestedOrientation=ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+					Fyan.sbar?.invoke(true)
 				}
-				AndroidView(factory={ctx->
+			} // 手机设备：全屏时启动横屏重力感应锁定，退出时自动恢复原始竖屏状态
+			AndroidView( // 全屏播放器
+				factory={ctx->
 					PlayerView(ctx).apply{
 						useController=true
-						setOnClickListener{if(isControllerFullyVisible)hideController() else showController()}
+						setOnClickListener{
+							if(isControllerFullyVisible)hideController() else showController()
+						}
 					}
-				},update={it.player=player;it.requestFocus()},modifier=Modifier.fillMaxSize())
-				
-				if(!Fyan.tv){
-					// 手机全屏额外提供左上角极简关闭退出按钮
-					Box(modifier=Modifier.align(Alignment.TopStart).padding(8.dp).size(32.dp).clip(CircleShape).background(cc.m).clickable{fscreen=false},contentAlignment=Alignment.Center){
-						BasicText("✕",style=ff.p.copy(color=Color.White))
-					}
-				}
-				BackHandler{fscreen=false}
+				},
+				update={it.player=player;it.requestFocus()},
+				modifier=Modifier.fillMaxSize()
+			)
+			if(!Fyan.tv){ // 手机全屏额外提供左上角极简关闭退出按钮
+				Box(
+					modifier=Modifier.align(Alignment.TopStart)
+						.padding(8.dp).size(32.dp).clip(CircleShape)
+						.background(cc.m).clickable{fscreen=false},
+					contentAlignment=Alignment.Center
+				){BasicText("✕",style=ff.p.copy(color=Color.White))}
 			}
+			BackHandler{fscreen=false}
 		}
 	}
 }

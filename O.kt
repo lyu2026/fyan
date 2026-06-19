@@ -12,6 +12,7 @@ import android.os.Handler
 import android.os.Looper
 import android.os.Process
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
@@ -59,6 +60,9 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.window.Dialog
 import androidx.core.content.FileProvider
 import androidx.core.content.pm.PackageInfoCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.lifecycleScope
@@ -296,7 +300,15 @@ class O:ComponentActivity(){
 
 	override fun onCreate(savedInstanceState:Bundle?){
 		super.onCreate(savedInstanceState)
+		enableEdgeToEdge() // 开启边缘到边缘体验
 		Fyan.init(this) // 初始化全局上下文及版本信息
+		Fyan.sbar={o:Boolean-> // 状态栏切换器
+			val ic=WindowCompat.getInsetsController(window,window.decorView)
+			if(o)ic.show(WindowInsetsCompat.Type.statusBars())else{
+				ic.hide(WindowInsetsCompat.Type.statusBars())
+				ic.systemBarsBehavior=WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+			}
+		}
 		setContent{
 			val c=Fyan.cc
 			// 全局注入极简交互背景色工厂，感知主题自动刷新

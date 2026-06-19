@@ -234,8 +234,8 @@ object Fyan{ // 全局数据
 	@Composable private fun RX(){Box(modifier=Modifier.fillMaxWidth(0.7f).height(6.dp).padding(bottom=2.dp).clip(RoundedCornerShape(2.dp)).background(Fyan.cc.cg).clickable{gn=false;gy=0f},contentAlignment=Alignment.Center){}}
 	// 展开态：完整日志面板，支持下拉折叠手势
 	@Composable private fun RO(){
-		val s=rememberLazyListState()
 		val cc=Fyan.cc;val ff=Fyan.ff
+		val s=rememberLazyListState()
 		// 新日志入队时自动滚动到底部
 		LaunchedEffect(gs.size){if(gs.isNotEmpty())s.animateScrollToItem(gs.size-1)}
 		Box(modifier=Modifier.fillMaxWidth().heightIn(max=(Fyan.sh/3).dp).navigationBarsPadding()
@@ -314,24 +314,23 @@ class O:ComponentActivity(){
 		setContent{
 			val cc=Fyan.cc
 			// 全局注入极简交互背景色工厂，感知主题自动刷新
-			CompositionLocalProvider(LocalIndication provides remember(cc.){Fyan.Idf(cc.fc,cc.ps)}){
+			CompositionLocalProvider(LocalIndication provides remember(cc){Fyan.Idf(cc.fc,cc.ps)}){
 				Fyan.nc=rememberNavController() // 创建并保存全局导航控制器
 				var exit by remember{mutableStateOf(false)} // 控制退出确认弹窗显示
 				// 拦截返回键：首次按返回弹出退出确认，再次取消
 				BackHandler(enabled=!exit){exit=true}
-				val cc=Fyan.cc;ff=Fyan.ff
 				// 退出确认弹窗
 				if(exit)Dialog(onDismissRequest={exit=false}){
 					Column(
 						modifier=Modifier.fillMaxWidth().padding(24.dp)
-							.clip(RoundedCornerShape(10.dp)).background(cc.cg)
-							.border(1.dp,cc.bd,RoundedCornerShape(10.dp))
+							.clip(RoundedCornerShape(10.dp)).background(Fyan.cc.cg)
+							.border(1.dp,Fyan.cc.bd,RoundedCornerShape(10.dp))
 							.padding(24.dp),
 						verticalArrangement=Arrangement.spacedBy(12.dp),
 						horizontalAlignment=Alignment.CenterHorizontally
 					){
-						BasicText("系统提醒",style=ff.h3.copy(color=cc.c))
-						BasicText("确定杀死应用并退出吗？",style=ff.pb.copy(color=cc.c,textAlign=TextAlign.Center))
+						BasicText("系统提醒",style=Fyan.ff.h3.copy(color=Fyan.cc.c))
+						BasicText("确定杀死应用并退出吗？",style=Fyan.ff.pb.copy(color=Fyan.cc.c,textAlign=TextAlign.Center))
 						Row(
 							modifier=Modifier.fillMaxWidth(),
 							horizontalArrangement=Arrangement.spacedBy(12.dp)
@@ -339,25 +338,25 @@ class O:ComponentActivity(){
 							Box( // 取消按钮：关闭弹窗
 								modifier=Modifier.weight(1f).height(40.dp)
 									.clip(RoundedCornerShape(6.dp))
-									.background(cc.ag)
+									.background(Fyan.cc.ag)
 									.clickable{exit=false},
 								contentAlignment=Alignment.Center
-							){BasicText("取消",style=ff.p.copy(color=cc.c))}
+							){BasicText("取消",style=Fyan.ff.p.copy(color=Fyan.cc.c))}
 							Box( // 确定按钮：结束所有 Activity 后延迟 100ms 杀死进程
 								modifier=Modifier.weight(1f).height(40.dp)
 									.clip(RoundedCornerShape(6.dp))
-									.background(cc.primary)
+									.background(Fyan.cc.primary)
 									.clickable{
 										finishAffinity()
 										Handler(Looper.getMainLooper()).postDelayed({Process.killProcess(Process.myPid())},100)
 									},
 								contentAlignment=Alignment.Center
-							){BasicText("确定",style=ff.p.copy(color=cc.cg))}
+							){BasicText("确定",style=Fyan.ff.p.copy(color=Fyan.cc.cg))}
 						}
 					}
 				}
 				Box( // 根布局：全屏背景 + 系统栏内边距 + 日志面板固定在底部
-					modifier=Modifier.fillMaxSize().background(cc.bg)
+					modifier=Modifier.fillMaxSize().background(Fyan.cc.bg)
 						.systemBarsPadding(),
 					contentAlignment=Alignment.BottomCenter
 				){

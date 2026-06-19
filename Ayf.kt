@@ -392,7 +392,7 @@ import org.json.JSONObject
 								)
 								if(!o["score"].isNullOrEmpty())Box( // 评分
 									modifier=Modifier.align(Alignment.TopStart).padding(4.dp)
-										.background(cc.m,RoundedCornerShape(10.dp)).padding(2.dp)
+										.background(cc.m,RoundedCornerShape(10.dp)).padding(5.dp,2.dp)
 								){BasicText(o["score"]!!,style=ff.ps.copy(color=cc.c,fontFamily=FontFamily.Monospace))}
 								if(!o["tip"].isNullOrEmpty())Box( // 提示
 									modifier=Modifier.align(Alignment.BottomCenter).padding(4.dp)
@@ -540,7 +540,7 @@ import org.json.JSONObject
 				verticalAlignment=Alignment.CenterVertically
 			){
 				Box( // 返回箭头
-					modifier=Modifier.size(26.dp).padding(6.dp).clip(CircleShape)
+					modifier=Modifier.size(36.dp).padding(2.dp).clip(CircleShape)
 						.clickable{Fyan.nc.popBackStack()},
 					contentAlignment=Alignment.Center
 				){

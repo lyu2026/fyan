@@ -35,9 +35,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -647,6 +649,7 @@ import org.json.JSONObject
 						modifier=Modifier.fillMaxHeight()
 							.padding(16.dp,12.dp).weight(1f)
 							.verticalScroll(rememberScrollState())
+							.clickable{}
 					){
 						BasicText("视频简介",style=ff.ps.copy(color=cc.c.copy(alpha=0.5f)))
 						BasicText(oo!!["brief"] as String,modifier=Modifier.padding(top=6.dp),style=ff.p.copy(color=cc.c))

@@ -50,7 +50,7 @@ private val CardShape=RoundedCornerShape(24.dp)
 //入口：两张卡片的容器
 //─────────────────────────────────────────────────────────────────────────────
 @Composable fun Home(){
-	Column(modifier=Modifier.fillMaxWidth().padding(horizontal=20.dp),
+	Column(modifier=Modifier.fillMaxSize().systemBarsPadding().padding(15.dp),
 		verticalArrangement=Arrangement.spacedBy(18.dp)
 	){AyfCard();DiaryCard()}
 }

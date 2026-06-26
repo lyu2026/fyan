@@ -134,7 +134,7 @@ private val CardShape=RoundedCornerShape(8.dp)
 			//6.边缘金色描边
 			drawRoundRect(brush=Brush.linearGradient(
 				colors=listOf(Color(0x00FDBC00),Color(0x80FDBC00),Color(0x00FDBC00))
-			),size=size,cornerRadius=CornerRadius(24.dp.toPx()),
+			),size=size,cornerRadius=CornerRadius(8.dp.toPx()),
 			style=Stroke(width=1.2.dp.toPx()))
 		}
 		//文字内容层
@@ -266,7 +266,7 @@ private val CardShape=RoundedCornerShape(8.dp)
 					colors=listOf(
 						Color(0x007ECBF3),Color(0x607ECBF3),Color(0x007ECBF3)
 					)
-				),size=size,cornerRadius=CornerRadius(24.dp.toPx()),style=Stroke(width=1.dp.toPx())
+				),size=size,cornerRadius=CornerRadius(8.dp.toPx()),style=Stroke(width=1.dp.toPx())
 			)
 		}
 		//文字内容
@@ -333,7 +333,7 @@ fun Modifier.deepShadow(
 	val dp=offsetY.toPx()
 	val sp=spread.toPx()
 	val bp=blur.toPx()
-	val r=24.dp.toPx()
+	val r=8.dp.toPx()
 	val steps=8
 	for(i in steps downTo 1){
 		val frac=i.toFloat()/steps

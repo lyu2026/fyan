@@ -44,7 +44,7 @@ private val DiaryGradientBot=Color(0xFF2C5364) //海蓝
 private val DiaryLine=Color(0x40A5D6F5) //淡蓝线
 private val DiaryAccent=Color(0xFF7ECBF3) //水蓝
 
-private val CardShape=RoundedCornerShape(24.dp)
+private val CardShape=RoundedCornerShape(8.dp)
 
 //─────────────────────────────────────────────────────────────────────────────
 //入口：两张卡片的容器

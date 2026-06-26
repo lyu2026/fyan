@@ -50,7 +50,7 @@ private val CardShape=RoundedCornerShape(24.dp)
 //入口：两张卡片的容器
 //─────────────────────────────────────────────────────────────────────────────
 @Composable fun Home(){
-	Column(modifier=modifier.fillMaxWidth().padding(horizontal=20.dp),
+	Column(modifier=Modifier.fillMaxWidth().padding(horizontal=20.dp),
 		verticalArrangement=Arrangement.spacedBy(18.dp)
 	){AyfCard();DiaryCard()}
 }
@@ -326,24 +326,24 @@ private val CardShape=RoundedCornerShape(24.dp)
 //工具：多层阴影（Modifier 扩展）
 //─────────────────────────────────────────────────────────────────────────────
 fun Modifier.deepShadow(
-	color:Color=Color(0x44000000),offsetY:Dp=8.dp,blur:Dp=16.dp,spread:Dp=0.dp,shape:Shape=CardShape
+	color:Color=Color(0x44000000),
+	offsetY:Dp=8.dp,blur:Dp=16.dp,
+	spread:Dp=0.dp,shape:Shape=CardShape
 ):Modifier=this.drawBehind{
-	val sc=color
-	val dx=0f
-	val dy=offsetY.toPx()
-	val bp=blur.toPx()
+	val dp=offsetY.toPx()
 	val sp=spread.toPx()
-
-	drawIntoCanvas{canvas->
-		val paint=Paint().apply{
-			asFrameworkPaint().apply{
-				isAntiAlias=true
-				this.color=android.graphics.Color.TRANSPARENT
-				setShadowLayer(bp,dx,dy,sc.toArgb())
-			}
-		}
-		canvas.drawRoundRect(
-			left=-sp,top=-sp,right=size.width+sp,bottom=size.height+sp,radiusX=24.dp.toPx(),radiusY=24.dp.toPx(),paint=paint
+	val bp=blur.toPx()
+	val r=24.dp.toPx()
+	val steps=8
+	for(i in steps downTo 1){
+		val frac=i.toFloat()/steps
+		val expand=sp+bp*frac
+		val alpha=color.alpha*(1f-frac)*0.35f
+		drawRoundRect(
+			color=color.copy(alpha=alpha),
+			topLeft=Offset(-expand,-expand+dp*frac),
+			size=Size(size.width+expand*2,size.height+expand*2),
+			cornerRadius=CornerRadius(r+expand)
 		)
 	}
 }

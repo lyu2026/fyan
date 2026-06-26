@@ -206,7 +206,7 @@ object Fyan{ // 全局数据
 	// 日志条目列表（可观察状态，驱动 UI 刷新）
 	private val gs=mutableStateListOf<String>()
 	// 日志面板是否折叠
-	private var gn by mutableStateOf(false)
+	private var gn by mutableStateOf(true)
 	// 日志面板当前拖拽偏移量（向下拖拽折叠）
 	private var gy by mutableStateOf(0f)
 	// 主线程 Handler，确保日志添加操作在主线程执行

@@ -362,10 +362,9 @@ class O:ComponentActivity(){
 					contentAlignment=Alignment.BottomCenter
 				){
 					// 路由导航宿主，startDestination 为爱壹帆首页
-					NavHost(navController=Fyan.nc,startDestination="ayf_home"){
+					NavHost(navController=Fyan.nc,startDestination="home"){
+						composable("home"){Home()}
 						composable("ayf_home"){AyfHome()}
-						composable("ayf_history"){AyfHistory()}
-						composable("ayf_list/{id}"){x->AyfList(id=x.arguments?.getString("id")?:"")}
 						composable("ayf_info/{id}"){x->AyfInfo(id=x.arguments?.getString("id")?:"")}
 					}
 					Fyan.Record() // 日志悬浮面板（叠加在导航内容之上）

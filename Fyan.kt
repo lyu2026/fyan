@@ -43,7 +43,7 @@ object Fya{
 			val p=if(i>0)t.substring(0,i)else t//提取前缀指令标识
 			val v=if(i>0)t.substring(i+1)else ""//提取指令附加参数值
 			m=when(p){//按指令类型进行极速路由映射
-				"⚄"->m.weight(if(v=="")0F else v.toFloat())//权重占比扩展，需在Row或ColumnScope内使用
+				"⚄"->m.weight(if(v=="")0f else v.toFloat())//权重占比扩展，需在Row或ColumnScope内使用
 				"⧓"->if(v.startsWith(">"))m.widthIn(min=v.substring(1).toInt().dp)else if(v.startsWith("<"))m.widthIn(max=v.substring(1).toInt().dp)else m.width(v.toInt().dp)//宽度及极大极小值约束
 				"⧗"->if(v.startsWith(">"))m.heightIn(min=v.substring(1).toInt().dp)else if(v.startsWith("<"))m.heightIn(max=v.substring(1).toInt().dp)else m.height(v.toInt().dp)//高度及极大极小值约束
 				"⧆"->v.split(".").let{if(it.size>1)m.size(it[0].toInt().dp,it[1].toInt().dp)else m.size(it[0].toInt().dp)}//统一正方尺寸或宽高独立尺寸

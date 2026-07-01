@@ -78,7 +78,7 @@ object Fya{
 				"⌽"->m.fillMaxSize(if(v.length>0)("0."+v).toFloat()else 1f)//XY轴全屏宽铺满或部分占比填充
 				"⍬"->m.fillMaxHeight(if(v.length>0)("0."+v).toFloat()else 1f)//Y轴高占比满级或部分填充
 				"☮"->m.clickable{}//注册点击事件拦截水波纹占位
-				else m//自动抛弃无法解析的无效指令修饰符
+				else->m//自动抛弃无法解析的无效指令修饰符
 			}
 		}
 		xc[s]=m//复合参数解析完毕写入缓存池
